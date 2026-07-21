@@ -1,0 +1,103 @@
+name: Repair TCM release portability
+
+on:
+  push:
+    paths:
+      - '.github/workflows/portable-release-fix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove development-only paths and package the frozen reference
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          
+          root = Path.cwd()
+          bench = root / 'benchmarks'
+          
+          for path in sorted(bench.glob('wave*/*.py')):
+              text = path.read_text(encoding='utf-8')
+              original = text
+              
+              imports = re.findall(r"sys\.path\.insert\(0,'/mnt/data(?:/(wave\d+))?'\)\n?", text)
+              text = re.sub(r"sys\.path\.insert\(0,'/mnt/data(?:/wave\d+)?'\)\n?", '', text)
+              if imports:
+                  waves = [w for w in imports if w]
+                  setup = "from pathlib import Path\n_BENCHMARKS = Path(__file__).resolve().parents[1]\n"
+                  for wave in waves:
+                      setup += f"sys.path.insert(0, str(_BENCHMARKS / '{wave}'))\n"
+                  marker = 'import numpy as np\n'
+                  if marker in text:
+                      text = text.replace(marker, marker + setup, 1)
+                  else:
+                      text = setup + text
+              
+              current_wave = path.parent.name
+              text = text.replace(f"'/mnt/data/{current_wave}'", "str(Path(__file__).resolve().parent)")
+              text = text.replace(f'"/mnt/data/{current_wave}"', 'str(Path(__file__).resolve().parent)')
+              
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+          
+          package = root / 'src' / 'tcm'
+          package.mkdir(parents=True, exist_ok=True)
+          sources = {
+              '_wave4.py': bench / 'wave4' / 'wave4_benchmark.py',
+              '_wave7.py': bench / 'wave7' / 'wave7_benchmark.py',
+              '_wave9.py': bench / 'wave9' / 'wave9_benchmark.py',
+              '_wave10.py': bench / 'wave10' / 'wave10_benchmark.py',
+              '_wave11.py': bench / 'wave11' / 'wave11_benchmark.py',
+          }
+          for dest, src in sources.items():
+              text = src.read_text(encoding='utf-8')
+              text = re.sub(r'^from pathlib import Path\n_BENCHMARKS.*?(?=^from wave|^class |^def |^EPS=)', '', text, flags=re.M | re.S)
+              text = re.sub(r'^sys\.path\.insert\([^\n]+\)\n?', '', text, flags=re.M)
+              text = text.replace('from wave4_benchmark import ', 'from ._wave4 import ')
+              text = text.replace('from wave7_benchmark import ', 'from ._wave7 import ')
+              text = text.replace('from wave9_benchmark import ', 'from ._wave9 import ')
+              text = text.replace('from wave10_benchmark import ', 'from ._wave10 import ')
+              text = text.replace("out=str(Path(__file__).resolve().parent)", "out=str(Path.cwd())")
+              text = text.replace("default=str(Path(__file__).resolve().parent)", "default=str(Path.cwd())")
+              (package / dest).write_text(text, encoding='utf-8')
+          
+          (package / 'reference.py').write_text('''"""Installable frozen Wave XI reference implementation.\n\nThe implementation is packaged under :mod:`tcm` and has no dependency on the\nrepository layout or benchmark directories.\n"""\n\nfrom ._wave11 import BatchedReserveCellular, FairProvGraph\n\n__all__ = ["BatchedReserveCellular", "FairProvGraph"]\n''', encoding='utf-8')
+          
+          test = root / 'tests' / 'test_installable_reference.py'
+          test.write_text('''from tcm import BatchedReserveCellular, FairProvGraph\n\n\ndef test_reference_models_import_without_repository_path_shims():\n    cellular = BatchedReserveCellular()\n    graph = FairProvGraph()\n    assert cellular.name == "exact_batched_reserve_cellular"\n    assert graph.name == "fair_provenance_graph"\n''', encoding='utf-8')
+          
+          for path in root.rglob('*.py'):
+              if '/.git/' not in path.as_posix():
+                  assert '/mnt/data' not in path.read_text(encoding='utf-8'), path
+          PY
+
+      - name: Validate package and tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e .
+          python -c "from tcm import BatchedReserveCellular, FairProvGraph; print(BatchedReserveCellular.name, FairProvGraph.name)"
+          pytest -q
+
+      - name: Commit portability repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/portable-release-fix.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Make frozen reference installable and remove dev paths'
+          git push origin HEAD:main
