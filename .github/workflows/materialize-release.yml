@@ -1,0 +1,63 @@
+name: Materialize TCM Version 1.0 release
+
+on:
+  push:
+    paths:
+      - '.github/workflows/materialize-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Expand bundled research release
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f Transient_Coalition_Memory_Full_Package.zip
+          rm -rf .release-stage
+          mkdir .release-stage
+          unzip -q Transient_Coalition_Memory_Full_Package.zip -d .release-stage
+          root='.release-stage/Transient_Coalition_Memory_Full_Package'
+          test -d "$root"
+          cp -a "$root"/. ./
+          rm -rf .release-stage
+          rm -f Transient_Coalition_Memory_Full_Package.zip
+          rm -f wave12_calibration_probe_package.zip
+
+      - name: Validate expected release structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f README.md
+          test -f LICENSE
+          test -f CITATION.cff
+          test -f pyproject.toml
+          test -f src/tcm/reference.py
+          test -f tests/test_batching.py
+          for wave in 4 5 6 7 8 9 10 11 12; do
+            test -d "benchmarks/wave${wave}"
+          done
+          test -f benchmarks/runtime/wall_clock_benchmark.py
+
+      - name: Commit materialized release
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Repository already matches the bundled release.'
+            exit 0
+          fi
+          git commit -m 'Freeze reproducible TCM Version 1.0 research release'
+          git push origin HEAD:main
