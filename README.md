@@ -13,7 +13,7 @@ On the current synthetic streaming provenance benchmark, the exact-batched cellu
 | Provenance graph | 0.9678 | 0.9521 | 12.00 | 21.00 |
 | Exact-batched TCM | **0.9860** | **0.9660** | **4.05** | **9.69** |
 
-A separate development-fitted temperature-scaling probe reduced TCM expected calibration error from 0.0566 to 0.0109 on untouched test worlds while preserving classification decisions.
+Raw TCM was less well calibrated than the provenance graph because it was underconfident. A separate development-fitted temperature-scaling probe reduced TCM expected calibration error from 0.0566 to 0.0109 on untouched test worlds while preserving classification decisions.
 
 ## Core mechanisms
 
@@ -39,6 +39,6 @@ This is a research prototype. Present evidence comes from synthetic worlds. The 
 
 ## Formal title
 
-**Transient Coalition Memory: A Cellular Architecture for Sparse, Adaptive Belief Formation**
+**Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation**
 
 Author: Phillip Peterkin
