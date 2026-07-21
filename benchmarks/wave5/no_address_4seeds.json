@@ -1,0 +1,70 @@
+{
+  "seeds": [
+    7100,
+    7101,
+    7102,
+    7103
+  ],
+  "mean": {
+    "accuracy": 0.957750496031746,
+    "post_change_accuracy": 0.9270337301587303,
+    "changed_fact_accuracy": 0.8899595986649056,
+    "brier": 0.04210030195171754,
+    "ece": 0.04465852740831282,
+    "false_certainty": 0.029774305555555557,
+    "memory_states": 2186.0,
+    "updates": 1589530.75,
+    "active_ops": 8086146.5,
+    "ops_per_correct": 418.79552227992656
+  },
+  "runs": [
+    {
+      "accuracy": 0.9590277777777778,
+      "post_change_accuracy": 0.928670634920635,
+      "changed_fact_accuracy": 0.9018877297565823,
+      "brier": 0.04155003583126651,
+      "ece": 0.045799137463233455,
+      "false_certainty": 0.028521825396825396,
+      "memory_states": 2186,
+      "updates": 1588165,
+      "active_ops": 8086026,
+      "ops_per_correct": 418.22830247232855
+    },
+    {
+      "accuracy": 0.9531746031746032,
+      "post_change_accuracy": 0.9189484126984127,
+      "changed_fact_accuracy": 0.8873239436619719,
+      "brier": 0.04630357304958076,
+      "ece": 0.052350660367994066,
+      "false_certainty": 0.03293650793650794,
+      "memory_states": 2186,
+      "updates": 1590363,
+      "active_ops": 8086285,
+      "ops_per_correct": 420.81000208159867
+    },
+    {
+      "accuracy": 0.959375,
+      "post_change_accuracy": 0.9298611111111111,
+      "changed_fact_accuracy": 0.9016085230833507,
+      "brier": 0.040476981119794087,
+      "ece": 0.04192626754400837,
+      "false_certainty": 0.02886904761904762,
+      "memory_states": 2186,
+      "updates": 1587602,
+      "active_ops": 8086106,
+      "ops_per_correct": 418.0810712993123
+    },
+    {
+      "accuracy": 0.9594246031746032,
+      "post_change_accuracy": 0.9306547619047619,
+      "changed_fact_accuracy": 0.8690181981577174,
+      "brier": 0.040070617806228816,
+      "ece": 0.0385580442580154,
+      "false_certainty": 0.028769841269841268,
+      "memory_states": 2186,
+      "updates": 1591993,
+      "active_ops": 8086169,
+      "ops_per_correct": 418.06271326646674
+    }
+  ]
+}

@@ -2,43 +2,43 @@
 
 **Transient Coalition Memory (TCM)** is an experimental cellular memory architecture for streaming belief formation under contradiction, delayed feedback, and changing truth.
 
-Knowledge is not stored as a permanent symbolic record. Evidence is distributed across a substrate and assembled into temporary coalitions for inference. Dormant evidence can still participate in certification and delayed learning without being fully activated.
+Instead of retrieving a permanent record, TCM recruits a temporary coalition of the most useful evidence. Dormant evidence is retained as a compressed reserve, can influence decision certification, and can receive delayed learning updates without being fully activated.
 
-## Version 1.0 result
+## Current result
 
-On the current synthetic streaming provenance benchmark, the exact-batched cellular implementation achieved a dominant accuracy-compute frontier against a tuned provenance-graph baseline on fresh held-out seeds:
+On fresh held-out synthetic worlds, the exact-batched TCM implementation outperformed the tuned provenance-graph baseline while activating substantially less evidence.
 
-| Method | Accuracy | Changed-world accuracy | Avg. reports activated | Operations per correct |
+| Method | Accuracy | Changed-fact accuracy | Average reports activated | Operations per correct answer |
 |---|---:|---:|---:|---:|
 | Provenance graph | 0.9678 | 0.9521 | 12.00 | 21.00 |
 | Exact-batched TCM | **0.9860** | **0.9660** | **4.05** | **9.69** |
 
-Raw TCM was less well calibrated than the provenance graph because it was underconfident. A separate development-fitted temperature-scaling probe reduced TCM expected calibration error from 0.0566 to 0.0109 on untouched test worlds while preserving classification decisions.
+Raw TCM was initially underconfident relative to the provenance graph. A development-fitted temperature-scaling probe reduced expected calibration error from 0.0566 to 0.0109 on untouched test worlds while preserving classification decisions.
 
-## Core mechanisms
+## Repository structure
 
-- Distributed claim and source state
-- Temporary evidence coalitions
-- Sparse certified recruitment
-- Compressed dormant reserve
-- Delayed eligibility-based learning
-- Exact closed-form coalition batching
-- Post-hoc temperature calibration
+- `benchmarks/wave4` through `benchmarks/wave12` preserve the experimental history, reports, raw results, and summaries.
+- `src/tcm` exposes the frozen Wave XI reference classes.
+- `docs/ARCHITECTURE.md` explains the mechanisms.
+- `docs/REPRODUCIBILITY.md` gives exact run instructions.
+- `tests/` contains lightweight invariance tests.
 
-## Repository layout
+## Quick start
 
-- `src/wave11_benchmark.py` — exact-batched reference benchmark
-- `src/calibration_probe.py` — held-out calibration experiment
-- `docs/ARCHITECTURE.md` — frozen Version 1.0 design
-- `reports/` — benchmark and calibration reports
-- `results/` — raw outputs and summaries
+```bash
+python -m venv .venv
+# Windows: .venv\\Scripts\\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+python benchmarks/wave11/wave11_benchmark.py
+python benchmarks/wave12/calibration_probe.py
+pytest
+```
 
 ## Scientific status
 
-This is a research prototype. Present evidence comes from synthetic worlds. The result is a foundation for replication, ablation, wall-clock profiling, and evaluation on external temporal-provenance datasets. It should not yet be represented as independently validated or as a general replacement for existing memory architectures.
+This repository is a research prototype. Its current evidence comes from controlled synthetic environments. The results support continued testing; they do not yet establish independent validation or superiority on real-world memory tasks.
 
-## Formal title
-
-**Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation**
+**Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*
 
 Author: Phillip Peterkin

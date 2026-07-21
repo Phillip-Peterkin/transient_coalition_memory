@@ -1,0 +1,322 @@
+{
+  "full": {
+    "mean": {
+      "accuracy": 0.9751736111111111,
+      "post_change_accuracy": 0.9533482142857144,
+      "changed_fact_accuracy": 0.9342715982293837,
+      "brier": 0.025101164679704205,
+      "ece": 0.026456574752078073,
+      "false_certainty": 0.021490575396825393,
+      "memory_states": 4068.0,
+      "updates": 207060.0,
+      "active_ops": 527018.0,
+      "ops_per_correct": 26.807561945275935
+    },
+    "runs": [
+      {
+        "accuracy": 0.979265873015873,
+        "post_change_accuracy": 0.960515873015873,
+        "changed_fact_accuracy": 0.9460131014230856,
+        "brier": 0.021278621332213296,
+        "ece": 0.023794670891133622,
+        "false_certainty": 0.018501984126984127,
+        "memory_states": 4068,
+        "updates": 207654,
+        "active_ops": 526706,
+        "ops_per_correct": 26.679465099787254
+      },
+      {
+        "accuracy": 0.9708333333333333,
+        "post_change_accuracy": 0.9448412698412698,
+        "changed_fact_accuracy": 0.9240255450341335,
+        "brier": 0.02919988860811417,
+        "ece": 0.030081961373899402,
+        "false_certainty": 0.025396825396825397,
+        "memory_states": 4068,
+        "updates": 207904,
+        "active_ops": 527020,
+        "ops_per_correct": 26.927243000204374
+      },
+      {
+        "accuracy": 0.9753472222222223,
+        "post_change_accuracy": 0.953670634920635,
+        "changed_fact_accuracy": 0.9372231850568072,
+        "brier": 0.024908291897728793,
+        "ece": 0.02599200230789251,
+        "false_certainty": 0.021180555555555557,
+        "memory_states": 4068,
+        "updates": 204938,
+        "active_ops": 526834,
+        "ops_per_correct": 26.79316482734069
+      },
+      {
+        "accuracy": 0.9752480158730159,
+        "post_change_accuracy": 0.9543650793650794,
+        "changed_fact_accuracy": 0.9298245614035088,
+        "brier": 0.02501785688076055,
+        "ece": 0.02595766443538676,
+        "false_certainty": 0.020882936507936507,
+        "memory_states": 4068,
+        "updates": 207744,
+        "active_ops": 527512,
+        "ops_per_correct": 26.830374853771424
+      }
+    ]
+  },
+  "no_path": {
+    "mean": {
+      "accuracy": 0.975186011904762,
+      "post_change_accuracy": 0.9533730158730159,
+      "changed_fact_accuracy": 0.9343244411801341,
+      "brier": 0.02507514989211468,
+      "ece": 0.026411677836827983,
+      "false_certainty": 0.02144097222222222,
+      "memory_states": 4068.0,
+      "updates": 207067.0,
+      "active_ops": 527026.0,
+      "ops_per_correct": 26.80762829149147
+    },
+    "runs": [
+      {
+        "accuracy": 0.979265873015873,
+        "post_change_accuracy": 0.960515873015873,
+        "changed_fact_accuracy": 0.9460131014230856,
+        "brier": 0.021266289880701714,
+        "ece": 0.023702725601719436,
+        "false_certainty": 0.018452380952380953,
+        "memory_states": 4068,
+        "updates": 207658,
+        "active_ops": 526710,
+        "ops_per_correct": 26.679667713504205
+      },
+      {
+        "accuracy": 0.9708333333333333,
+        "post_change_accuracy": 0.9448412698412698,
+        "changed_fact_accuracy": 0.9240255450341335,
+        "brier": 0.02914480168755414,
+        "ece": 0.02989914064426344,
+        "false_certainty": 0.025248015873015874,
+        "memory_states": 4068,
+        "updates": 207916,
+        "active_ops": 527034,
+        "ops_per_correct": 26.927958307786636
+      },
+      {
+        "accuracy": 0.9753472222222223,
+        "post_change_accuracy": 0.953670634920635,
+        "changed_fact_accuracy": 0.9372231850568072,
+        "brier": 0.02488290521960969,
+        "ece": 0.025937592900929736,
+        "false_certainty": 0.021180555555555557,
+        "memory_states": 4068,
+        "updates": 204936,
+        "active_ops": 526830,
+        "ops_per_correct": 26.792961399582975
+      },
+      {
+        "accuracy": 0.975297619047619,
+        "post_change_accuracy": 0.9544642857142858,
+        "changed_fact_accuracy": 0.9300359332065102,
+        "brier": 0.02500660278059318,
+        "ece": 0.026107252200399333,
+        "false_certainty": 0.020882936507936507,
+        "memory_states": 4068,
+        "updates": 207758,
+        "active_ops": 527530,
+        "ops_per_correct": 26.829925745092055
+      }
+    ]
+  },
+  "no_fast_claim": {
+    "mean": {
+      "accuracy": 0.8983258928571428,
+      "post_change_accuracy": 0.8025545634920634,
+      "changed_fact_accuracy": 0.6868898649046785,
+      "brier": 0.08269330698793205,
+      "ece": 0.05174015627940075,
+      "false_certainty": 0.04769345238095238,
+      "memory_states": 4068.0,
+      "updates": 212375.5,
+      "active_ops": 536354.0,
+      "ops_per_correct": 29.624062243747957
+    },
+    "runs": [
+      {
+        "accuracy": 0.9163690476190476,
+        "post_change_accuracy": 0.8375,
+        "changed_fact_accuracy": 0.7400045177320985,
+        "brier": 0.06873402579795578,
+        "ece": 0.04185218365670161,
+        "false_certainty": 0.038938492063492064,
+        "memory_states": 4068,
+        "updates": 212412,
+        "active_ops": 535170,
+        "ops_per_correct": 28.96882104579409
+      },
+      {
+        "accuracy": 0.8783730158730159,
+        "post_change_accuracy": 0.7624007936507936,
+        "changed_fact_accuracy": 0.6311385157454306,
+        "brier": 0.09757779097675873,
+        "ece": 0.06330302131748097,
+        "false_certainty": 0.05496031746031746,
+        "memory_states": 4068,
+        "updates": 214694,
+        "active_ops": 538650,
+        "ops_per_correct": 30.418454935622318
+      },
+      {
+        "accuracy": 0.9031746031746032,
+        "post_change_accuracy": 0.8120039682539683,
+        "changed_fact_accuracy": 0.7124975929135374,
+        "brier": 0.07911155671125429,
+        "ece": 0.047736075453560775,
+        "false_certainty": 0.04538690476190476,
+        "memory_states": 4068,
+        "updates": 210020,
+        "active_ops": 535794,
+        "ops_per_correct": 29.426296133567664
+      },
+      {
+        "accuracy": 0.8953869047619047,
+        "post_change_accuracy": 0.7983134920634921,
+        "changed_fact_accuracy": 0.6639188332276474,
+        "brier": 0.08534985446575938,
+        "ece": 0.05406934468985962,
+        "false_certainty": 0.051488095238095236,
+        "memory_states": 4068,
+        "updates": 212376,
+        "active_ops": 535802,
+        "ops_per_correct": 29.682676860007756
+      }
+    ]
+  },
+  "fixed_full_recruitment": {
+    "mean": {
+      "accuracy": 0.9750868055555556,
+      "post_change_accuracy": 0.9528769841269842,
+      "changed_fact_accuracy": 0.9339132450591676,
+      "brier": 0.024858641217065436,
+      "ece": 0.025271088747797103,
+      "false_certainty": 0.02079613095238095,
+      "memory_states": 4068.0,
+      "updates": 319543.0,
+      "active_ops": 725760.0,
+      "ops_per_correct": 36.92012785693847
+    },
+    "runs": [
+      {
+        "accuracy": 0.9791170634920635,
+        "post_change_accuracy": 0.9598214285714286,
+        "changed_fact_accuracy": 0.9455613282132369,
+        "brier": 0.02133734989039069,
+        "ece": 0.02245781911874793,
+        "false_certainty": 0.017757936507936507,
+        "memory_states": 4068,
+        "updates": 320600,
+        "active_ops": 725760,
+        "ops_per_correct": 36.76782005167435
+      },
+      {
+        "accuracy": 0.9707837301587302,
+        "post_change_accuracy": 0.9444444444444444,
+        "changed_fact_accuracy": 0.9240255450341335,
+        "brier": 0.02900934219005878,
+        "ece": 0.02937826321953365,
+        "false_certainty": 0.0248015873015873,
+        "memory_states": 4068,
+        "updates": 321132,
+        "active_ops": 725760,
+        "ops_per_correct": 37.08343978335292
+      },
+      {
+        "accuracy": 0.9751984126984127,
+        "post_change_accuracy": 0.9532738095238096,
+        "changed_fact_accuracy": 0.9364529173887927,
+        "brier": 0.024515712211823495,
+        "ece": 0.02472559137464049,
+        "false_certainty": 0.020833333333333332,
+        "memory_states": 4068,
+        "updates": 316288,
+        "active_ops": 725760,
+        "ops_per_correct": 36.91556459816887
+      },
+      {
+        "accuracy": 0.9752480158730159,
+        "post_change_accuracy": 0.953968253968254,
+        "changed_fact_accuracy": 0.9296131896005073,
+        "brier": 0.024572160575988787,
+        "ece": 0.024522681278266345,
+        "false_certainty": 0.019791666666666666,
+        "memory_states": 4068,
+        "updates": 320152,
+        "active_ops": 725760,
+        "ops_per_correct": 36.91368699455776
+      }
+    ]
+  },
+  "weak_claim_specific": {
+    "mean": {
+      "accuracy": 0.9777529761904762,
+      "post_change_accuracy": 0.9586805555555555,
+      "changed_fact_accuracy": 0.9369750632050509,
+      "brier": 0.02043589326232103,
+      "ece": 0.009942990500243156,
+      "false_certainty": 0.013591269841269842,
+      "memory_states": 4068.0,
+      "updates": 207576.0,
+      "active_ops": 527916.0,
+      "ops_per_correct": 26.782390943801595
+    },
+    "runs": [
+      {
+        "accuracy": 0.9813988095238095,
+        "post_change_accuracy": 0.9649801587301587,
+        "changed_fact_accuracy": 0.9471425344477072,
+        "brier": 0.017230708804789403,
+        "ece": 0.008325983981638103,
+        "false_certainty": 0.01130952380952381,
+        "memory_states": 4068,
+        "updates": 208016,
+        "active_ops": 527354,
+        "ops_per_correct": 26.65423300480162
+      },
+      {
+        "accuracy": 0.9734623015873016,
+        "post_change_accuracy": 0.9501984126984127,
+        "changed_fact_accuracy": 0.9262277031490861,
+        "brier": 0.023824606307275703,
+        "ece": 0.011967002324550776,
+        "false_certainty": 0.01572420634920635,
+        "memory_states": 4068,
+        "updates": 208562,
+        "active_ops": 528022,
+        "ops_per_correct": 26.905579617834395
+      },
+      {
+        "accuracy": 0.9784226190476191,
+        "post_change_accuracy": 0.959920634920635,
+        "changed_fact_accuracy": 0.9406893895628731,
+        "brier": 0.020117167786990575,
+        "ece": 0.01058545741163546,
+        "false_certainty": 0.014136904761904762,
+        "memory_states": 4068,
+        "updates": 205482,
+        "active_ops": 527834,
+        "ops_per_correct": 26.759645120405576
+      },
+      {
+        "accuracy": 0.9777281746031746,
+        "post_change_accuracy": 0.9596230158730159,
+        "changed_fact_accuracy": 0.9338406256605369,
+        "brier": 0.020571090150228448,
+        "ece": 0.008893518283148284,
+        "false_certainty": 0.013194444444444444,
+        "memory_states": 4068,
+        "updates": 208244,
+        "active_ops": 528454,
+        "ops_per_correct": 26.810106032164782
+      }
+    ]
+  }
+}

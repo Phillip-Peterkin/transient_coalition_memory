@@ -1,0 +1,123 @@
+{
+  "params": {
+    "lr": 0.3,
+    "fast_decay": 0.75,
+    "slow_decay": 0.995,
+    "min_k": 7,
+    "margin": 1.2,
+    "path": 0.25,
+    "claim_fast": 0.9,
+    "claim_slow": 0.2,
+    "source": 0.15
+  },
+  "dev": {
+    "accuracy": 0.974404761904762,
+    "post_change_accuracy": 0.9513392857142857,
+    "changed_fact_accuracy": 0.9270270323680052,
+    "brier": 0.025917792799952218,
+    "ece": 0.027390857778938273,
+    "false_certainty": 0.02269345238095238,
+    "memory_states": 4068.0,
+    "updates": 207194.0,
+    "active_ops": 526680.0,
+    "ops_per_correct": 26.81132695379376
+  },
+  "test_mean": {
+    "accuracy": 0.9774222883597884,
+    "post_change_accuracy": 0.9574900793650795,
+    "changed_fact_accuracy": 0.9326399714665919,
+    "brier": 0.022967574661428236,
+    "ece": 0.0245334662570873,
+    "false_certainty": 0.01960978835978836,
+    "memory_states": 4068.0,
+    "updates": 205969.66666666666,
+    "active_ops": 526821.3333333334,
+    "ops_per_correct": 26.735913637548578
+  },
+  "test_sd": {
+    "accuracy": 0.003462630838182638,
+    "post_change_accuracy": 0.006957117121841104,
+    "changed_fact_accuracy": 0.010400024387012052,
+    "brier": 0.003198223633200307,
+    "ece": 0.002841461944556512,
+    "false_certainty": 0.0031062309033554015,
+    "memory_states": 0.0,
+    "updates": 1433.9447223190532,
+    "active_ops": 158.66274504957573,
+    "ops_per_correct": 0.09295106629011127
+  },
+  "runs": [
+    {
+      "accuracy": 0.9775297619047619,
+      "post_change_accuracy": 0.9585317460317461,
+      "changed_fact_accuracy": 0.9348887683125339,
+      "brier": 0.022640734666303043,
+      "ece": 0.02313875649007075,
+      "false_certainty": 0.01865079365079365,
+      "memory_states": 4068,
+      "updates": 205440,
+      "active_ops": 527024,
+      "ops_per_correct": 26.742984726239406
+    },
+    {
+      "accuracy": 0.9806547619047619,
+      "post_change_accuracy": 0.9634920634920635,
+      "changed_fact_accuracy": 0.9426531552280055,
+      "brier": 0.020311121237798963,
+      "ece": 0.02272402696336396,
+      "false_certainty": 0.017063492063492062,
+      "memory_states": 4068,
+      "updates": 207906,
+      "active_ops": 526904,
+      "ops_per_correct": 26.65169448659585
+    },
+    {
+      "accuracy": 0.982390873015873,
+      "post_change_accuracy": 0.9673611111111111,
+      "changed_fact_accuracy": 0.9434007134363852,
+      "brier": 0.01818955145724507,
+      "ece": 0.02047984071980056,
+      "false_certainty": 0.015277777777777777,
+      "memory_states": 4068,
+      "updates": 205004,
+      "active_ops": 526732,
+      "ops_per_correct": 26.595910123706133
+    },
+    {
+      "accuracy": 0.9737599206349207,
+      "post_change_accuracy": 0.9500992063492063,
+      "changed_fact_accuracy": 0.9161007667031763,
+      "brier": 0.026266425784544828,
+      "ece": 0.02767935153403231,
+      "false_certainty": 0.022966269841269843,
+      "memory_states": 4068,
+      "updates": 206668,
+      "active_ops": 526678,
+      "ops_per_correct": 26.828893077275737
+    },
+    {
+      "accuracy": 0.9756448412698413,
+      "post_change_accuracy": 0.9546626984126985,
+      "changed_fact_accuracy": 0.9329425556858147,
+      "brier": 0.024804549104683833,
+      "ece": 0.02616048612627308,
+      "false_certainty": 0.02123015873015873,
+      "memory_states": 4068,
+      "updates": 203954,
+      "active_ops": 526950,
+      "ops_per_correct": 26.790889216533632
+    },
+    {
+      "accuracy": 0.9745535714285715,
+      "post_change_accuracy": 0.9507936507936507,
+      "changed_fact_accuracy": 0.925853869433636,
+      "brier": 0.025593065717993684,
+      "ece": 0.02701833570898313,
+      "false_certainty": 0.022470238095238095,
+      "memory_states": 4068,
+      "updates": 206846,
+      "active_ops": 526640,
+      "ops_per_correct": 26.805110194940703
+    }
+  ]
+}
