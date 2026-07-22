@@ -215,6 +215,28 @@ and [`REPORT_RELEVANCE.md`](../benchmarks/realdata_finance/REPORT_RELEVANCE.md).
   (still far below 45% flip target), and same-source/same-calendar validation
   is not independent-dataset replication.
 
+### 17. Wave XVIII prediction-error trust — finance development gate failed
+Protocol: [`WAVE_XVIII_PROTOCOL.md`](../benchmarks/realdata_finance/WAVE_XVIII_PROTOCOL.md);
+implementation: `tcm.WaveXVIIITrustCellular`; writeup:
+[`REPORT_WAVE_XVIII.md`](../benchmarks/realdata_finance/REPORT_WAVE_XVIII.md).
+
+- Exact three-way mechanism: confident wrong prediction raises a per-item
+  mistrust state; next decision recruits at most one report deeper, lowers the
+  anchor, and protects fresh relevant counter-evidence. Confident correct
+  feedback relaxes the same state.
+- Finance development result: active sensory baseline flip 0.271; broad trust
+  loop 0.402 but prediction-up 0.695; evidence-gated version 0.381 with
+  prediction-up 0.667. **Neither clears the required 0.45 flip / ≤0.65-up
+  gate.**
+- Trust loop contains a real change-response signal, but routine
+  Positive/Negative finance messages do not provide enough trustworthy
+  counter-evidence after the gate opens. Do **not** promote the class and do
+  **not** run Weather.
+- Weather cannot currently be the promised final test: no Weather harness,
+  data, protocol, or locked untouched split is present in this repo; prior
+  sandbox Weather contact and silver-label caveats remain. Recover the
+  original locked split/harness first.
+
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where
 it is genuinely state of the art on accuracy, cost, and calibration — but it

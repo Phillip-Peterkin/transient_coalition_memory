@@ -66,3 +66,9 @@ flip detection 22.1% → 28.1% (+5.9 pts, paired-bootstrap p=0.006), with 64%
 less evidence activated. It remains an **experimental** model, not a claim of
 regime generality or a replacement for the frozen reference. Full protocol and
 limits: [`../benchmarks/realdata_finance/REPORT_RELEVANCE.md`](../benchmarks/realdata_finance/REPORT_RELEVANCE.md).
+
+Wave XVIII tested the next architectural cure: per-item prediction-error trust
+that jointly raises recruitment, lowers the anchor, and protects fresh
+counter-evidence. It reached ~40% finance-development flip detection but
+violated the balanced-prediction / 45% gate, so it remains unpromoted. See
+[`../benchmarks/realdata_finance/REPORT_WAVE_XVIII.md`](../benchmarks/realdata_finance/REPORT_WAVE_XVIII.md).

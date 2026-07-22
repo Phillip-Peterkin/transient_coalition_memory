@@ -39,6 +39,10 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
   (+5.9 pts, p=0.006) while using 64% less evidence. This is a promising but
   still incomplete real-data result; see
   [`benchmarks/realdata_finance/REPORT_RELEVANCE.md`](benchmarks/realdata_finance/REPORT_RELEVANCE.md).
+- Wave XVIII then tested the proposed prediction-error trust loop (recruit
+  deeper, weaken memory, protect fresh counter-evidence). It reached ~40%
+  change detection in finance development but missed the pre-set 45% /
+  balanced-prediction gate, so it is **not** promoted or presented as a result.
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*

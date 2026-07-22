@@ -71,6 +71,8 @@ resamples) for accuracy and flip detection. Writeup: `REPORT_ABLATION.md`.
   transition-investigation circuit (not baked in)
 - `REPORT_RELEVANCE.md` — successful fresh-company confirmation of the active
   sensory relevance front end
+- `REPORT_WAVE_XVIII.md` — finance-development failure of the three-part
+  prediction-error trust loop (not promoted; no Weather run)
 
 ## Process honesty
 
