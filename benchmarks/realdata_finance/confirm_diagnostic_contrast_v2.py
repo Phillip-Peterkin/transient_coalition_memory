@@ -2,7 +2,7 @@
 """One-shot fresh-company confirmation for diagnostic-contrast v2.
 
 Protocol: DIAGNOSTIC_CONTRAST_V2_CONFIRMATION_PROTOCOL.md
-Universe: confirmation6 (virgin). One look. No retuning.
+Universe: confirmation7 (virgin). One look. No retuning.
 """
 
 from __future__ import annotations
@@ -66,7 +66,7 @@ def concise(result: dict) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data-dir", type=Path, default=ROOT / "data_confirmation6")
+    ap.add_argument("--data-dir", type=Path, default=ROOT / "data_confirmation7")
     ap.add_argument(
         "--out",
         type=Path,
@@ -143,7 +143,7 @@ def main() -> None:
             "clean": "CleanEvidenceCellular",
             "silence_escape": f"SilenceEscapeCellular({SILENCE_FROZEN})",
         },
-        "universe": "confirmation6_universe",
+        "universe": "confirmation7_universe",
         "stream": stream.summary(),
         "warmup": "first 70% of dates; causal state only, not scored",
         "confirmation": {

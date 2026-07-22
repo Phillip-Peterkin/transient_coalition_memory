@@ -1,6 +1,6 @@
 # Diagnostic-contrast v2 confirmation protocol
 
-Written **before** scoring the sixth fresh company universe.
+Written **before** scoring the seventh fresh company universe.
 
 ## Fixed candidate
 
@@ -24,9 +24,13 @@ is tested on this universe in the same cycle.
 
 ## Fresh universe
 
-`confirmation6_universe.py` declares 30 companies disjoint from all earlier
+`confirmation7_universe.py` declares 30 companies disjoint from all earlier
 company sets. Selected from curated liquid names using only in-window news-row
-availability (≥35 sentiment-labelled rows).
+availability (≥35 sentiment-labelled rows). Price coverage is validated before
+scoring.
+
+`confirmation6` is spent and invalid as a sealed look: its download included
+delisted tickers with null prices and a score was observed on that broken panel.
 
 Same FMP-news / Yahoo-price sources and calendar window as v0.
 
