@@ -38,6 +38,7 @@ class TransitionInvestigator(CuredCellular):
         *,
         error_decay: float = 0.65,
         ignite_threshold: float = 0.95,
+        confidence_floor: float = 0.20,
         investigate_decay: float = 0.72,
         anchor_floor: float = 0.25,
         counterevidence_floor: float = 0.75,
@@ -51,6 +52,7 @@ class TransitionInvestigator(CuredCellular):
 
         self.error_decay = error_decay
         self.ignite_threshold = ignite_threshold
+        self.confidence_floor = confidence_floor
         self.investigate_decay = investigate_decay
         self.anchor_floor = anchor_floor
         self.counterevidence_floor = counterevidence_floor
@@ -59,6 +61,7 @@ class TransitionInvestigator(CuredCellular):
         self.investigation = defaultdict(float)
         self.investigation_ignitions = 0
         self.protected_counter_reports = 0
+        self.investigation_predictions = 0
 
     def _anchor_side(self, key):
         """Return the currently preferred answer, or None before any memory."""
@@ -125,6 +128,7 @@ class TransitionInvestigator(CuredCellular):
         # sample the world, then decays rather than remaining permanently open.
         self.investigation[key] *= self.investigate_decay
         p, trace = super().predict(key, reports, t)
+        self.investigation_predictions += int(self.investigation[key] > 0)
         trace["investigation"] = self.investigation[key]
         trace["error_pressure"] = self.error_pressure[key]
         return p, trace
@@ -133,16 +137,16 @@ class TransitionInvestigator(CuredCellular):
         p = float(event["trace"]["p"])
         truth = float(event["truth"])
         key = event["key"]
-        surprise = abs(truth - p)
+        confidence = 2.0 * abs(p - 0.5)
 
         super().feedback(event)
 
-        # A correct outcome drains the pending warning.  A wrong prediction
-        # adds only the degree of surprise, so a coin-flip miss does not cause
-        # a full regime reset.
+        # A correct outcome drains the pending warning.  A near-coin-flip
+        # miss does not enter the warning circuit at all: brains do not launch
+        # a state-change investigation after a guess they barely committed to.
         pressure = self.error_pressure[key] * self.error_decay
-        if int(p >= 0.5) != int(truth):
-            pressure += surprise
+        if int(p >= 0.5) != int(truth) and confidence >= self.confidence_floor:
+            pressure += confidence
         self.error_pressure[key] = pressure
 
         # Ignition requires accumulated prediction failure (not one noisy
@@ -155,5 +159,6 @@ class TransitionInvestigator(CuredCellular):
     def stats(self):
         stats = super().stats()
         stats["investigation_ignitions"] = self.investigation_ignitions
+        stats["investigation_predictions"] = self.investigation_predictions
         stats["protected_counter_reports"] = self.protected_counter_reports
         return stats

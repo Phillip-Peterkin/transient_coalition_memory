@@ -90,44 +90,57 @@ def main() -> None:
     stream = FinanceNewsStream(args.data_dir)
     days = contact_tail_days(stream)
 
-    # Small, predeclared mechanism sweep.  Each candidate varies the three
-    # meaningful biological controls: how much error it takes to ignite,
-    # how long investigation stays open, and how strongly it protects
-    # counter-evidence.  No old holdout scores are read or used here.
+    # Small, predeclared mechanism sweep.  Each candidate varies the four
+    # meaningful biological controls: how confident/wrong a prediction must be
+    # to count, how much error it takes to ignite, how long investigation stays
+    # open, and how strongly it protects counter-evidence.  No old holdout
+    # scores are read or used here.
     candidates = {
         "calibrated_baseline": None,
-        "short_cautious": {
-            "ignite_threshold": 1.10,
+        "brief_cautious": {
+            "error_decay": 0.30,
+            "ignite_threshold": 0.35,
+            "confidence_floor": 0.10,
             "investigate_decay": 0.50,
-            "anchor_floor": 0.40,
+            "anchor_floor": 0.50,
             "counterevidence_floor": 0.50,
         },
-        "short_strong": {
-            "ignite_threshold": 0.80,
+        "brief_strong": {
+            "error_decay": 0.30,
+            "ignite_threshold": 0.35,
+            "confidence_floor": 0.10,
             "investigate_decay": 0.50,
             "anchor_floor": 0.20,
             "counterevidence_floor": 0.75,
         },
         "medium_cautious": {
-            "ignite_threshold": 1.10,
+            "error_decay": 0.45,
+            "ignite_threshold": 0.50,
+            "confidence_floor": 0.15,
             "investigate_decay": 0.72,
-            "anchor_floor": 0.40,
+            "anchor_floor": 0.50,
             "counterevidence_floor": 0.50,
         },
         "medium_strong": {
-            "ignite_threshold": 0.80,
+            "error_decay": 0.45,
+            "ignite_threshold": 0.50,
+            "confidence_floor": 0.15,
             "investigate_decay": 0.72,
             "anchor_floor": 0.20,
             "counterevidence_floor": 0.75,
         },
         "long_cautious": {
-            "ignite_threshold": 1.10,
+            "error_decay": 0.60,
+            "ignite_threshold": 0.75,
+            "confidence_floor": 0.20,
             "investigate_decay": 0.88,
-            "anchor_floor": 0.40,
+            "anchor_floor": 0.50,
             "counterevidence_floor": 0.50,
         },
         "long_strong": {
-            "ignite_threshold": 0.80,
+            "error_decay": 0.60,
+            "ignite_threshold": 0.75,
+            "confidence_floor": 0.20,
             "investigate_decay": 0.88,
             "anchor_floor": 0.20,
             "counterevidence_floor": 0.75,
