@@ -95,3 +95,24 @@ def test_null_cure_reproduces_frozen_and_calibration_helps_flips():
     assert abs(null - frozen) < 1e-9
     # Calibration must materially raise flip detection (documented ~+5.7 pts).
     assert calib > frozen + 0.03
+
+
+def test_active_sensory_model_matches_confirmed_relevance_benchmark():
+    from ablation import run_vectors
+    from relevance import RelevanceFinanceNewsStream, RelevanceGatedCellular
+    from evaluate import CELL_PARAMS
+    from tcm import SensoryGatedCellular
+
+    data = ROOT / "benchmarks" / "realdata_finance" / "data"
+    benchmark = run_vectors(
+        RelevanceFinanceNewsStream(data),
+        RelevanceGatedCellular(**CELL_PARAMS),
+        "holdout",
+    )
+    active = run_vectors(
+        RelevanceFinanceNewsStream(data),
+        SensoryGatedCellular(**CELL_PARAMS),
+        "holdout",
+    )
+    assert np.allclose(active["p"], benchmark["p"], atol=1e-12)
+    assert np.array_equal(active["correct"], benchmark["correct"])

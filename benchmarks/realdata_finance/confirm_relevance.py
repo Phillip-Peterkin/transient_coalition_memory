@@ -16,8 +16,9 @@ sys.path.insert(0, str(ROOT))
 from ablation import boot_ci, paired_delta, run_vectors  # noqa: E402
 from cures import CuredCellular  # noqa: E402
 from evaluate import CELL_PARAMS  # noqa: E402
-from relevance import RelevanceFinanceNewsStream, RelevanceGatedCellular  # noqa: E402
+from relevance import RelevanceFinanceNewsStream  # noqa: E402
 from stream import FinanceNewsStream  # noqa: E402
+from tcm import SensoryGatedCellular  # noqa: E402
 
 
 def concise(result: dict) -> dict:
@@ -53,7 +54,7 @@ def main() -> None:
     )
     gated = run_vectors(
         relevance,
-        RelevanceGatedCellular(cures=("source_calib", "corr_downweight"), **CELL_PARAMS),
+        SensoryGatedCellular(**CELL_PARAMS),
         "holdout",
     )
     if gated["n"] != baseline["n"] or not (gated["flip"] == baseline["flip"]).all():
