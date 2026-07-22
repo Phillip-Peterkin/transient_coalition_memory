@@ -30,7 +30,9 @@ Use `.venv/bin/python` / `.venv/bin/pytest`.
 ### How to run things
 - Tests: `.venv/bin/pytest` (config in `pyproject.toml`).
 - Public API: `import tcm` exposes frozen `BatchedReserveCellular` (TCM) and
-  `FairProvGraph` (baseline). See `README.md` and `docs/REPRODUCIBILITY.md`.
+  `FairProvGraph` (baseline), plus experimental real-data
+  `SensoryGatedCellular` (requires upstream relevance-filtered reports). See
+  `README.md` and `docs/REPRODUCIBILITY.md`.
 - Calibration probe: `benchmarks/wave12/calibration_probe.py` (needs `PYTHONPATH`
   below on `main`).
 - Wall-clock benchmark: `benchmarks/runtime/wall_clock_benchmark.py`

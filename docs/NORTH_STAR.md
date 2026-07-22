@@ -191,6 +191,30 @@ writeup: [`REPORT_TRANSITION.md`](../benchmarks/realdata_finance/REPORT_TRANSITI
   inspired attention gate can distinguish a real new event from routine biased
   publisher flow.
 
+### 16. Sensory relevance gate — fresh-company confirmation passed
+Implementation: [`src/tcm/experimental.py`](../src/tcm/experimental.py)
+(`SensoryGatedCellular`); input gate:
+[`relevance.py`](../benchmarks/realdata_finance/relevance.py); protocol and
+writeup:
+[`RELEVANCE_CONFIRMATION_PROTOCOL.md`](../benchmarks/realdata_finance/RELEVANCE_CONFIRMATION_PROTOCOL.md)
+and [`REPORT_RELEVANCE.md`](../benchmarks/realdata_finance/REPORT_RELEVANCE.md).
+
+- Human-like premise: sensory evidence must be about the thing being decided.
+  The raw feed often assigns clearly unrelated headlines to a company; memory
+  must not update from them. With no relevant report, retain memory rather than
+  treating a 50/50 empty input as “up.”
+- Fixed combination: explicit title/company relevance + source base-rate
+  calibration + correlated-report discounting. The frozen Wave XI reference
+  remains unchanged; this is the active **experimental** real-data front end.
+- Predeclared, disjoint second company universe (29 declared; 28 price-labeled)
+  confirmation: flip detection **0.221→0.281** (+5.9 pts, 95% CI +1.2 to
+  +10.7, p=0.006); overall accuracy 0.493→0.520 (uncertain, p=0.084);
+  prediction-up 0.539→0.482; activation 1.13→0.40.
+- This clears the +3-point fresh-company gate and is the first real-data cure
+  to survive a fresh-company confirmation. It is **not** the final solution
+  (still far below 45% flip target), and same-source/same-calendar validation
+  is not independent-dataset replication.
+
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where
 it is genuinely state of the art on accuracy, cost, and calibration — but it

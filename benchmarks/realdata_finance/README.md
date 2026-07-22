@@ -13,6 +13,18 @@ produces sparse report coalitions for liquid US equities. The label is the
 This is past pure simulation: real publishers, real prices, delayed feedback,
 and the metrics the north star demands (persistence oracle + flip detection).
 
+## Active experimental model
+
+`tcm.SensoryGatedCellular` is the first real-data front end that survived a
+predeclared fresh-company check. It works with `RelevanceFinanceNewsStream`:
+only titles that explicitly name the company become reports; sensory silence
+keeps the existing memory. The model also calibrates publisher base-rate bias
+and discounts redundant same-direction reports.
+
+Fresh-company confirmation: change detection 22.1% → 28.1% (+5.9 pts,
+p=0.006), while using 64% fewer reports. It remains experimental; full limits
+are in `REPORT_RELEVANCE.md`.
+
 ## Setup
 
 ```bash
@@ -57,6 +69,8 @@ resamples) for accuracy and flip detection. Writeup: `REPORT_ABLATION.md`.
 - `REPORT_ABLATION.md` — five-cure ablation writeup
 - `REPORT_TRANSITION.md` — failed fresh-company test of the brain-shaped
   transition-investigation circuit (not baked in)
+- `REPORT_RELEVANCE.md` — successful fresh-company confirmation of the active
+  sensory relevance front end
 
 ## Process honesty
 

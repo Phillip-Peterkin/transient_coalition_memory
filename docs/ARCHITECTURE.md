@@ -45,3 +45,24 @@ after source calibration but **did not** clear its predeclared fresh-company
 confirmation gate (flip +1.5 points, uncertain); it remains experimental and
 is not part of the active model. See
 [`../benchmarks/realdata_finance/REPORT_TRANSITION.md`](../benchmarks/realdata_finance/REPORT_TRANSITION.md).
+
+## Active real-data experimental front end
+
+`tcm.SensoryGatedCellular` keeps the frozen Wave XI memory, reserve, delayed
+learning, and certificate mechanisms. It changes only how real-world stories
+become input:
+
+1. **Sensory relevance gate.** An upstream title-based gate removes stories
+   that do not explicitly name the company. If nothing relevant remains,
+   preserve the current memory instead of treating empty input as an implicit
+   positive vote.
+2. **Source base-rate calibration.** Frequent source emissions carry less
+   information; rare emissions carry more.
+3. **Correlation discount.** Same-direction stories in one event do not count
+   as independent evidence.
+
+This fixed front end passed a predeclared second fresh-company confirmation:
+flip detection 22.1% → 28.1% (+5.9 pts, paired-bootstrap p=0.006), with 64%
+less evidence activated. It remains an **experimental** model, not a claim of
+regime generality or a replacement for the frozen reference. Full protocol and
+limits: [`../benchmarks/realdata_finance/REPORT_RELEVANCE.md`](../benchmarks/realdata_finance/REPORT_RELEVANCE.md).

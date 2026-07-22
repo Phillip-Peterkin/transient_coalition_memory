@@ -116,3 +116,11 @@ def test_active_sensory_model_matches_confirmed_relevance_benchmark():
     )
     assert np.allclose(active["p"], benchmark["p"], atol=1e-12)
     assert np.array_equal(active["correct"], benchmark["correct"])
+
+
+def test_relevance_gate_rejects_misattribution_and_keeps_direct_evidence():
+    from relevance import is_relevant
+
+    assert is_relevant("Apple's new product ships next month", "AAPL")
+    assert not is_relevant("Judge revives Obama-era ban on coal sales", "AAPL")
+    assert is_relevant("Nvidia announces a new AI platform", "NVDA")

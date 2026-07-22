@@ -32,6 +32,13 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
 - A brain-shaped temporary investigation circuit was then tested on a fresh,
   disjoint company universe. Its +1.5-point flip gain was uncertain and failed
   its pre-set gate, so it is **not** treated as a shipped cure.
+- Active experimental real-data front end: the system now filters stories that
+  do not explicitly concern the company before they enter memory, calibrates
+  source base-rate bias, and discounts redundant same-direction stories.
+  On a second fresh company group this raises flip detection 22.1% → 28.1%
+  (+5.9 pts, p=0.006) while using 64% less evidence. This is a promising but
+  still incomplete real-data result; see
+  [`benchmarks/realdata_finance/REPORT_RELEVANCE.md`](benchmarks/realdata_finance/REPORT_RELEVANCE.md).
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*
@@ -54,7 +61,7 @@ Author: Phillip Peterkin
 ## Repository structure
 
 - `benchmarks/wave4` through `benchmarks/wave12` preserve the experimental history, reports, raw results, and summaries.
-- `src/tcm` exposes the frozen Wave XI reference classes (`BatchedReserveCellular`, `FairProvGraph`).
+- `src/tcm` exposes frozen Wave XI references (`BatchedReserveCellular`, `FairProvGraph`) and the active real-data experimental model (`SensoryGatedCellular`).
 - `tests/` contains lightweight invariance tests.
 
 ## Quick start
