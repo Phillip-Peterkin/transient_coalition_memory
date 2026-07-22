@@ -65,13 +65,14 @@ gains is the next impurity.
 
 ## Holdout snapshot (post-design)
 
-| Cell | Acc | Flip | Pred-up |
-|---|---:|---:|---:|
-| session clean | 0.517 | 0.421 | 0.692 |
-| skew scale 1.0 | 0.490 | 0.450 | 0.370 |
-| skew scale 1.5 | 0.494 | 0.477 | 0.368 |
+| Cell | Acc | Flip | Pred-up | Act |
+|---|---:|---:|---:|---:|
+| session clean | 0.517 | 0.421 | 0.692 | 0.72 |
+| skew scale 1.0 | 0.509 | 0.437 | 0.401 | 0.81 |
+| skew scale 1.5 | 0.504 | 0.461 | 0.406 | 0.82 |
 
-Same shape. Not a virgin confirmation.
+Same direction as contact-tail; pred-up lands nearer 40% on holdout. Still not
+a virgin confirmation.
 
 ## Status
 
