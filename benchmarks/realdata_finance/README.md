@@ -25,6 +25,14 @@ Fresh-company confirmation: change detection 22.1% → 28.1% (+5.9 pts,
 p=0.006), while using 64% fewer reports. It remains experimental; full limits
 are in `REPORT_RELEVANCE.md`.
 
+### Dead-pixel cleanup (development)
+
+`SessionRelevanceFinanceNewsStream` + `tcm.CleanEvidenceCellular` fix the next
+impurities: session cutoffs, adjacent-session flips, no sign-reversal by
+memory, and delayed-correctness source trust. Contact-tail change detection
+moves to ~41% with zero sign-reversal, but prediction-up rises to ~70% because
+publisher Positive skew is no longer hidden. Details: `REPORT_CLEAN.md`.
+
 ## Setup
 
 ```bash
@@ -73,6 +81,8 @@ resamples) for accuracy and flip detection. Writeup: `REPORT_ABLATION.md`.
   sensory relevance front end
 - `REPORT_WAVE_XVIII.md` — finance-development failure of the three-part
   prediction-error trust loop (not promoted; no Weather run)
+- `REPORT_CLEAN.md` — session/cutoff + sign-preserving evidence cleanup and
+  the new purity / performance markers
 
 ## Process honesty
 
