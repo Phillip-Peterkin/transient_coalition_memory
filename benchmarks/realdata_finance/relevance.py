@@ -17,8 +17,10 @@ import re
 
 import pandas as pd
 
+from cures import CuredCellular
 from stream import DecisionEvent, FinanceNewsStream
 from universe import CONTACT_FRACTION
+from wave4_benchmark import EPS, sigmoid
 
 # Names intentionally favor precision over recall.  Broad sector stories may
 # matter in a later model, but this first test asks a narrow question: does
@@ -159,3 +161,34 @@ class RelevanceFinanceNewsStream(FinanceNewsStream):
             }
         )
         return summary
+
+
+class RelevanceGatedCellular(CuredCellular):
+    """Calibrated TCM that retains its belief when no relevant report arrives."""
+
+    name = "relevance_gated_cellular"
+
+    def predict(self, key, reports, t):
+        if reports:
+            return super().predict(key, reports, t)
+
+        # Sensory silence must not be silently converted into an "up" vote by
+        # a 0.5 tie-break.  Preserve the current fast/slow claim state instead.
+        memory_log_odds = (
+            self.wf * (self.cf[(key, 1)] - self.cf[(key, 0)])
+            + self.ws * (self.cs[(key, 1)] - self.cs[(key, 0)])
+        )
+        p = sigmoid(memory_log_odds / max(self.temp, EPS))
+        self.infer_reads += 1.0  # one claim-state read
+        return p, {
+            "key": key,
+            "p": p,
+            "active": [],
+            "used": 0,
+            "contradiction": 0.0,
+            "hazard": 0.0,
+            "required": 0,
+            "certificate_shift": 0.0,
+            "stop_reason": "no_relevant_report",
+            "shadow_mass": (0.0, 0.0),
+        }

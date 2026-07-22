@@ -17,7 +17,7 @@ from ablation import paired_delta  # noqa: E402
 from cures import CuredCellular  # noqa: E402
 from develop_transition import contact_tail_days, score_days  # noqa: E402
 from evaluate import CELL_PARAMS  # noqa: E402
-from relevance import RelevanceFinanceNewsStream  # noqa: E402
+from relevance import RelevanceFinanceNewsStream, RelevanceGatedCellular  # noqa: E402
 from stream import FinanceNewsStream  # noqa: E402
 
 
@@ -45,7 +45,11 @@ def main() -> None:
     baseline = score_days(ordinary, model(), days)
 
     relevance_stream = RelevanceFinanceNewsStream(args.data_dir)
-    relevant = score_days(relevance_stream, model(), days)
+    relevant = score_days(
+        relevance_stream,
+        RelevanceGatedCellular(cures=("source_calib", "corr_downweight"), **CELL_PARAMS),
+        days,
+    )
     if relevant["n"] != baseline["n"] or not (relevant["flip"] == baseline["flip"]).all():
         raise RuntimeError("relevance stream no longer aligns with baseline events")
 
