@@ -447,22 +447,26 @@ class SilenceEscapeCellular(CleanEvidenceCellular):
 
 
 class DiagnosticContrastCellular(SilenceEscapeCellular):
-    """Bake DCAI architectural laws into the silence-escape cell.
+    """Proper DCAI-law bake into the silence-escape cell (v2).
 
-    Not a wrapper stack. Laws live on the same sensation → PE → hazard →
-    transition path:
+    Not wrappers. Three internal laws:
 
-    1. Slot preservation — a report that only paraphrases the current memory
-       direction slot is not diagnostic sensation (`preserve_cloud`). Kept
-       *with* the confirmed cheerleader-null law (all-Positive is null); using
-       slot-null alone reopens publisher up-skew.
-    2. Typed operator fire + paraphrase demotion — on real slot-edit
-       sensation, memory-agreeing reports are demoted in recruitment so
-       confirming paraphrases cannot seal the attractor.
-    3. Escape hazard stays the silence-escape PE+|ρ| sum by default.
-       Noisy-OR survival over those two scalars failed contact screens
-       (`use_survival_hazard=True`); span-style survival needs a richer local
-       defect substrate than this binary feed currently provides.
+    1. Slot continuity — empty is sensory absence; preserve-cloud (every
+       report paraphrases memory's direction slot) means belief continues.
+       Cheerleader all-Positive is *not* blanket-null: against down-memory
+       it is a real direction edit. Publisher skew is solved inside that
+       edit path by emission base-rate contrast, not by overriding slots.
+
+    2. Local survival — per-report slot-edit hazards pool by noisy-OR into
+       recruitment depth (one hard edit can force a deeper look). This is
+       not noisy-OR over global PE/|ρ| scalars.
+
+    3. Certificate contrast — certify only when the claim side beats the
+       nearest false alternative (opposing mass + remaining reserve) by a
+       margin. Final probability is the contrast between side masses.
+
+    Escape policy: PE+|ρ| anti-memory mix applies to true absence only.
+    Preserve-cloud keeps memory (slot continuity), and does not escape.
     """
 
     name = "diagnostic_contrast_cellular"
@@ -470,17 +474,28 @@ class DiagnosticContrastCellular(SilenceEscapeCellular):
     def __init__(
         self,
         *,
-        slot_preserve_scale: float = 0.50,
-        use_slot_null: bool = True,
-        use_survival_hazard: bool = False,
+        cheerleader_contrast_scale: float = 1.0,
+        contrast_margin: float = 0.08,
+        survival_gain: float = 1.0,
+        survival_tau: float = 1.0,
+        preserve_recruit_scale: float = 0.0,
+        market_rate: float = 0.5,
+        apply_to_all_positive: bool = False,
         **params,
     ):
+        # Slot law owns null; silence-escape cheerleader blanket stays off.
+        params["apply_to_all_positive"] = bool(apply_to_all_positive)
         super().__init__(**params)
-        self.slot_preserve_scale = float(slot_preserve_scale)
-        self.use_slot_null = bool(use_slot_null)
-        self.use_survival_hazard = bool(use_survival_hazard)
+        self.cheerleader_contrast_scale = float(cheerleader_contrast_scale)
+        self.contrast_margin = float(contrast_margin)
+        self.survival_gain = float(survival_gain)
+        self.survival_tau = float(survival_tau)
+        self.preserve_recruit_scale = float(preserve_recruit_scale)
+        self.market_rate = float(market_rate)
         self.operator_counts = defaultdict(int)
         self.slot_demotions = 0
+        self.cheerleader_penalties = 0
+        self.contrast_rejects = 0
 
     def _memory_side(self, key):
         preference = (
@@ -499,93 +514,282 @@ class DiagnosticContrastCellular(SilenceEscapeCellular):
             survival *= 1.0 - clamped
         return 1.0 - survival
 
+    def _emission_positive_gap(self, source, context) -> float:
+        positive = self.src_pos[(source, context)]
+        negative = self.src_neg[(source, context)]
+        emit_positive = positive / (positive + negative)
+        return max(0.0, _logit(emit_positive) - _logit(self.market_rate))
+
     def _operator_state(self, key, reports) -> dict:
         if not reports:
             return {
                 "operators": ("absence",),
                 "null": True,
+                "cheerleader_edit": False,
                 "edit_votes": (),
                 "preserve_votes": (),
-            }
-        # Confirmed silence-escape cheerleader law — keep it.
-        if self.apply_to_all_positive and all(vote == 1 for _, _, vote in reports):
-            return {
-                "operators": ("cheerleader_null",),
-                "null": True,
-                "edit_votes": (),
-                "preserve_votes": tuple(vote for _, _, vote in reports),
             }
 
         memory_side = self._memory_side(key)
         votes = [vote for _, _, vote in reports]
+        all_positive = all(vote == 1 for vote in votes)
+        mixed = len(set(votes)) > 1
+
         if memory_side is None:
-            mixed = len(set(votes)) > 1
+            operators = []
+            if mixed:
+                operators.append("fusion_conflict")
+            elif all_positive:
+                operators.append("cheerleader_edit")
+            else:
+                operators.append("uncommitted_cloud")
             return {
-                "operators": (("fusion_conflict",) if mixed else ("uncommitted_cloud",)),
+                "operators": tuple(operators),
                 "null": False,
+                "cheerleader_edit": all_positive,
                 "edit_votes": tuple(votes),
                 "preserve_votes": (),
             }
 
         edit_votes = tuple(vote for vote in votes if vote != memory_side)
         preserve_votes = tuple(vote for vote in votes if vote == memory_side)
-        if self.use_slot_null and not edit_votes:
+        if not edit_votes:
+            # Calibrated fire: all-Positive paraphrase of up-memory is
+            # emission-null (publisher cheerleading), not diagnostic
+            # confirmation. Other preserve-clouds continue belief.
+            cheerleader_preserve = all(vote == 1 for vote in votes)
             return {
-                "operators": ("preserve_cloud",),
+                "operators": (
+                    ("cheerleader_preserve",) if cheerleader_preserve else ("preserve_cloud",)
+                ),
                 "null": True,
+                "cheerleader_edit": False,
                 "edit_votes": (),
                 "preserve_votes": preserve_votes,
             }
-        operators = ["direction_swap"] if edit_votes else ["uncommitted_cloud"]
+
+        operators = ["direction_swap"]
+        cheerleader_edit = all_positive and memory_side == 0
+        if cheerleader_edit:
+            operators.append("cheerleader_edit")
         if preserve_votes and edit_votes:
             operators.append("fusion_conflict")
         return {
             "operators": tuple(operators),
             "null": False,
+            "cheerleader_edit": cheerleader_edit,
             "edit_votes": edit_votes,
             "preserve_votes": preserve_votes,
         }
 
-    def _escape_hazard(self, key) -> float:
-        pe = self.err_ewma[key]
-        pe_hazard = max(0.0, (pe - self.pe_floor) / max(EPS, self.pe_span))
-        rho_hazard = self.rho_gain * self._rho(key) if self.rho_gain else 0.0
-        if self.use_survival_hazard:
-            hazard = self._noisy_or([pe_hazard, rho_hazard])
-        else:
-            hazard = pe_hazard + rho_hazard
-        return float(min(self.max_hazard, hazard))
+    def _rows(self, key, reports, *, cheerleader_edit: bool = False):
+        correlation_scale = self._correlation_scale(reports)
+        memory_side = self._memory_side(key)
+        rows = []
+        for source, context, vote in reports:
+            sign = 1.0 if vote else -1.0
+            claim_key = (key, vote)
+            sensory = self.direct + self.wsrc * self.src[(source, context)]
+            memory = self.wf * self.cf[claim_key] + self.ws * self.cs[claim_key]
+            strength = sensory + memory
+            if self.preserve_sign and strength <= 0:
+                strength = EPS
+                self.sign_floors += 1
+            strength *= self._source_weight((source, context), vote) * correlation_scale
 
-    def _rows(self, key, reports):
-        rows = CleanEvidenceCellular._rows(self, key, reports)
-        if self.slot_preserve_scale >= 1.0 - EPS:
-            return rows
+            # Structural shield: memory-paraphrase reports do not recruit as
+            # sealing evidence.
+            if memory_side is not None and vote == memory_side:
+                strength *= self.preserve_recruit_scale
+                self.slot_demotions += 1
+
+            # Skew solved inside cheerleader edits (not by null override).
+            if cheerleader_edit and vote == 1:
+                gap = self._emission_positive_gap(source, context)
+                strength = max(EPS, strength - self.cheerleader_contrast_scale * gap)
+                self.cheerleader_penalties += 1
+
+            signed_strength = sign * abs(strength) if self.preserve_sign else sign * strength
+            rows.append(
+                (abs(signed_strength), signed_strength, source, context, vote, claim_key)
+            )
+        rows.sort(key=lambda row: row[0], reverse=True)
+        self.preview_ops += self.header_cost * len(rows)
+        return rows
+
+    def _local_edit_survival(self, key, rows) -> float:
         memory_side = self._memory_side(key)
         if memory_side is None:
-            return rows
-        scaled = []
-        for abs_strength, signed_strength, source, context, vote, claim_key in rows:
-            if vote == memory_side:
-                signed_strength = signed_strength * self.slot_preserve_scale
-                abs_strength = abs(signed_strength)
-                self.slot_demotions += 1
-            scaled.append(
-                (abs_strength, signed_strength, source, context, vote, claim_key)
+            hazards = [
+                min(1.0, abs(strength) / (abs(strength) + self.survival_tau))
+                for _, strength, _, _, _, _ in rows
+                if abs(strength) > EPS
+            ]
+        else:
+            hazards = [
+                min(1.0, abs(strength) / (abs(strength) + self.survival_tau))
+                for _, strength, _, _, vote, _ in rows
+                if vote != memory_side and abs(strength) > EPS
+            ]
+        if not hazards:
+            return 0.0
+        return self._noisy_or(hazards)
+
+    def _base_hazard(self, key, reports, t) -> float:
+        ones = sum(vote for _, _, vote in reports)
+        zeros = len(reports) - ones
+        report_disagreement = min(ones, zeros) / (max(ones, zeros) + EPS)
+        fast_preference = self.cf[(key, 1)] - self.cf[(key, 0)]
+        slow_preference = self.cs[(key, 1)] - self.cs[(key, 0)]
+        memory_conflict = float(fast_preference * slow_preference < 0)
+        volatility = min(1.0, abs(fast_preference - slow_preference))
+        age = max(0, t - self.last_fb[key])
+        stale = min(1.0, age / 30.0)
+        return min(
+            1.0,
+            0.45 * report_disagreement
+            + 0.25 * memory_conflict
+            + 0.20 * volatility
+            + 0.10 * stale,
+        )
+
+    def _predict_contrast(self, key, reports, t, state) -> tuple:
+        rows = self._rows(
+            key, reports, cheerleader_edit=state["cheerleader_edit"]
+        )[: self.max_k]
+        count = len(rows)
+        suffix_pos = [0.0] * (count + 1)
+        suffix_neg = [0.0] * (count + 1)
+        for index in range(count - 1, -1, -1):
+            strength = rows[index][1]
+            suffix_pos[index] = suffix_pos[index + 1] + (
+                abs(strength) if strength >= 0 else 0.0
             )
-        scaled.sort(key=lambda row: row[0], reverse=True)
-        return scaled
+            suffix_neg[index] = suffix_neg[index + 1] + (
+                abs(strength) if strength < 0 else 0.0
+            )
+
+        base_hazard = self._base_hazard(key, reports, t)
+        edit_survival = self._local_edit_survival(key, rows)
+        hazard = min(
+            1.0,
+            base_hazard + self.survival_gain * edit_survival * (1.0 - base_hazard),
+        )
+        required = min(
+            self.max_k,
+            max(self.min_k, 1 + int(round(self.hazard_gain * hazard))),
+        )
+
+        stop_reason = "budget"
+        certificate_shift = 1.0
+        contrast_margin_seen = 0.0
+        coalition = []
+        evidence_sum = positive = negative = 0.0
+        for index, row in enumerate(rows):
+            coalition.append(row)
+            strength = row[1]
+            evidence_sum += strength
+            if strength >= 0:
+                positive += abs(strength)
+            else:
+                negative += abs(strength)
+            self.activation_ops += 1.0
+            self.ops += 2
+            if len(coalition) < required:
+                continue
+
+            remaining_positive = suffix_pos[index + 1]
+            remaining_negative = suffix_neg[index + 1]
+            reserve_mass = remaining_positive + remaining_negative
+            if reserve_mass <= EPS and index + 1 >= count:
+                stop_reason = "exhausted"
+                certificate_shift = 0.0
+                break
+
+            # Nearest false alternative: opposing side plus all unused reserve.
+            claim_is_up = evidence_sum >= 0
+            claim_mass = positive if claim_is_up else negative
+            false_mass = (negative if claim_is_up else positive) + reserve_mass
+            contrast = claim_mass - false_mass
+            contrast_margin_seen = contrast
+            contradiction = min(positive, negative) / (max(positive, negative) + EPS)
+            current = evidence_sum * (1.0 - self.cg * contradiction)
+            full_positive = positive + remaining_positive
+            full_negative = negative + remaining_negative
+            full_sum = full_positive - full_negative
+            full_contradiction = min(full_positive, full_negative) / (
+                max(full_positive, full_negative) + EPS
+            )
+            full = full_sum * (1.0 - self.cg * full_contradiction)
+            current_probability = _sigmoid(current / max(self.temp, EPS))
+            full_probability = _sigmoid(full / max(self.temp, EPS))
+            certificate_shift = abs(current_probability - full_probability)
+            same_decision = (current >= 0) == (full >= 0)
+            if contrast < self.contrast_margin:
+                self.contrast_rejects += 1
+                continue
+            if (
+                same_decision
+                and contrast >= self.contrast_margin
+                and abs(current) >= self.min_margin
+                and certificate_shift <= self.cert_delta
+            ):
+                stop_reason = "contrast_certified"
+                break
+
+        contradiction = min(positive, negative) / (max(positive, negative) + EPS)
+        # Decision from side-mass contrast, not sealed anchor sum alone.
+        final_contrast = positive - negative
+        probability = _sigmoid(final_contrast / max(self.temp, EPS))
+        cutoff = len(coalition)
+        shadow_zero = sum(abs(row[1]) for row in rows[cutoff:] if row[4] == 0)
+        shadow_one = sum(abs(row[1]) for row in rows[cutoff:] if row[4] == 1)
+        return probability, {
+            "key": key,
+            "p": probability,
+            "active": [
+                (source, context, vote, claim_key, abs(strength))
+                for _, strength, source, context, vote, claim_key in coalition
+            ],
+            "used": cutoff,
+            "contradiction": contradiction,
+            "hazard": hazard,
+            "base_hazard": base_hazard,
+            "edit_survival": edit_survival,
+            "required": required,
+            "certificate_shift": certificate_shift,
+            "contrast_margin_seen": contrast_margin_seen,
+            "stop_reason": stop_reason,
+            "shadow_mass": (shadow_zero, shadow_one),
+            "operators": state["operators"],
+            "cheerleader_edit": state["cheerleader_edit"],
+        }
 
     def predict(self, key, reports, t):
         state = self._operator_state(key, reports)
         for operator in state["operators"]:
             self.operator_counts[operator] += 1
+
         if state["null"]:
             memory_p = self._memory_probability(key)
-            hazard = self._escape_hazard(key)
-            probability = (1.0 - hazard) * memory_p + hazard * (1.0 - memory_p)
             self.infer_reads += 1.0
-            if hazard > 0:
-                self.escape_events += 1
+            operators = state["operators"]
+            # Absence or calibrated cheerleader-preserve: PE+|ρ| escape.
+            # Ordinary preserve-cloud: continue memory (slot continuity).
+            if operators in (("absence",), ("cheerleader_preserve",)):
+                hazard = SilenceEscapeCellular._escape_hazard(self, key)
+                probability = (1.0 - hazard) * memory_p + hazard * (1.0 - memory_p)
+                if hazard > 0:
+                    self.escape_events += 1
+                stop_reason = (
+                    "absence_escape"
+                    if operators == ("absence",)
+                    else "cheerleader_preserve_escape"
+                )
+            else:
+                hazard = 0.0
+                probability = memory_p
+                stop_reason = "slot_preserve_continue"
             self._track_belief(key)
             return probability, {
                 "key": key,
@@ -596,7 +800,7 @@ class DiagnosticContrastCellular(SilenceEscapeCellular):
                 "hazard": hazard,
                 "required": 0,
                 "certificate_shift": 0.0,
-                "stop_reason": "diagnostic_contrast_escape",
+                "stop_reason": stop_reason,
                 "shadow_mass": (0.0, 0.0),
                 "memory_p": memory_p,
                 "escape_hazard": hazard,
@@ -605,10 +809,10 @@ class DiagnosticContrastCellular(SilenceEscapeCellular):
                 "operators": state["operators"],
             }
 
-        probability, trace = CleanEvidenceCellular.predict(self, key, reports, t)
+        probability, trace = self._predict_contrast(key, reports, t, state)
+        self.infer_reads += self.header_cost * len(reports) + trace["used"]
+        self._record_emissions(reports)
         self._track_belief(key)
-        trace = dict(trace)
-        trace["operators"] = state["operators"]
         return probability, trace
 
     def stats(self):
@@ -616,6 +820,8 @@ class DiagnosticContrastCellular(SilenceEscapeCellular):
         stats.update(
             {
                 "slot_demotions": self.slot_demotions,
+                "cheerleader_penalties": self.cheerleader_penalties,
+                "contrast_rejects": self.contrast_rejects,
                 "operator_counts": dict(self.operator_counts),
             }
         )
