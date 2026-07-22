@@ -1,0 +1,69 @@
+{
+  "protocol": "contact_tail_relevance_development_v1",
+  "n_scored_days": 60,
+  "calibrated_baseline": {
+    "accuracy": 0.48166259168704156,
+    "flip_accuracy": 0.22123893805309736,
+    "nonflip_accuracy": 0.7039274924471299,
+    "avg_activated": 1.5378973105134475,
+    "pred_up_rate": 0.5982070089649552,
+    "n": 1227,
+    "flip_n": 565
+  },
+  "relevance_gated": {
+    "accuracy": 0.4906275468622657,
+    "flip_accuracy": 0.27079646017699116,
+    "nonflip_accuracy": 0.6782477341389728,
+    "avg_activated": 0.7889160554197229,
+    "pred_up_rate": 0.5680521597392013,
+    "n": 1227,
+    "flip_n": 565
+  },
+  "stream": {
+    "n_events": 6121,
+    "n_symbols": 38,
+    "n_sources": 12,
+    "n_days": 286,
+    "contact_events": 3832,
+    "holdout_events": 2289,
+    "flip_events": 2641,
+    "truth_up_rate": 0.4963241300441104,
+    "mean_reports": 1.138049338343408,
+    "mean_sites": 0.8015030223819637,
+    "multi_source_frac": 0.16729292599248488,
+    "mean_source_agreement": 0.7989904192234365,
+    "sources": {
+      "0": "benzinga",
+      "1": "feeds2",
+      "2": "finance",
+      "3": "fool",
+      "4": "globenewswire",
+      "5": "investing",
+      "6": "investorplace",
+      "7": "itbusiness",
+      "8": "marketbeat",
+      "9": "marketwatch",
+      "10": "profitconfidential",
+      "11": "reutersagency"
+    },
+    "sensory_gate": "explicit_company_mention_in_title",
+    "relevant_article_fraction": 0.45642772900013107,
+    "events_without_relevant_reports": 2613
+  },
+  "paired_vs_calibrated_baseline": {
+    "accuracy": {
+      "delta": 0.008964955175224124,
+      "lo": -0.012224938875305624,
+      "hi": 0.029339853300733496,
+      "p": 0.382
+    },
+    "flip_accuracy": {
+      "delta": 0.049557522123893805,
+      "lo": 0.017699115044247787,
+      "hi": 0.08141592920353982,
+      "p": 0.002
+    }
+  },
+  "passes_development_gate": true,
+  "rule": "flip gain >= 0.03, accuracy drop < 0.01, prediction-up rate <= 0.65; a separate fresh universe is required for any claim."
+}
