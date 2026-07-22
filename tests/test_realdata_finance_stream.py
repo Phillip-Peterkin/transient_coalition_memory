@@ -202,3 +202,69 @@ def test_wave_xviii_can_require_ignored_counterevidence():
         {"key": key, "reports": [(0, 0, 0)], "truth": 0, "trace": {"p": 0.9, "active": []}}
     )
     assert model.mistrust[key] > 0.0
+
+
+def test_session_stream_is_one_decision_per_symbol_session_with_adjacent_flips():
+    import pandas as pd
+
+    from session_stream import (
+        SessionRelevanceFinanceNewsStream,
+        assign_sessions,
+        session_close_utc,
+    )
+
+    data = ROOT / "benchmarks" / "realdata_finance" / "data"
+    stream = SessionRelevanceFinanceNewsStream(data)
+    keys = [(event.symbol, event.day) for event in stream.events]
+    assert len(keys) == len(set(keys))
+    markers = stream.purity_markers()
+    assert markers["duplicate_symbol_session_events"] == 0
+    assert markers["flip_events"] == markers["flip_events_adjacent_session"]
+    assert markers["flip_events"] > 0
+
+    trading_days = pd.DatetimeIndex(stream.close.index).tz_localize(None).normalize()
+    # After the close belongs to the next session; before the close stays same day.
+    session_day = trading_days[10]
+    close = session_close_utc(session_day)
+    published = pd.Series(
+        [
+            (close - pd.Timedelta(minutes=1)).isoformat(),
+            (close + pd.Timedelta(minutes=1)).isoformat(),
+        ]
+    )
+    assigned = assign_sessions(published, trading_days)
+    assert pd.Timestamp(assigned.iloc[0]).normalize() == session_day
+    assert pd.Timestamp(assigned.iloc[1]).normalize() > session_day
+
+
+def test_clean_evidence_never_reverses_report_sign_and_learns_delayed_trust():
+    from tcm import CleanEvidenceCellular
+    from evaluate import CELL_PARAMS
+
+    model = CleanEvidenceCellular(**CELL_PARAMS)
+    key = (3, 0)
+    # Poison memory hard against an up vote.
+    model.cf[(key, 1)] = -50.0
+    model.cs[(key, 1)] = -50.0
+    rows = model._rows(key, [(0, 0, 1)])
+    _, signed, _, _, vote, _ = rows[0]
+    assert vote == 1
+    assert signed > 0
+    assert model.sign_floors >= 1
+
+    model.feedback(
+        {
+            "key": key,
+            "reports": [(7, 0, 1)],
+            "truth": 1,
+            "trace": {
+                "p": 0.6,
+                "active": [(7, 0, 1, (key, 1), 1.0)],
+                "shadow_mass": (0.0, 0.0),
+            },
+            "time": 1,
+        }
+    )
+    assert model.src_tries[(7, 0)] > model.trust_prior_tries
+    assert model.src_hits[(7, 0)] > model.trust_prior_hits
+    assert model._delayed_trust_weight((7, 0)) > model._delayed_trust_weight((8, 0))

@@ -14,6 +14,12 @@ predeclared fresh-company confirmation:
 
 The upstream relevance gate belongs to the ingestion stream because it needs
 article titles and item names.  See `benchmarks/realdata_finance/relevance.py`.
+
+`CleanEvidenceCellular` is the next experimental step: keep the sensory gate,
+but remove two remaining impurities inside the decision path itself:
+
+1. Memory may change a report's weight, never its direction.
+2. Source trust is learned from delayed correctness, not emission rarity.
 """
 
 from __future__ import annotations
@@ -124,6 +130,103 @@ class SensoryGatedCellular(BatchedReserveCellular):
             "stop_reason": "no_relevant_report",
             "shadow_mass": (0.0, 0.0),
         }
+
+
+class CleanEvidenceCellular(SensoryGatedCellular):
+    """Sensory TCM with sign-preserving memory and delayed source trust.
+
+    Hard rules:
+
+    - A report's vote direction is owned by the report. Memory may raise or
+      lower its weight down to a tiny positive floor, but cannot flip it.
+    - Source multipliers come from delayed correctness (Laplace-smoothed hit
+      rate), not from how rarely a publisher emits a Positive/Negative label.
+    """
+
+    name = "clean_evidence_cellular"
+
+    def __init__(
+        self,
+        *,
+        trust_min: float = 0.25,
+        trust_max: float = 2.5,
+        trust_prior_hits: float = 1.0,
+        trust_prior_tries: float = 2.0,
+        preserve_sign: bool = True,
+        use_delayed_trust: bool = True,
+        **params,
+    ):
+        super().__init__(**params)
+        self.trust_min = trust_min
+        self.trust_max = trust_max
+        self.trust_prior_hits = trust_prior_hits
+        self.trust_prior_tries = trust_prior_tries
+        self.preserve_sign = preserve_sign
+        self.use_delayed_trust = use_delayed_trust
+        self.src_hits = defaultdict(lambda: float(trust_prior_hits))
+        self.src_tries = defaultdict(lambda: float(trust_prior_tries))
+        self.sign_floors = 0
+        self.trust_updates = 0
+
+    def _delayed_trust_weight(self, source_key) -> float:
+        hit_rate = self.src_hits[source_key] / max(EPS, self.src_tries[source_key])
+        # Map [0, 1] reliability onto the same general scale as emission calib.
+        return min(self.trust_max, max(self.trust_min, self.trust_min + (self.trust_max - self.trust_min) * hit_rate))
+
+    def _source_weight(self, source_key, vote: int) -> float:
+        if self.use_delayed_trust:
+            return self._delayed_trust_weight(source_key)
+        return self._calibration_weight(source_key, vote)
+
+    def _rows(self, key, reports):
+        correlation_scale = self._correlation_scale(reports)
+        rows = []
+        for source, context, vote in reports:
+            sign = 1.0 if vote else -1.0
+            claim_key = (key, vote)
+            sensory = self.direct + self.wsrc * self.src[(source, context)]
+            memory = self.wf * self.cf[claim_key] + self.ws * self.cs[claim_key]
+            strength = sensory + memory
+            if self.preserve_sign and strength <= 0:
+                strength = EPS
+                self.sign_floors += 1
+            strength *= self._source_weight((source, context), vote) * correlation_scale
+            signed_strength = sign * abs(strength) if self.preserve_sign else sign * strength
+            rows.append(
+                (abs(signed_strength), signed_strength, source, context, vote, claim_key)
+            )
+        rows.sort(key=lambda row: row[0], reverse=True)
+        self.preview_ops += self.header_cost * len(rows)
+        return rows
+
+    def feedback(self, event):
+        super().feedback(event)
+        if not self.use_delayed_trust:
+            return
+        truth = int(event["truth"])
+        for source, context, vote in event.get("reports", []):
+            key = (source, context)
+            self.src_tries[key] += 1.0
+            if int(vote) == truth:
+                self.src_hits[key] += 1.0
+            self.trust_updates += 1
+
+    def stats(self):
+        stats = super().stats()
+        stats.update(
+            {
+                "sign_floors": self.sign_floors,
+                "trust_updates": self.trust_updates,
+                "mean_source_trust": (
+                    sum(
+                        self.src_hits[key] / max(EPS, self.src_tries[key])
+                        for key in self.src_tries
+                    )
+                    / max(1, len(self.src_tries))
+                ),
+            }
+        )
+        return stats
 
 
 class WaveXVIIITrustCellular(SensoryGatedCellular):
