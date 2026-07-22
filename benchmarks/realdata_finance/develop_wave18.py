@@ -45,6 +45,38 @@ WAVE_XVIII_CANDIDATES = {
         "anchor_floor": 0.15,
         "fresh_evidence_floor": 1.00,
     },
+    # Isolation cells explain which part of the three-way loop helps or
+    # creates bias. They use the same per-item confidence/error state.
+    "hazard_only": {
+        "mistrust_gain": 0.75,
+        "correct_relaxation": 0.40,
+        "trust_hazard_gain": 0.25,
+        "anchor_floor": 1.00,
+        "fresh_evidence_floor": 0.00,
+    },
+    "anchor_only": {
+        "mistrust_gain": 0.75,
+        "correct_relaxation": 0.40,
+        "trust_hazard_gain": 0.00,
+        "anchor_floor": 0.35,
+        "fresh_evidence_floor": 0.00,
+    },
+    "surprise_floor_only": {
+        "mistrust_gain": 0.75,
+        "correct_relaxation": 0.40,
+        "trust_hazard_gain": 0.00,
+        "anchor_floor": 1.00,
+        "fresh_evidence_floor": 0.75,
+        "fresh_floor_surprise_only": True,
+    },
+    "balanced_surprise_floor": {
+        "mistrust_gain": 0.75,
+        "correct_relaxation": 0.40,
+        "trust_hazard_gain": 0.25,
+        "anchor_floor": 0.35,
+        "fresh_evidence_floor": 0.75,
+        "fresh_floor_surprise_only": True,
+    },
 }
 COMMON = {"confidence_threshold": 0.20, "recruit_threshold": 0.50}
 

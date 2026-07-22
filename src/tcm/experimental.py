@@ -147,6 +147,7 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
         recruit_threshold: float = 0.50,
         anchor_floor: float = 0.35,
         fresh_evidence_floor: float = 0.75,
+        fresh_floor_surprise_only: bool = False,
         **params,
     ):
         super().__init__(**params)
@@ -157,6 +158,7 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
         self.recruit_threshold = recruit_threshold
         self.anchor_floor = anchor_floor
         self.fresh_evidence_floor = fresh_evidence_floor
+        self.fresh_floor_surprise_only = fresh_floor_surprise_only
 
         self.mistrust = defaultdict(float)
         self.trust_raises = 0
@@ -213,7 +215,16 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
             # retain at least this fraction of its sensory strength. The floor
             # rises only after confident error and only for counter-evidence.
             if old_side is not None and vote != old_side:
-                floor = fresh_floor * sensory
+                surprise_factor = 1.0
+                if self.fresh_floor_surprise_only:
+                    # A routine message from a source that says it almost
+                    # every day is not "fresh" in the brain-like sense. Only
+                    # a source-surprising message earns the elevated floor.
+                    surprise_factor = max(
+                        0.0,
+                        (calibration - 1.0) / max(EPS, self.cal_max - 1.0),
+                    )
+                floor = fresh_floor * surprise_factor * sensory
                 if strength < floor:
                     strength = floor
                     self.floor_hits += 1

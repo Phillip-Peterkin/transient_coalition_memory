@@ -59,6 +59,21 @@ The finance development winner must meet all of:
 
 If no candidate meets the rule, Wave XVIII does not proceed to Weather.
 
+## Second small development test: isolate the trust loop
+
+The first three-way cells may improve flip detection while over-predicting up.
+If that happens, run only these four finance-development isolation cells before
+discarding the mechanism:
+
+1. hazard only;
+2. anchor reduction only;
+3. source-surprising fresh-evidence floor only;
+4. full balanced loop, but fresh-evidence floor applies only to messages that
+   are surprising for that source (not its routine Positive output).
+
+The same 45% / accuracy / sparse-evidence / prediction-up selection rule
+applies. This is still finance-only development, not a Weather look.
+
 ## Weather rule and current blocker
 
 Weather is final-only: no mechanism or parameter will be designed against it.
