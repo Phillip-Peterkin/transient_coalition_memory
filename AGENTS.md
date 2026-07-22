@@ -3,6 +3,11 @@
 Research prototype: a Python (>=3.10) package plus a set of frozen benchmark
 scripts. No services/servers — everything runs as one-shot CLI scripts.
 
+**North star (read before proposing cures):** [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md)
+— long-term vision (General Dynamic Memory Architecture / living populations),
+canonical vision PDF, real-data weakness ledger, and anti-scope-creep rules.
+Do not start mechanism work from chat alone without checking that file.
+
 ## Cursor Cloud specific instructions
 
 Dependencies live in a virtualenv at `.venv` (created by the startup update
