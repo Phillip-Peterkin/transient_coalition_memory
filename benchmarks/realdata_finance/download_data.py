@@ -17,9 +17,9 @@ ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 
 
-def fetch_news() -> pd.DataFrame:
+def fetch_news(symbols: list[str] = UNIVERSE) -> pd.DataFrame:
     ds = load_dataset(NEWS_DATASET, split="train")
-    allowed = set(UNIVERSE)
+    allowed = set(symbols)
     rows = []
     for row in ds:
         sym = row["symbol"]
