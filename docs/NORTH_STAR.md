@@ -175,3 +175,18 @@ these — or be explicitly marked as out-of-vision exploratory work:
 
 When in doubt: **preserve the dream, name the tradeoff, do not paper over
 persistence as intelligence.**
+
+---
+
+## 5. Related docs (keep these in sync)
+
+| Doc | Role |
+|---|---|
+| [`TCM_Vision_and_Technical_Report.pdf`](TCM_Vision_and_Technical_Report.pdf) | Canonical Vision & Technical Report |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Frozen mechanisms + known failure modes |
+| [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) | How to run / reproduce on `main` |
+| [`../README.md`](../README.md) | Public entry point: vision vs shipped results |
+| [`../AGENTS.md`](../AGENTS.md) | Agent / Cursor Cloud operating notes |
+
+If this ledger or the vision statement changes, update the README scientific-status
+section and the Architecture "known failure modes" section in the same change.

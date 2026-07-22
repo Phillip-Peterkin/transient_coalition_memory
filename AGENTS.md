@@ -3,10 +3,20 @@
 Research prototype: a Python (>=3.10) package plus a set of frozen benchmark
 scripts. No services/servers — everything runs as one-shot CLI scripts.
 
-**North star (read before proposing cures):** [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md)
-— long-term vision (General Dynamic Memory Architecture / living populations),
-canonical vision PDF, real-data weakness ledger, and anti-scope-creep rules.
-Do not start mechanism work from chat alone without checking that file.
+## Read first (transparency across conversations)
+
+| Doc | Why |
+|---|---|
+| [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) | Long-term vision (General Dynamic Memory Architecture / living populations), canonical vision PDF pointer, **complete real-data weakness ledger**, anti-scope-creep rules. **Mandatory before proposing cures.** |
+| [`docs/TCM_Vision_and_Technical_Report.pdf`](docs/TCM_Vision_and_Technical_Report.pdf) | What the research program currently is (Waves IV–XVI). |
+| [`README.md`](README.md) | Public summary: synthetic results + scientific-status honesty. |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Frozen mechanisms + known architectural failure modes. |
+| [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) | Exact run commands and `main`-branch `/mnt/data` gotchas. |
+
+Do not start mechanism work from chat alone without checking `docs/NORTH_STAR.md`.
+Prefer curing ledger items 2–5 (self-sealing attractor, confirmation-biased
+recruitment, static exchange rate, regime specialization) over new surface
+features. Do not rewrite archival `benchmarks/wave*/REPORT.md` files.
 
 ## Cursor Cloud specific instructions
 
@@ -16,10 +26,10 @@ Use `.venv/bin/python` / `.venv/bin/pytest`.
 
 ### How to run things
 - Tests: `.venv/bin/pytest` (config in `pyproject.toml`).
-- Public API demo: `import tcm` exposes the frozen `BatchedReserveCellular`
-  (TCM) and `FairProvGraph` (baseline) reference classes. See `README.md`
-  "Quick start" and `docs/REPRODUCIBILITY.md` for the documented commands.
-- Calibration probe: `benchmarks/wave12/calibration_probe.py`.
+- Public API: `import tcm` exposes frozen `BatchedReserveCellular` (TCM) and
+  `FairProvGraph` (baseline). See `README.md` and `docs/REPRODUCIBILITY.md`.
+- Calibration probe: `benchmarks/wave12/calibration_probe.py` (needs `PYTHONPATH`
+  below on `main`).
 - Wall-clock benchmark: `benchmarks/runtime/wall_clock_benchmark.py`
   (writes into `benchmarks/runtime/results/`, which is untracked).
 
