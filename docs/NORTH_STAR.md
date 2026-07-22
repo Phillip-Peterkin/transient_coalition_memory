@@ -129,8 +129,25 @@ where evidence is good and TCM still fails.
 - Whether *any* anchor-based memory architecture can be regime-general, or
   whether the exchange rate must be learned online (Wave XVIII's premise).
 - Whether C7/C8-style fixes generalize or are weather-shaped.
-- Performance on a fourth, untouched dataset — currently zero clean test
-  beds remain except untouched weather-half splits.
+- Whether an online exchange-rate mechanism can raise flip detection on the
+  new finance/news stream without sacrificing adversarial-regime wins.
+
+### 13. Finance/news stream v0 (new, first contact in-repo)
+Harness: [`benchmarks/realdata_finance/`](../benchmarks/realdata_finance/)
+(protocol + locked Wave XI params; not the July 2011 stock gold setup).
+
+- Multi-publisher news (HF FMP RSS sentiments) → next-day equity direction
+  (Yahoo). Window 2022-08 → 2023-10; 6,121 events; chronological
+  contact/holdout 70/30.
+- Persistence oracle ≈ 0.50 here (near coin-flip days) — persistence is **not**
+  masquerading as accuracy the way it did on the old stock bed.
+- Locked TCM holdout: accuracy **0.526** (edges persistence / graph) but flip
+  accuracy **0.183** vs ~0.49 for memoryless majority / dynamic Bayes.
+  Self-sealing attractor reproduced on a fresh stream.
+- Publisher evidence is ~90% Positive while labels are balanced; independence
+  is limited (mean agreement ~0.84).
+- Holdout remains confirmatory only for these locked weights; mechanism work
+  informed by holdout must retire or replace that split.
 
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where
@@ -188,6 +205,7 @@ persistence as intelligence.**
 | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) | How to run / reproduce on `main` |
 | [`../README.md`](../README.md) | Public entry point: vision vs shipped results |
 | [`../AGENTS.md`](../AGENTS.md) | Agent / Cursor Cloud operating notes |
+| [`../benchmarks/realdata_finance/`](../benchmarks/realdata_finance/) | Finance/news real-data harness + v0 report |
 
 If this ledger or the vision statement changes, update the README scientific-status
 section and the Architecture "known failure modes" section in the same change.

@@ -37,3 +37,5 @@ These are mechanism-level findings from real-data sandbox contact **ahead of** t
 5. **Reserve truncation (pre-Wave-XV sandbox).** In dense-report worlds, reports beyond `max_k` could influence nothing — decision, certificate, or reserve learning — silently capping the "compressed dormant reserve."
 
 Cure priority for future work (see fidelity rules in [`NORTH_STAR.md`](NORTH_STAR.md)): items 2–5 of the weakness ledger (attractor, biased recruitment, static exchange rate, regime specialization) before new surface features.
+
+Real-data reproduction of the flip failure (locked Wave XI, no cures): [`../benchmarks/realdata_finance/REPORT.md`](../benchmarks/realdata_finance/REPORT.md).

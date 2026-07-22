@@ -69,6 +69,17 @@ python -c "from tcm import BatchedReserveCellular, FairProvGraph; print('ok')"
 pytest
 ```
 
+## Finance / news real-data harness
+
+```bash
+pip install -r benchmarks/realdata_finance/requirements.txt
+python benchmarks/realdata_finance/download_data.py   # refresh cache (committed slim parquet also works offline)
+python benchmarks/realdata_finance/evaluate.py
+```
+
+Protocol, splits, and non-claims: `benchmarks/realdata_finance/PROTOCOL.md`.
+First locked-parameter writeup: `benchmarks/realdata_finance/REPORT.md`.
+
 ## Historical waves
 
 Each historical script and its checked-in outputs preserve the original completed run. Some earlier waves use larger searches and therefore take longer. Treat `benchmarks/wave*/REPORT.md` as archival; do not rewrite them to match later narrative.

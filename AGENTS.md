@@ -18,6 +18,9 @@ Prefer curing ledger items 2–5 (self-sealing attractor, confirmation-biased
 recruitment, static exchange rate, regime specialization) over new surface
 features. Do not rewrite archival `benchmarks/wave*/REPORT.md` files.
 
+Active real-data entrypoint: `benchmarks/realdata_finance/` (download + evaluate).
+Treat its chronological `holdout` split as confirmatory for locked weights only.
+
 ## Cursor Cloud specific instructions
 
 Dependencies live in a virtualenv at `.venv` (created by the startup update

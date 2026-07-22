@@ -14,3 +14,6 @@ Keep these documents aligned when the research narrative changes.
 Historical wave writeups live under `../benchmarks/wave*/REPORT.md` and are
 **archival** — preserve them as completed-run records; do not rewrite to match
 later narrative.
+
+Active real-data work: [`../benchmarks/realdata_finance/`](../benchmarks/realdata_finance/)
+(finance/news stream v0; see its `PROTOCOL.md` / `REPORT.md`).

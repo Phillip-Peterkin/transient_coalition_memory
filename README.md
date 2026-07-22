@@ -28,6 +28,7 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
 
 - Strongest **shipped** evidence is synthetic (this repo). Results support continued testing; they do **not** establish independent validation or superiority on real-world memory tasks.
 - Sandbox contact with real data (stock, weather) — **ahead of what is frozen here** — exposed a regime boundary: TCM is strong in adversarial/noisy-source regimes and weak (often worst) in trustworthy-source, fast-crossing regimes. Flip detection, not headline accuracy, is the core failure. See the complete ledger in [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md).
+- In-repo finance/news harness ([`benchmarks/realdata_finance/`](benchmarks/realdata_finance/)): locked Wave XI on a 2022–2023 multi-publisher news → next-day direction stream again shows weak flip detection (~0.18 holdout) despite a small accuracy edge over persistence. Persistence is ~50% here (not the old stock artifact).
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*
@@ -44,6 +45,7 @@ Author: Phillip Peterkin
 | [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) | Exact run instructions, including `main`-branch path gotchas |
 | [`AGENTS.md`](AGENTS.md) | Cursor Cloud / agent operating notes |
 | [`benchmarks/runtime/README.md`](benchmarks/runtime/README.md) | Wall-clock benchmark |
+| [`benchmarks/realdata_finance/`](benchmarks/realdata_finance/) | Finance/news real-data harness (active) |
 | `benchmarks/wave*/REPORT.md` | Frozen historical wave reports (archival; do not rewrite) |
 
 ## Repository structure
