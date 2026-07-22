@@ -33,12 +33,12 @@ memory, and delayed-correctness source trust. Contact-tail change detection
 moves to ~41% with zero sign-reversal, but prediction-up rises to ~70% because
 publisher Positive skew is no longer hidden. Details: `REPORT_CLEAN.md`.
 
-### Skew correction (development)
+### Skew correction (development; confirmation failed)
 
 `tcm.SkewCorrectedCellular` subtracts publisher Positive base-rate inflation
-from all-Positive coalitions. Contact-tail gate passed at scale 1.5: flip
-~47%, pred-up ~36% (mirror bias reported honestly). Last-truth mean-reversion
-was tested and rejected as a flip-metric hack. Details: `REPORT_SKEW.md`.
+from all-Positive coalitions. Contact-tail looked strong (~47% flip), but the
+predeclared virgin `confirmation3` look **failed** (42.2% flip, no gain vs
+clean). Details: `REPORT_SKEW.md`, `REPORT_SKEW_CONFIRMATION.md`.
 
 ## Setup
 
@@ -90,8 +90,8 @@ resamples) for accuracy and flip detection. Writeup: `REPORT_ABLATION.md`.
   prediction-error trust loop (not promoted; no Weather run)
 - `REPORT_CLEAN.md` — session/cutoff + sign-preserving evidence cleanup and
   the new purity / performance markers
-- `REPORT_SKEW.md` — publisher Positive base-rate correction on cheerleader
-  coalitions (contact gate passed; fresh confirmation still required)
+- `REPORT_SKEW.md` — publisher Positive base-rate correction (contact only)
+- `REPORT_SKEW_CONFIRMATION.md` — virgin confirmation3 **fail** (42.2% flip)
 
 ## Process honesty
 
