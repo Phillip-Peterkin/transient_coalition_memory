@@ -65,7 +65,7 @@ and it writes `results.json` / `summary.csv` into `benchmarks/wave11`.
 ## Public API smoke test
 
 ```bash
-python -c "from tcm import BatchedReserveCellular, FairProvGraph, SensoryGatedCellular; print('ok')"
+python -c "from tcm import BatchedReserveCellular, FairProvGraph, ActiveCoalitionCellular, ActiveExperimentalCellular; print('ok')"
 pytest
 ```
 
@@ -80,10 +80,11 @@ python benchmarks/realdata_finance/evaluate.py
 Protocol, splits, and non-claims: `benchmarks/realdata_finance/PROTOCOL.md`.
 First locked-parameter writeup: `benchmarks/realdata_finance/REPORT.md`.
 
-The active experimental real-data front end uses
-`tcm.SensoryGatedCellular` with the title/company input gate in
-`benchmarks/realdata_finance/relevance.py`. Its predeclared fresh-company
-confirmation is documented in `benchmarks/realdata_finance/REPORT_RELEVANCE.md`.
+The active experimental real-data model is `tcm.ActiveCoalitionCellular`
+(alias `ActiveExperimentalCellular`) with
+`SessionRelevanceFinanceNewsStream`. Sealed confirmation8 writeup:
+`benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md`.
+Wave XI (`BatchedReserveCellular`) remains the frozen synthetic reference.
 
 ## Historical waves
 
