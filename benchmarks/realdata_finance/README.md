@@ -55,6 +55,8 @@ resamples) for accuracy and flip detection. Writeup: `REPORT_ABLATION.md`.
 - `results/ablation.json` — cure ablation with bootstrap CIs + paired tests
 - `REPORT.md` — first locked-parameter writeup
 - `REPORT_ABLATION.md` — five-cure ablation writeup
+- `REPORT_TRANSITION.md` — failed fresh-company test of the brain-shaped
+  transition-investigation circuit (not baked in)
 
 ## Process honesty
 

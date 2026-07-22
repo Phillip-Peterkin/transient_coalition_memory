@@ -171,6 +171,26 @@ reproduces it exactly). Paired bootstrap (5k) on holdout flip detection:
 - Cure params were set a priori, not tuned on holdout; a fresh untouched slice
   is still needed to confirm a tuned calibration cure.
 
+### 15. Brain-shaped transition investigation — fresh-company result
+Harness: [`transition.py`](../benchmarks/realdata_finance/transition.py);
+protocol: [`CONFIRMATION_PROTOCOL.md`](../benchmarks/realdata_finance/CONFIRMATION_PROTOCOL.md);
+writeup: [`REPORT_TRANSITION.md`](../benchmarks/realdata_finance/REPORT_TRANSITION.md).
+
+- Design: accumulated **confident** prediction errors ignite a temporary,
+  hysteretic investigation state; during it, calibrated counter-evidence cannot
+  be sign-reversed by stale memory. This is directly grounded in HRF energetic
+  gating / precision-weighted error and tested after source calibration.
+- Contact-only design looked promising (flip 0.221→0.287), but the
+  pre-declared, disjoint 33-company (32 price-labeled) confirmation result was 0.240→0.255:
+  **+1.5 pts, 95% CI −0.3 to +3.4; fails the pre-set +3-point gate.**
+- Do **not** bake it into the active model. A generic prediction-error alarm
+  signals that something may have changed but supplies no representation of
+  *what* changed; its apparent contact gain did not generalize.
+- Next hypothesis: semantic novelty / event identity in reports — a compact
+  representation of what a story is about — is needed before a biologically
+  inspired attention gate can distinguish a real new event from routine biased
+  publisher flow.
+
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where
 it is genuinely state of the art on accuracy, cost, and calibration — but it

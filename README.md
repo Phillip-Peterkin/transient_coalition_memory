@@ -29,6 +29,9 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
 - Strongest **shipped** evidence is synthetic (this repo). Results support continued testing; they do **not** establish independent validation or superiority on real-world memory tasks.
 - Sandbox contact with real data (stock, weather) — **ahead of what is frozen here** — exposed a regime boundary: TCM is strong in adversarial/noisy-source regimes and weak (often worst) in trustworthy-source, fast-crossing regimes. Flip detection, not headline accuracy, is the core failure. See the complete ledger in [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md).
 - In-repo finance/news harness ([`benchmarks/realdata_finance/`](benchmarks/realdata_finance/)): locked Wave XI on a 2022–2023 multi-publisher news → next-day direction stream again shows weak flip detection (~0.18 holdout) despite a small accuracy edge over persistence. Persistence is ~50% here (not the old stock artifact).
+- A brain-shaped temporary investigation circuit was then tested on a fresh,
+  disjoint company universe. Its +1.5-point flip gain was uncertain and failed
+  its pre-set gate, so it is **not** treated as a shipped cure.
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*

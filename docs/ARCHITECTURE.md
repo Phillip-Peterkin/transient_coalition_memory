@@ -39,3 +39,9 @@ These are mechanism-level findings from real-data sandbox contact **ahead of** t
 Cure priority for future work (see fidelity rules in [`NORTH_STAR.md`](NORTH_STAR.md)): items 2–5 of the weakness ledger (attractor, biased recruitment, static exchange rate, regime specialization) before new surface features.
 
 Real-data reproduction of the flip failure (locked Wave XI, no cures): [`../benchmarks/realdata_finance/REPORT.md`](../benchmarks/realdata_finance/REPORT.md).
+
+A brain-shaped prediction-error / temporary-investigation circuit was tested
+after source calibration but **did not** clear its predeclared fresh-company
+confirmation gate (flip +1.5 points, uncertain); it remains experimental and
+is not part of the active model. See
+[`../benchmarks/realdata_finance/REPORT_TRANSITION.md`](../benchmarks/realdata_finance/REPORT_TRANSITION.md).
