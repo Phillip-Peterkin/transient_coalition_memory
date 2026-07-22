@@ -35,7 +35,9 @@ def fetch_news(symbols: list[str] = UNIVERSE) -> pd.DataFrame:
             {
                 "symbol": sym,
                 "date": str(row["publishedDate"])[:10],
+                "published": str(row["publishedDate"]),
                 "site": str(row["site"]),
+                "title": str(row["title"]),
                 "sentiment": sentiment,
                 "score": float(score),
             }
