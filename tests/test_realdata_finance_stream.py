@@ -183,3 +183,22 @@ def test_wave_xviii_confident_success_relaxes_only_its_item():
     model.feedback({"key": key_a, "reports": [], "truth": 1, "trace": {"p": 0.9, "active": []}})
     assert 0.0 <= model.mistrust[key_a] < 0.8
     assert model.mistrust[key_b] == 0.0
+
+
+def test_wave_xviii_can_require_ignored_counterevidence():
+    from tcm import WaveXVIIITrustCellular
+    from evaluate import CELL_PARAMS
+
+    model = WaveXVIIITrustCellular(require_counterevidence=True, **CELL_PARAMS)
+    key = (5, 0)
+    # Wrong, but all relevant reports agreed with the incorrect prediction:
+    # do not blame memory for an unsupported environmental surprise.
+    model.feedback(
+        {"key": key, "reports": [(0, 0, 1)], "truth": 0, "trace": {"p": 0.9, "active": []}}
+    )
+    assert model.mistrust[key] == 0.0
+    # Wrong while a relevant report pointed the other way: raise mistrust.
+    model.feedback(
+        {"key": key, "reports": [(0, 0, 0)], "truth": 0, "trace": {"p": 0.9, "active": []}}
+    )
+    assert model.mistrust[key] > 0.0

@@ -74,6 +74,20 @@ discarding the mechanism:
 The same 45% / accuracy / sparse-evidence / prediction-up selection rule
 applies. This is still finance-only development, not a Weather look.
 
+## Third small development test: evidence-gated prediction error
+
+If broad prediction-error mistrust fires on ordinary market noise and produces
+an “up” bias, test the same light / balanced / strong three-way loop with one
+additional condition:
+
+> Raise mistrust only when the model was confidently wrong **and** relevant
+> current evidence already pointed against its prediction.
+
+This makes the system distrust memory only when it ignored a sensory warning;
+an unsupported wrong forecast is treated as unresolved environmental noise.
+The original 45% / accuracy / sparse-evidence / prediction-up gate is
+unchanged. This is finance-only development.
+
 ## Weather rule and current blocker
 
 Weather is final-only: no mechanism or parameter will be designed against it.

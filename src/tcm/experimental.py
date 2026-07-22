@@ -148,6 +148,7 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
         anchor_floor: float = 0.35,
         fresh_evidence_floor: float = 0.75,
         fresh_floor_surprise_only: bool = False,
+        require_counterevidence: bool = False,
         **params,
     ):
         super().__init__(**params)
@@ -159,10 +160,12 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
         self.anchor_floor = anchor_floor
         self.fresh_evidence_floor = fresh_evidence_floor
         self.fresh_floor_surprise_only = fresh_floor_surprise_only
+        self.require_counterevidence = require_counterevidence
 
         self.mistrust = defaultdict(float)
         self.trust_raises = 0
         self.trust_relaxations = 0
+        self.counterevidence_raises = 0
         self.floor_hits = 0
         self.extra_recruitments = 0
 
@@ -277,7 +280,9 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
             self.max_k,
             max(self.min_k, 1 + int(round(self.hazard_gain * base_hazard))),
         )
-        extra_report = int(mistrust >= self.recruit_threshold)
+        extra_report = int(
+            self.trust_hazard_gain > 0 and mistrust >= self.recruit_threshold
+        )
         required = min(self.max_k, base_required + extra_report)
         self.extra_recruitments += extra_report
 
@@ -407,7 +412,11 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
         truth = int(event["truth"])
         key = event["key"]
         signal = self._signal_strength(probability)
-        correct = int(probability >= 0.5) == truth
+        predicted = int(probability >= 0.5)
+        correct = predicted == truth
+        has_ignored_counterevidence = any(
+            vote != predicted for _, _, vote in event["reports"]
+        )
 
         super().feedback(event)
 
@@ -416,11 +425,12 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
         if correct:
             self.mistrust[key] *= 1.0 - self.correct_relaxation * signal
             self.trust_relaxations += 1
-        else:
+        elif not self.require_counterevidence or has_ignored_counterevidence:
             self.mistrust[key] += self.mistrust_gain * signal * (
                 1.0 - self.mistrust[key]
             )
             self.trust_raises += 1
+            self.counterevidence_raises += int(has_ignored_counterevidence)
 
     def stats(self):
         stats = super().stats()
@@ -428,6 +438,7 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
             {
                 "trust_raises": self.trust_raises,
                 "trust_relaxations": self.trust_relaxations,
+                "counterevidence_raises": self.counterevidence_raises,
                 "floor_hits": self.floor_hits,
                 "extra_recruitments": self.extra_recruitments,
             }

@@ -77,6 +77,35 @@ WAVE_XVIII_CANDIDATES = {
         "fresh_evidence_floor": 0.75,
         "fresh_floor_surprise_only": True,
     },
+    # A prediction error only changes trust when relevant evidence was already
+    # pointing against the model and the model ignored it.
+    "counterevidence_light": {
+        "mistrust_gain": 0.50,
+        "correct_relaxation": 0.30,
+        "trust_hazard_gain": 0.15,
+        "anchor_floor": 0.55,
+        "fresh_evidence_floor": 0.50,
+        "fresh_floor_surprise_only": True,
+        "require_counterevidence": True,
+    },
+    "counterevidence_balanced": {
+        "mistrust_gain": 0.75,
+        "correct_relaxation": 0.40,
+        "trust_hazard_gain": 0.25,
+        "anchor_floor": 0.35,
+        "fresh_evidence_floor": 0.75,
+        "fresh_floor_surprise_only": True,
+        "require_counterevidence": True,
+    },
+    "counterevidence_strong": {
+        "mistrust_gain": 1.00,
+        "correct_relaxation": 0.50,
+        "trust_hazard_gain": 0.35,
+        "anchor_floor": 0.15,
+        "fresh_evidence_floor": 1.00,
+        "fresh_floor_surprise_only": True,
+        "require_counterevidence": True,
+    },
 }
 COMMON = {"confidence_threshold": 0.20, "recruit_threshold": 0.50}
 
