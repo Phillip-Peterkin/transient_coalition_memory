@@ -149,6 +149,28 @@ Harness: [`benchmarks/realdata_finance/`](../benchmarks/realdata_finance/)
 - Holdout remains confirmatory only for these locked weights; mechanism work
   informed by holdout must retire or replace that split.
 
+### 14. Cure ablation v0 — which fixes actually work (finance/news)
+Harness: [`benchmarks/realdata_finance/cures.py`](../benchmarks/realdata_finance/cures.py)
++ [`ablation.py`](../benchmarks/realdata_finance/ablation.py); writeup
+[`REPORT_ABLATION.md`](../benchmarks/realdata_finance/REPORT_ABLATION.md).
+Cures are grounded in the two Peterkin papers (HRF energetic gating; fitted
+operator geometry) and toggled on the frozen Wave XI reference (empty cure set
+reproduces it exactly). Paired bootstrap (5k) on holdout flip detection:
+
+- **Independence/calibration (ledger 8) is the only robust win.** Source
+  base-rate self-information weighting (+3.6 pts, p<0.001) and correlated-report
+  down-weighting (+1.8 pts, p=0.008) are additive (+5.7 pts, 0.183→0.239,
+  p<0.001), at equal accuracy, better Brier/ECE, and lower compute.
+- **Anchor-dynamics cures did not help here.** Precision-weighted exchange rate
+  (ledger 4) and prior-neutral recruitment (ledger 3) were null; surprise-driven
+  hazard (ledger 2) was significantly *worse* on flips (−1.0 pt, p=0.001) —
+  deeper recruitment just amplifies the ~90%-Positive news skew.
+- **Lesson:** on a trustworthy-but-biased-source regime the dominant defect is
+  the evidence *representation*, not the memory-vs-world balance. This corrected
+  a wrong a-priori ranking (the value of testing all options, not one).
+- Cure params were set a priori, not tuned on holdout; a fresh untouched slice
+  is still needed to confirm a tuned calibration cure.
+
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where
 it is genuinely state of the art on accuracy, cost, and calibration — but it

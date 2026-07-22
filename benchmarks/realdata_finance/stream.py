@@ -31,7 +31,8 @@ class DecisionEvent:
 class FinanceNewsStream:
     """Event stream compatible with TCM report tuples `(source, context, y)`."""
 
-    def __init__(self, data_dir: Path | None = None):
+    def __init__(self, data_dir: Path | None = None, horizon: int = 1):
+        self.horizon = int(horizon)
         data_dir = Path(data_dir or DATA)
         news_path = data_dir / "news_slim.parquet"
         price_path = data_dir / "prices_close.parquet"
@@ -51,8 +52,8 @@ class FinanceNewsStream:
         self.item_ids = {sym: i for i, sym in enumerate(symbols)}
         self.id_to_item = {i: s for s, i in self.item_ids.items()}
 
-        # Next-day return sign, labeled at day t.
-        ret = self.close.pct_change(fill_method=None).shift(-1)
+        # h-day-ahead return sign, labeled at day t (h=1 -> next session).
+        ret = (self.close.shift(-self.horizon) / self.close - 1.0)
         self.truth = (ret > 0).astype(float).where(ret.notna())
         # Same-day direction for persistence oracle / previous truth.
         self.same_day_dir = (self.close.pct_change(fill_method=None) > 0).astype(float).where(

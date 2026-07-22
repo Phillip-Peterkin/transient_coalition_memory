@@ -58,3 +58,40 @@ def test_locked_tcm_smoke_predict():
     assert 0.0 <= p <= 1.0
     assert tr["used"] >= 1
     assert np.isfinite(p)
+
+
+def _run_flip_accuracy(stream, model):
+    from collections import defaultdict
+
+    q = defaultdict(list)
+    correct_flip = []
+    for ev in stream.events:
+        for fb in q.pop(ev.t, []):
+            model.feedback(fb)
+        p, tr = model.predict(ev.key, ev.reports, ev.t)
+        q[ev.t + 1].append(
+            {"key": ev.key, "reports": ev.reports, "truth": ev.truth,
+             "pred": p, "trace": tr, "time": ev.t + 1}
+        )
+        if ev.split == "holdout" and ev.prev_truth is not None and ev.truth != ev.prev_truth:
+            correct_flip.append(int((p >= 0.5) == ev.truth))
+    return float(np.mean(correct_flip)) if correct_flip else float("nan")
+
+
+def test_null_cure_reproduces_frozen_and_calibration_helps_flips():
+    from tcm import BatchedReserveCellular
+
+    from cures import CuredCellular
+    from evaluate import CELL_PARAMS
+
+    data = ROOT / "benchmarks" / "realdata_finance" / "data"
+    frozen = _run_flip_accuracy(FinanceNewsStream(data), BatchedReserveCellular(**CELL_PARAMS))
+    null = _run_flip_accuracy(FinanceNewsStream(data), CuredCellular(cures=(), **CELL_PARAMS))
+    calib = _run_flip_accuracy(
+        FinanceNewsStream(data),
+        CuredCellular(cures=("source_calib", "corr_downweight"), **CELL_PARAMS),
+    )
+    # Empty cure set must reproduce the frozen reference exactly.
+    assert abs(null - frozen) < 1e-9
+    # Calibration must materially raise flip detection (documented ~+5.7 pts).
+    assert calib > frozen + 0.03
