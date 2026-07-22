@@ -1,0 +1,115 @@
+{
+  "protocol": "skew_confirmation_v1",
+  "fixed_candidate": "SessionRelevanceFinanceNewsStream + SkewCorrectedCellular(base_rate_scale=1.5)",
+  "baseline": "same stream + CleanEvidenceCellular",
+  "universe": "confirmation3_universe",
+  "stream": {
+    "n_events": 2206,
+    "n_symbols": 30,
+    "n_sources": 11,
+    "n_days": 280,
+    "contact_events": 1418,
+    "holdout_events": 788,
+    "flip_events": 1084,
+    "truth_up_rate": 0.48912058023572075,
+    "mean_reports": 0.5643699002719855,
+    "mean_sites": 0.49546690843155033,
+    "multi_source_frac": 0.0743427017225748,
+    "mean_source_agreement": 0.8698132114798781,
+    "sources": {
+      "0": "benzinga",
+      "1": "feeds2",
+      "2": "finance",
+      "3": "fool",
+      "4": "globenewswire",
+      "5": "investing",
+      "6": "investorplace",
+      "7": "itbusiness",
+      "8": "marketbeat",
+      "9": "marketwatch",
+      "10": "profitconfidential"
+    },
+    "sensory_gate": "explicit_company_mention_in_title",
+    "session_protocol": "close_cutoff_america_new_york",
+    "flip_definition": "adjacent_trading_session",
+    "duplicate_symbol_session_events": 0,
+    "news_event_gap_mean": 3.8189338235294117,
+    "news_event_gap_frac_1": 0.41590073529411764,
+    "news_event_gap_frac_gt_1": 0.5840992647058824,
+    "flip_events_adjacent_session": 1084,
+    "events_without_relevant_reports": 1336,
+    "relevant_article_fraction": 0.32832278481012656,
+    "assigned_article_fraction": 1.0,
+    "dropped_unassigned_articles": 0,
+    "company_patterns": 102,
+    "session_timezone": "America/New_York",
+    "session_close": "16:00"
+  },
+  "warmup": "first 70% of dates; causal state only, not scored",
+  "confirmation": {
+    "clean_baseline": {
+      "n": 788,
+      "accuracy": 0.5126903553299492,
+      "flip_accuracy": 0.43765903307888043,
+      "nonflip_accuracy": 0.5873417721518988,
+      "flip_n": 393,
+      "brier": 0.2575522941883288,
+      "ece": 0.06574986171004163,
+      "pred_up_rate": 0.5685279187817259,
+      "avg_activated": 0.3769035532994924
+    },
+    "skew_corrected": {
+      "n": 788,
+      "accuracy": 0.5088832487309645,
+      "flip_accuracy": 0.4223918575063613,
+      "nonflip_accuracy": 0.5949367088607594,
+      "flip_n": 393,
+      "brier": 0.31828010465387996,
+      "ece": 0.2053859285000186,
+      "pred_up_rate": 0.4479695431472081,
+      "avg_activated": 0.41751269035532995
+    },
+    "paired_vs_clean_baseline": {
+      "accuracy": {
+        "delta": -0.0038071065989847717,
+        "lo": -0.05203045685279188,
+        "hi": 0.04568527918781726,
+        "p": 0.8392
+      },
+      "flip_accuracy": {
+        "delta": -0.015267175572519083,
+        "lo": -0.08651399491094147,
+        "hi": 0.05597964376590331,
+        "p": 0.6456
+      }
+    },
+    "bootstrap_confidence_intervals": {
+      "baseline_accuracy": {
+        "mean": 0.5126903553299492,
+        "lo": 0.47715736040609136,
+        "hi": 0.5482233502538071
+      },
+      "candidate_accuracy": {
+        "mean": 0.5088832487309645,
+        "lo": 0.4733502538071066,
+        "hi": 0.5431472081218274
+      },
+      "baseline_flip": {
+        "mean": 0.43765903307888043,
+        "lo": 0.3893129770992366,
+        "hi": 0.48854961832061067
+      },
+      "candidate_flip": {
+        "mean": 0.4223918575063613,
+        "lo": 0.37404580152671757,
+        "hi": 0.4707379134860051
+      }
+    },
+    "passes_predeclared_gate": false,
+    "gate": {
+      "flip_accuracy_min": 0.45,
+      "accuracy_max_drop_vs_clean": 0.01,
+      "pred_up_rate_max": 0.65
+    }
+  }
+}
