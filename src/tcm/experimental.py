@@ -1,25 +1,25 @@
 """Active real-data experimental TCM mechanisms.
 
-`SensoryGatedCellular` preserves the frozen Wave XI memory / reserve /
-certification mechanism.  It adds the one real-data cure that survived a
-predeclared fresh-company confirmation:
+Active experimental model (finance-confirmed):
+    `ActiveCoalitionCellular` — Active Coalition Inference (ACI).
+    Pair with `SessionRelevanceFinanceNewsStream`. Sealed on virgin
+    confirmation8; Wave XI reference stays frozen.
 
-1. Source base-rate calibration: a message that a source says almost every day
-   is weak; a rare message from that source is more informative.
-2. Correlation discounting: several same-direction reports within an event do
-   not count as independent evidence.
-3. Sensory-silence memory fallback: when an upstream relevance gate finds no
-   report actually about the current item, retain memory rather than treating
-   a 50/50 tie as an implicit positive vote.
+Historical / ancestor cells kept for regression and protocol archives:
+    `SensoryGatedCellular`, `CleanEvidenceCellular`, `SilenceEscapeCellular`,
+    and failed screens (`SkewCorrectedCellular`, `DiagnosticContrastCellular`,
+    `WaveXVIIITrustCellular`).
 
-The upstream relevance gate belongs to the ingestion stream because it needs
-article titles and item names.  See `benchmarks/realdata_finance/relevance.py`.
+ACI laws (one cell, not bolted modules):
+1. Evidence is contrast (source LRs); prior never enters report strength.
+2. Null sensation (empty / cheerleader Positive / near-zero Δ) is a first-class
+   channel: PE+|ρ| anti-prior mix (Friston form of sealed silence escape).
+3. Recruit by |Δ|; certify when unread discrimination mass cannot flip
+   (free-energy stop). Prior and evidence meet once at the posterior.
+4. Budgeted reading is TCM's novelty on top of predictive processing.
 
-`CleanEvidenceCellular` is the next experimental step: keep the sensory gate,
-but remove two remaining impurities inside the decision path itself:
-
-1. Memory may change a report's weight, never its direction.
-2. Source trust is learned from delayed correctness, not emission rarity.
+Upstream relevance still belongs to the ingestion stream
+(`benchmarks/realdata_finance/relevance.py` / `session_stream.py`).
 """
 
 from __future__ import annotations
@@ -37,7 +37,10 @@ def _sigmoid(value: float) -> float:
 
 
 class SensoryGatedCellular(BatchedReserveCellular):
-    """Wave XI TCM with the confirmed real-data sensory evidence front end.
+    """Historical first real-data front end (relevance confirmation).
+
+    Superseded as the *active* experimental model by `ActiveCoalitionCellular`.
+    Kept for archival protocols and regression against the relevance bake.
 
     The model expects report tuples `(source_id, context_id, vote)`.  `context`
     may remain `0`; source base-rate calibration is learned separately for each
@@ -1149,33 +1152,37 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
 
 
 class ActiveCoalitionCellular(BatchedReserveCellular):
-    """Active Coalition Inference — one Friston-native upgrade.
+    """Active Coalition Inference — active real-data experimental TCM.
 
-    Predictive coding under a read budget:
+    Predictive coding under a read budget. Defaults are the sealed
+    confirmation8 freeze (do not retune on spent universes).
 
     - Prior (fast/slow claim memory) never enters report strength.
     - Each report is a precision-weighted log-likelihood ratio
       Δ = log P(vote|up) − log P(vote|down), learned from delayed outcomes.
-    - Silence is a first-class channel: how often emptiness preceded change
-      vs stay relative to the prior prediction.
+    - Silence is a first-class channel: null PE + stickiness mix toward
+      anti-prior under empty / cheerleader / non-diagnostic batches.
     - Recruitment ranks by |Δ| (discriminative power), never by agreement
       with memory — prior-neutral sampling.
     - Prior and evidence meet once: posterior_lo = prior_lo + Σ Δ_active.
     - Free-energy certificate: stop when unread Σ|Δ| cannot flip the sign
       of the posterior (expected surprise reduction below read cost).
 
-    This is not TCM+DCAI bolted together. It is one cell whose native
-    quantities are precision, dual log-odds, and budgeted active sampling.
+    Not a Wave XI replacement: frozen `BatchedReserveCellular` remains the
+    synthetic reference. This cell is the active experimental real-data model.
     """
 
     name = "active_coalition_cellular"
+    # Sealed finance confirmation (confirmation8); do not retune here.
+    confirmed_universe = "confirmation8"
+    confirmed_flip = 0.5256410256410257
 
     def __init__(
         self,
         *,
         laplace: float = 1.0,
         min_delta: float = 0.15,
-        max_silence_hazard: float = 0.70,
+        max_silence_hazard: float = 0.55,
         null_pe_floor: float = 0.35,
         null_pe_span: float = 0.50,
         null_err_beta: float = 0.30,

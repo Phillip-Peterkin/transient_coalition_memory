@@ -33,3 +33,11 @@ Prior stays out of the likelihood; null-channel precision carries the sealed
 silence law; free-energy certification handles the rare discriminative batch.
 
 No retuning on confirmation8. Universe is spent.
+
+## Active experimental bake
+
+`ActiveCoalitionCellular` is now the **active experimental real-data TCM**
+(alias `ActiveExperimentalCellular`). Sealed hyperparameters are the class
+defaults. Wave XI (`BatchedReserveCellular`) remains the frozen synthetic
+reference — this is not a foundation replacement and not a Weather / regime-
+generality claim.

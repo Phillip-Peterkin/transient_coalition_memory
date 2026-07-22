@@ -15,38 +15,27 @@ and the metrics the north star demands (persistence oracle + flip detection).
 
 ## Active experimental model
 
-`tcm.SensoryGatedCellular` is the first real-data front end that survived a
-predeclared fresh-company check. It works with `RelevanceFinanceNewsStream`:
-only titles that explicitly name the company become reports; sensory silence
-keeps the existing memory. The model also calibrates publisher base-rate bias
-and discounts redundant same-direction reports.
+`tcm.ActiveCoalitionCellular` (alias `tcm.ActiveExperimentalCellular`) with
+`SessionRelevanceFinanceNewsStream` is the active experimental TCM for this
+harness. Wave XI (`BatchedReserveCellular`) stays the frozen synthetic
+reference.
 
-Fresh-company confirmation: change detection 22.1% → 28.1% (+5.9 pts,
-p=0.006), while using 64% fewer reports. It remains experimental; full limits
-are in `REPORT_RELEVANCE.md`.
+ACI: prior-free likelihood-ratio evidence; null channel (empty / cheerleader /
+near-zero Δ) via PE+|ρ| anti-prior mix; recruit by |Δ|; free-energy certify
+when unread mass cannot flip. Sealed virgin `confirmation8`: flip **52.6%**,
+pred-up **53.7%**, gate passed. Defaults match that freeze. Details:
+`REPORT_ACTIVE_COALITION.md`, `REPORT_ACTIVE_COALITION_CONFIRMATION.md`.
 
-### Dead-pixel cleanup (development)
+### Lineage (confirmed ancestors / failed screens)
 
-`SessionRelevanceFinanceNewsStream` + `tcm.CleanEvidenceCellular` fix the next
-impurities: session cutoffs, adjacent-session flips, no sign-reversal by
-memory, and delayed-correctness source trust. Contact-tail change detection
-moves to ~41% with zero sign-reversal, but prediction-up rises to ~70% because
-publisher Positive skew is no longer hidden. Details: `REPORT_CLEAN.md`.
-
-### Skew correction (development; confirmation failed)
-
-`tcm.SkewCorrectedCellular` subtracts publisher Positive base-rate inflation
-from all-Positive coalitions. Contact-tail looked strong (~47% flip), but the
-predeclared virgin `confirmation3` look **failed** (42.2% flip, no gain vs
-clean). Details: `REPORT_SKEW.md`, `REPORT_SKEW_CONFIRMATION.md`.
-
-### Silence escape (confirmed)
-
-`tcm.SilenceEscapeCellular`: when sensation is null (empty or all-Positive),
-prediction-error + belief criticality releases sticky memory toward
-anti-memory. Virgin `confirmation4` **passed** the sealed gate: flip
-**52.2%** (+9.2 pts vs clean, p≈0.004), pred-up **50.1%**, accuracy held.
-Details: `REPORT_SILENCE_ESCAPE.md`, `REPORT_SILENCE_ESCAPE_CONFIRMATION.md`.
+- **Relevance** (`SensoryGatedCellular`): first fresh-company PASS (flip 28.1%).
+  `REPORT_RELEVANCE.md`.
+- **Clean evidence** (development): session cutoffs + sign-preserving trust.
+  `REPORT_CLEAN.md`.
+- **Skew correction**: confirmation3 **FAIL**. `REPORT_SKEW_CONFIRMATION.md`.
+- **Silence escape**: confirmation4 **PASS** (flip 52.2%) — ACI null-channel
+  ancestor. `REPORT_SILENCE_ESCAPE_CONFIRMATION.md`.
+- **Diagnostic contrast v1/v2**: confirmation5/7 **FAIL**.
 
 ## Setup
 
@@ -103,6 +92,9 @@ resamples) for accuracy and flip detection. Writeup: `REPORT_ABLATION.md`.
 - `REPORT_SILENCE_ESCAPE.md` — PE/rho null-sensation escape (development)
 - `REPORT_SILENCE_ESCAPE_CONFIRMATION.md` — virgin confirmation4 **PASS**
   (52.2% flip)
+- `REPORT_ACTIVE_COALITION.md` — ACI contact-tail freeze
+- `REPORT_ACTIVE_COALITION_CONFIRMATION.md` — virgin confirmation8 **PASS**
+  (52.6% flip); active experimental bake
 
 ## Process honesty
 

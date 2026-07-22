@@ -9,7 +9,7 @@ Instead of retrieving a permanent record, TCM recruits a temporary coalition of 
 | | |
 |---|---|
 | **Dream** | A **General Dynamic Memory Architecture** — information treated like living populations, not fixed database entries. |
-| **This repo today** | Frozen Wave XI reference + historical synthetic waves / calibration / wall-clock tooling. A research prototype, not the finished general architecture. |
+| **This repo today** | Frozen Wave XI synthetic reference + active experimental real-data cell (`ActiveCoalitionCellular`) + historical waves / calibration / wall-clock tooling. A research prototype, not the finished general architecture. |
 | **Full vision writeup** | [`docs/TCM_Vision_and_Technical_Report.pdf`](docs/TCM_Vision_and_Technical_Report.pdf) |
 | **North star + real-data honesty ledger** | [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) — read before proposing cures; anti-scope-creep rules live there. |
 
@@ -32,17 +32,16 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
 - A brain-shaped temporary investigation circuit was then tested on a fresh,
   disjoint company universe. Its +1.5-point flip gain was uncertain and failed
   its pre-set gate, so it is **not** treated as a shipped cure.
-- Active experimental real-data front end: the system now filters stories that
-  do not explicitly concern the company before they enter memory, calibrates
-  source base-rate bias, and discounts redundant same-direction stories.
-  On a second fresh company group this raises flip detection 22.1% → 28.1%
-  (+5.9 pts, p=0.006) while using 64% less evidence. This is a promising but
-  still incomplete real-data result; see
-  [`benchmarks/realdata_finance/REPORT_RELEVANCE.md`](benchmarks/realdata_finance/REPORT_RELEVANCE.md).
-- Wave XVIII then tested the proposed prediction-error trust loop (recruit
-  deeper, weaken memory, protect fresh counter-evidence). It reached ~40%
-  change detection in finance development but missed the pre-set 45% /
-  balanced-prediction gate, so it is **not** promoted or presented as a result.
+- Active experimental real-data model: `tcm.ActiveCoalitionCellular` (ACI) with
+  `SessionRelevanceFinanceNewsStream`. Prior stays out of report strength;
+  null sensation is a PE+|ρ| channel; free-energy certification stops unread
+  mass that cannot flip the posterior. Virgin confirmation8 **passed** the
+  predeclared gate (flip **52.6%**, pred-up 53.7%). Wave XI remains the frozen
+  synthetic reference — ACI is not a foundation replacement. See
+  [`benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md`](benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md).
+- Earlier sealed steps kept as lineage: relevance front end (confirmation
+  flip 28.1%); silence escape (confirmation4 flip 52.2%). Wave XVIII and
+  diagnostic-contrast ports failed their gates and are not promoted.
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*
@@ -65,7 +64,7 @@ Author: Phillip Peterkin
 ## Repository structure
 
 - `benchmarks/wave4` through `benchmarks/wave12` preserve the experimental history, reports, raw results, and summaries.
-- `src/tcm` exposes frozen Wave XI references (`BatchedReserveCellular`, `FairProvGraph`) and the active real-data experimental model (`SensoryGatedCellular`).
+- `src/tcm` exposes frozen Wave XI references (`BatchedReserveCellular`, `FairProvGraph`) and the active real-data experimental model (`ActiveCoalitionCellular` / `ActiveExperimentalCellular`).
 - `tests/` contains lightweight invariance tests.
 
 ## Quick start

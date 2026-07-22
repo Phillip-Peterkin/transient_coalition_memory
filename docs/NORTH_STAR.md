@@ -205,7 +205,9 @@ and [`REPORT_RELEVANCE.md`](../benchmarks/realdata_finance/REPORT_RELEVANCE.md).
   treating a 50/50 empty input as “up.”
 - Fixed combination: explicit title/company relevance + source base-rate
   calibration + correlated-report discounting. The frozen Wave XI reference
-  remains unchanged; this is the active **experimental** real-data front end.
+  remains unchanged. This was the first active **experimental** real-data
+  front end; later superseded as the active model by Active Coalition
+  Inference (ledger item 18) while remaining an archival confirmed step.
 - Predeclared, disjoint second company universe (29 declared; 28 price-labeled)
   confirmation: flip detection **0.221→0.281** (+5.9 pts, 95% CI +1.2 to
   +10.7, p=0.006); overall accuracy 0.493→0.520 (uncertain, p=0.084);
@@ -236,6 +238,25 @@ implementation: `tcm.WaveXVIIITrustCellular`; writeup:
   data, protocol, or locked untouched split is present in this repo; prior
   sandbox Weather contact and silver-label caveats remain. Recover the
   original locked split/harness first.
+
+### 18. Active Coalition Inference — active experimental model (finance sealed)
+Implementation: `tcm.ActiveCoalitionCellular` (alias
+`ActiveExperimentalCellular`); protocol / writeups:
+[`ACTIVE_COALITION_CONFIRMATION_PROTOCOL.md`](../benchmarks/realdata_finance/ACTIVE_COALITION_CONFIRMATION_PROTOCOL.md),
+[`REPORT_ACTIVE_COALITION.md`](../benchmarks/realdata_finance/REPORT_ACTIVE_COALITION.md),
+[`REPORT_ACTIVE_COALITION_CONFIRMATION.md`](../benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md).
+
+- One Friston-native cell: prior-free likelihood-ratio evidence; null-channel
+  PE+|ρ| anti-prior mix; recruit by |Δ|; free-energy stop when unread mass
+  cannot flip the posterior. Upstream session relevance still owns gating.
+- Virgin `confirmation8` **passed** the predeclared gate: flip **0.526**,
+  accuracy 0.517 (held vs clean), pred-up 0.537, nonflip 0.510. Edges sealed
+  silence-escape on flip (~+3.5 pts on this world).
+- **Bake status:** active experimental real-data TCM. **Not** a Wave XI
+  foundation replacement. **Not** a regime-generality claim (no Weather
+  harness; synthetic adversarial identity of Wave XI unchanged).
+- confirmation8 is spent; do not retune on it. Next foundation-level claims
+  need synthetic/adversarial regression and trustworthy-source regime tests.
 
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where

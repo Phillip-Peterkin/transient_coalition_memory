@@ -46,29 +46,34 @@ confirmation gate (flip +1.5 points, uncertain); it remains experimental and
 is not part of the active model. See
 [`../benchmarks/realdata_finance/REPORT_TRANSITION.md`](../benchmarks/realdata_finance/REPORT_TRANSITION.md).
 
-## Active real-data experimental front end
+## Active real-data experimental model
 
-`tcm.SensoryGatedCellular` keeps the frozen Wave XI memory, reserve, delayed
-learning, and certificate mechanisms. It changes only how real-world stories
-become input:
+`tcm.ActiveCoalitionCellular` (alias `ActiveExperimentalCellular`) is the
+active experimental TCM for real data. Wave XI
+(`tcm.BatchedReserveCellular`) remains the frozen synthetic reference.
 
-1. **Sensory relevance gate.** An upstream title-based gate removes stories
-   that do not explicitly name the company. If nothing relevant remains,
-   preserve the current memory instead of treating empty input as an implicit
-   positive vote.
-2. **Source base-rate calibration.** Frequent source emissions carry less
-   information; rare emissions carry more.
-3. **Correlation discount.** Same-direction stories in one event do not count
-   as independent evidence.
+ACI is one Friston-native cell on the Wave XI substrate:
 
-This fixed front end passed a predeclared second fresh-company confirmation:
-flip detection 22.1% → 28.1% (+5.9 pts, paired-bootstrap p=0.006), with 64%
-less evidence activated. It remains an **experimental** model, not a claim of
-regime generality or a replacement for the frozen reference. Full protocol and
-limits: [`../benchmarks/realdata_finance/REPORT_RELEVANCE.md`](../benchmarks/realdata_finance/REPORT_RELEVANCE.md).
+1. **Prior-free evidence.** Report strength is a source likelihood ratio;
+   fast/slow claim memory never enters Δ.
+2. **Null channel.** Empty, cheerleader all-Positive, or near-zero-Δ batches
+   use PE+|ρ| anti-prior mix (sealed silence-escape law inside precision).
+3. **Budgeted free-energy certification.** Recruit by |Δ|; stop when unread
+   discrimination mass cannot flip the posterior.
+4. **Upstream relevance.** `SessionRelevanceFinanceNewsStream` still owns
+   title/company gating before reports enter the cell.
 
-Wave XVIII tested the next architectural cure: per-item prediction-error trust
-that jointly raises recruitment, lowers the anchor, and protects fresh
-counter-evidence. It reached ~40% finance-development flip detection but
-violated the balanced-prediction / 45% gate, so it remains unpromoted. See
-[`../benchmarks/realdata_finance/REPORT_WAVE_XVIII.md`](../benchmarks/realdata_finance/REPORT_WAVE_XVIII.md).
+Virgin `confirmation8` cleared the predeclared gate (flip **52.6%**, pred-up
+**53.7%**, nonflip **51.0%**, accuracy held vs clean). This is a confirmed
+finance win and the active experimental front end — **not** a Wave XI
+replacement and **not** a regime-generality claim. Protocol and scores:
+[`../benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md`](../benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md).
+
+### Historical experimental lineage (not active)
+
+- `SensoryGatedCellular` — first fresh-company PASS (relevance; flip 28.1%).
+- `SilenceEscapeCellular` — sealed confirmation4 PASS (flip 52.2%); ACI’s
+  null-channel ancestor.
+- Wave XVIII / skew / diagnostic-contrast — failed gates; not promoted.
+
+See [`../benchmarks/realdata_finance/README.md`](../benchmarks/realdata_finance/README.md).
