@@ -268,3 +268,25 @@ def test_clean_evidence_never_reverses_report_sign_and_learns_delayed_trust():
     assert model.src_tries[(7, 0)] > model.trust_prior_tries
     assert model.src_hits[(7, 0)] > model.trust_prior_hits
     assert model._delayed_trust_weight((7, 0)) > model._delayed_trust_weight((8, 0))
+
+
+def test_skew_correction_penalizes_all_positive_not_mixed_and_preserves_sign():
+    from tcm import SkewCorrectedCellular
+    from evaluate import CELL_PARAMS
+
+    model = SkewCorrectedCellular(base_rate_scale=1.5, **CELL_PARAMS)
+    key = (9, 0)
+    # Chronically Positive publisher.
+    model.src_pos[(0, 0)] = 20.0
+    model.src_neg[(0, 0)] = 2.0
+
+    rows = model._rows(key, [(0, 0, 1)])
+    assert rows[0][1] > 0
+
+    p_all, tr_all = model.predict(key, [(0, 0, 1)], t=1)
+    assert tr_all["skew_penalty"] > 0
+    assert p_all < tr_all["p_raw"]
+
+    p_mix, tr_mix = model.predict(key, [(0, 0, 1), (0, 0, 0)], t=2)
+    assert tr_mix["skew_penalty"] == 0.0
+    assert p_mix == tr_mix["p_raw"]

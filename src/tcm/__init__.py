@@ -3,6 +3,7 @@
 from .experimental import (
     CleanEvidenceCellular,
     SensoryGatedCellular,
+    SkewCorrectedCellular,
     WaveXVIIITrustCellular,
 )
 from .reference import BatchedReserveCellular, FairProvGraph
@@ -12,5 +13,6 @@ __all__ = [
     "CleanEvidenceCellular",
     "FairProvGraph",
     "SensoryGatedCellular",
+    "SkewCorrectedCellular",
     "WaveXVIIITrustCellular",
 ]

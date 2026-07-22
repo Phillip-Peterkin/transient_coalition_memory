@@ -229,6 +229,93 @@ class CleanEvidenceCellular(SensoryGatedCellular):
         return stats
 
 
+def _logit(probability: float) -> float:
+    probability = min(1.0 - EPS, max(EPS, probability))
+    return math.log(probability / (1.0 - probability))
+
+
+class SkewCorrectedCellular(CleanEvidenceCellular):
+    """Clean evidence plus publisher Positive base-rate correction.
+
+    Relevant financial headlines are ~88% Positive while next-session direction
+    is ~50%.  An all-Positive coalition therefore carries an emission base-rate
+    that should not be read as strong up evidence.
+
+    For cheerleader (all-Positive) coalitions this class subtracts
+
+        scale * mean_i [logit(P_emit+(source_i)) - logit(market_rate)]
+
+    from the decision logit.  Report signs stay preserved; mixed or negative
+    coalitions are untouched.  `scale=1` is the theoretical full correction.
+    """
+
+    name = "skew_corrected_cellular"
+
+    def __init__(
+        self,
+        *,
+        base_rate_scale: float = 1.0,
+        only_all_positive: bool = True,
+        market_rate: float = 0.5,
+        **params,
+    ):
+        super().__init__(**params)
+        self.base_rate_scale = float(base_rate_scale)
+        self.only_all_positive = bool(only_all_positive)
+        self.market_rate = float(market_rate)
+        self.skew_penalties = 0
+        self.skew_penalty_sum = 0.0
+
+    def _cheerleader_penalty(self, reports) -> float:
+        if not reports:
+            return 0.0
+        if self.only_all_positive and not all(vote == 1 for _, _, vote in reports):
+            return 0.0
+        gaps = []
+        for source, context, vote in reports:
+            if vote != 1:
+                continue
+            positive = self.src_pos[(source, context)]
+            negative = self.src_neg[(source, context)]
+            emit_positive = positive / (positive + negative)
+            gaps.append(max(0.0, _logit(emit_positive) - _logit(self.market_rate)))
+        if not gaps:
+            return 0.0
+        return self.base_rate_scale * (sum(gaps) / len(gaps))
+
+    def predict(self, key, reports, t):
+        probability, trace = super().predict(key, reports, t)
+        penalty = self._cheerleader_penalty(reports)
+        if penalty <= 0:
+            trace = dict(trace)
+            trace.update({"skew_penalty": 0.0, "p_raw": probability})
+            return probability, trace
+        corrected = _sigmoid(_logit(probability) - penalty)
+        self.skew_penalties += 1
+        self.skew_penalty_sum += penalty
+        trace = dict(trace)
+        trace.update(
+            {
+                "p": corrected,
+                "p_raw": probability,
+                "skew_penalty": penalty,
+            }
+        )
+        return corrected, trace
+
+    def stats(self):
+        stats = super().stats()
+        stats.update(
+            {
+                "skew_penalties": self.skew_penalties,
+                "mean_skew_penalty": (
+                    self.skew_penalty_sum / max(1, self.skew_penalties)
+                ),
+            }
+        )
+        return stats
+
+
 class WaveXVIIITrustCellular(SensoryGatedCellular):
     """Development-only per-item prediction-error-driven trust mechanism.
 
