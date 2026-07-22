@@ -1146,3 +1146,329 @@ class WaveXVIIITrustCellular(SensoryGatedCellular):
             }
         )
         return stats
+
+
+class ActiveCoalitionCellular(BatchedReserveCellular):
+    """Active Coalition Inference — one Friston-native upgrade.
+
+    Predictive coding under a read budget:
+
+    - Prior (fast/slow claim memory) never enters report strength.
+    - Each report is a precision-weighted log-likelihood ratio
+      Δ = log P(vote|up) − log P(vote|down), learned from delayed outcomes.
+    - Silence is a first-class channel: how often emptiness preceded change
+      vs stay relative to the prior prediction.
+    - Recruitment ranks by |Δ| (discriminative power), never by agreement
+      with memory — prior-neutral sampling.
+    - Prior and evidence meet once: posterior_lo = prior_lo + Σ Δ_active.
+    - Free-energy certificate: stop when unread Σ|Δ| cannot flip the sign
+      of the posterior (expected surprise reduction below read cost).
+
+    This is not TCM+DCAI bolted together. It is one cell whose native
+    quantities are precision, dual log-odds, and budgeted active sampling.
+    """
+
+    name = "active_coalition_cellular"
+
+    def __init__(
+        self,
+        *,
+        laplace: float = 1.0,
+        min_delta: float = 0.15,
+        max_silence_hazard: float = 0.70,
+        null_pe_floor: float = 0.35,
+        null_pe_span: float = 0.50,
+        null_err_beta: float = 0.30,
+        null_rho_gain: float = 0.30,
+        fe_cert_slack: float = 0.0,
+        use_correlation_discount: bool = True,
+        force_all_positive_null: bool = True,
+        **params,
+    ):
+        super().__init__(**params)
+        self.laplace = float(laplace)
+        self.min_delta = float(min_delta)
+        self.max_silence_hazard = float(max_silence_hazard)
+        self.null_pe_floor = float(null_pe_floor)
+        self.null_pe_span = float(null_pe_span)
+        self.null_err_beta = float(null_err_beta)
+        self.null_rho_gain = float(null_rho_gain)
+        self.fe_cert_slack = float(fe_cert_slack)
+        self.use_correlation_discount = bool(use_correlation_discount)
+        self.force_all_positive_null = bool(force_all_positive_null)
+
+        # Likelihood tables: counts of (source said vote | truth).
+        self.src_vote_up = defaultdict(lambda: self.laplace)
+        self.src_vote_down = defaultdict(lambda: self.laplace)
+        # Global backoff (pooled over sources) for sparse publishers.
+        self.global_vote_up = {0: self.laplace, 1: self.laplace}
+        self.global_vote_down = {0: self.laplace, 1: self.laplace}
+
+        # Null-channel precision: PE EWMA under emptiness / non-diagnostic
+        # clouds. High PE ⇒ continuation hypothesis failing ⇒ anti-prior mix.
+        # Start at 0.5 (same cold start as sealed silence-escape PE).
+        self.null_pe = defaultdict(lambda: 0.5)
+        self.belief_hist = defaultdict(list)
+
+        self.silence_events = 0
+        self.null_diagnostic_events = 0
+        self.fe_certificates = 0
+        self.source_backoff = 8.0
+
+    @staticmethod
+    def _correlation_scale(reports) -> float:
+        if len(reports) < 2:
+            return 1.0
+        votes = [vote for _, _, vote in reports]
+        agreeing_pairs = sum(
+            votes[i] == votes[j]
+            for i in range(len(votes))
+            for j in range(i + 1, len(votes))
+        )
+        total_pairs = len(votes) * (len(votes) - 1) / 2
+        agreement = agreeing_pairs / total_pairs if total_pairs else 0.0
+        effective_count = 1.0 + (len(votes) - 1) * (1.0 - agreement)
+        return effective_count / len(reports)
+
+    def _prior_log_odds(self, key) -> float:
+        return (
+            self.wf * (self.cf[(key, 1)] - self.cf[(key, 0)])
+            + self.ws * (self.cs[(key, 1)] - self.cs[(key, 0)])
+        ) / max(self.temp, EPS)
+
+    def _source_counts(self, source, vote: int) -> tuple[float, float, float, float]:
+        # Touch both votes so Laplace prior is symmetric for new sources.
+        up_v = self.src_vote_up[(source, vote)]
+        up_o = self.src_vote_up[(source, 1 - vote)]
+        down_v = self.src_vote_down[(source, vote)]
+        down_o = self.src_vote_down[(source, 1 - vote)]
+        return up_v, up_o, down_v, down_o
+
+    def _report_delta(self, source, vote: int) -> float:
+        """Evidence log-odds for *up* from observing this vote.
+
+        Source LR backed off toward a global pooled LR so sparse publishers
+        are not stuck at Δ≈0 forever.
+        """
+        vote = int(vote)
+        up_v, up_o, down_v, down_o = self._source_counts(source, vote)
+        p_v_up = up_v / max(EPS, up_v + up_o)
+        p_v_down = down_v / max(EPS, down_v + down_o)
+        source_delta = math.log(max(EPS, p_v_up)) - math.log(max(EPS, p_v_down))
+
+        g_up_v = self.global_vote_up[vote]
+        g_up_o = self.global_vote_up[1 - vote]
+        g_down_v = self.global_vote_down[vote]
+        g_down_o = self.global_vote_down[1 - vote]
+        g_p_up = g_up_v / max(EPS, g_up_v + g_up_o)
+        g_p_down = g_down_v / max(EPS, g_down_v + g_down_o)
+        global_delta = math.log(max(EPS, g_p_up)) - math.log(max(EPS, g_p_down))
+
+        n_source = up_v + up_o + down_v + down_o - 4.0 * self.laplace
+        weight = max(0.0, n_source) / (max(0.0, n_source) + self.source_backoff)
+        return weight * source_delta + (1.0 - weight) * global_delta
+
+    def _evidence_rows(self, reports):
+        scale = (
+            self._correlation_scale(reports) if self.use_correlation_discount else 1.0
+        )
+        rows = []
+        for source, context, vote in reports:
+            delta = self._report_delta(source, int(vote)) * scale
+            rows.append((abs(delta), delta, source, context, int(vote)))
+        rows.sort(key=lambda row: row[0], reverse=True)
+        self.preview_ops += self.header_cost * len(rows)
+        return rows
+
+    def _rho(self, key) -> float:
+        hist = self.belief_hist[key]
+        if len(hist) < 4:
+            return 0.0
+        x = hist[-4:-1]
+        y = hist[-3:]
+        mx = sum(x) / len(x)
+        my = sum(y) / len(y)
+        num = sum((a - mx) * (b - my) for a, b in zip(x, y))
+        den = sum((a - mx) ** 2 for a in x)
+        if den <= EPS:
+            return 0.0
+        return float(min(1.0, abs(num / den)))
+
+    def _track_belief(self, key) -> None:
+        fast = self.cf[(key, 1)] - self.cf[(key, 0)]
+        hist = self.belief_hist[key]
+        hist.append(fast)
+        if len(hist) > 8:
+            del hist[0]
+
+    def _null_hazard(self, key) -> float:
+        pe = self.null_pe[key]
+        hazard = max(0.0, (pe - self.null_pe_floor) / max(EPS, self.null_pe_span))
+        if self.null_rho_gain:
+            hazard += self.null_rho_gain * self._rho(key)
+        return float(min(self.max_silence_hazard, hazard))
+
+    def _silence_posterior(self, key, prior_p: float) -> tuple[float, float]:
+        # Precision that the continuation hypothesis is failing under null
+        # sensation — mix toward the rival (anti-prior). Friston form of the
+        # sealed silence-escape law (PE + stickiness), inside the null organ.
+        hazard = self._null_hazard(key)
+        probability = (1.0 - hazard) * prior_p + hazard * (1.0 - prior_p)
+        return probability, hazard
+
+    def _is_null_batch(self, reports, max_delta: float) -> bool:
+        if not reports:
+            return True
+        if self.force_all_positive_null and all(vote == 1 for _, _, vote in reports):
+            return True
+        return max_delta < self.min_delta
+
+    def predict(self, key, reports, t):
+        prior_lo = self._prior_log_odds(key)
+        prior_p = _sigmoid(prior_lo)
+
+        rows = self._evidence_rows(reports)[: self.max_k] if reports else []
+        max_delta = rows[0][0] if rows else 0.0
+
+        if self._is_null_batch(reports, max_delta):
+            probability, hazard = self._silence_posterior(key, prior_p)
+            if not reports:
+                self.silence_events += 1
+                stop_reason = "silence_channel"
+                self.infer_reads += 1.0
+            else:
+                self.null_diagnostic_events += 1
+                stop_reason = "null_diagnostic"
+                self.infer_reads += self.header_cost * len(reports) + 1.0
+            self._track_belief(key)
+            return probability, {
+                "key": key,
+                "p": probability,
+                "prior_p": prior_p,
+                "prior_lo": prior_lo,
+                "evidence_lo": 0.0,
+                "active": [],
+                "used": 0,
+                "contradiction": 0.0,
+                "hazard": hazard,
+                "required": 0,
+                "certificate_shift": 0.0,
+                "stop_reason": stop_reason,
+                "shadow_mass": (0.0, 0.0),
+                "max_delta": max_delta,
+                "null_pe": self.null_pe[key],
+            }
+
+        # Suffix of unread absolute evidence mass for free-energy certificate.
+        count = len(rows)
+        suffix_abs = [0.0] * (count + 1)
+        for index in range(count - 1, -1, -1):
+            suffix_abs[index] = suffix_abs[index + 1] + rows[index][0]
+
+        active = []
+        evidence_lo = 0.0
+        stop_reason = "budget"
+        for index, row in enumerate(rows):
+            abs_delta, delta, source, context, vote = row
+            active.append(row)
+            evidence_lo += delta
+            self.activation_ops += 1.0
+            self.ops += 2
+            posterior_lo = prior_lo + evidence_lo
+            unread = suffix_abs[index + 1]
+            # Certificate: unread discrimination cannot flip the commitment.
+            if len(active) >= self.min_k and abs(posterior_lo) > unread + self.fe_cert_slack:
+                stop_reason = "free_energy_certified"
+                self.fe_certificates += 1
+                break
+
+        posterior_lo = prior_lo + evidence_lo
+        probability = _sigmoid(posterior_lo)
+        pos = sum(delta for _, delta, _, _, _ in active if delta >= 0)
+        neg = sum(-delta for _, delta, _, _, _ in active if delta < 0)
+        contradiction = min(pos, neg) / (max(pos, neg) + EPS)
+        self.infer_reads += self.header_cost * len(reports) + len(active)
+        self._track_belief(key)
+
+        return probability, {
+            "key": key,
+            "p": probability,
+            "prior_p": prior_p,
+            "prior_lo": prior_lo,
+            "evidence_lo": evidence_lo,
+            "active": [
+                (source, context, vote, (key, vote), abs_delta)
+                for abs_delta, delta, source, context, vote in active
+            ],
+            "used": len(active),
+            "contradiction": contradiction,
+            "hazard": 0.0,
+            "required": self.min_k,
+            "certificate_shift": suffix_abs[len(active)] if active else 0.0,
+            "stop_reason": stop_reason,
+            "shadow_mass": (0.0, 0.0),
+            "max_delta": max_delta,
+            "unread_mass": suffix_abs[len(active)] if active else 0.0,
+        }
+
+    def feedback(self, event):
+        key = event["key"]
+        truth = int(event["truth"])
+        reports = event.get("reports", [])
+        trace = event["trace"]
+        null_channel = trace.get("stop_reason") in {
+            "silence_channel",
+            "null_diagnostic",
+        }
+
+        if null_channel or not reports:
+            # Precision update on the null channel from posterior error
+            # (same target as sealed silence-escape PE EWMA).
+            probability = float(trace["p"])
+            self.null_pe[key] = (
+                (1.0 - self.null_err_beta) * self.null_pe[key]
+                + self.null_err_beta * abs(truth - probability)
+            )
+
+        if reports:
+            for source, _context, vote in reports:
+                vote = int(vote)
+                if truth == 1:
+                    self.src_vote_up[(source, vote)] += 1.0
+                    self.global_vote_up[vote] += 1.0
+                else:
+                    self.src_vote_down[(source, vote)] += 1.0
+                    self.global_vote_down[vote] += 1.0
+
+        # Prior update only — evidence tables above are the likelihood organ.
+        probability = float(trace["p"])
+        err = float(truth) - probability
+        anchor_step = self.lr * self.anchor * (0.25 + abs(err))
+        true_key = (key, truth)
+        false_key = (key, 1 - truth)
+        self.cf[true_key] = self.fd * self.cf[true_key] + anchor_step
+        self.cf[false_key] = self.fd * self.cf[false_key] - anchor_step
+        self.cs[true_key] = self.sd * self.cs[true_key] + 0.08 * anchor_step
+        self.cs[false_key] = self.sd * self.cs[false_key] - 0.08 * anchor_step
+        self.up += 4
+        if hasattr(self, "learn_writes"):
+            self.learn_writes += 4.0
+        self.last_fb[key] = event.get("time", self.last_fb[key])
+
+    def stats(self):
+        stats = super().stats()
+        stats.update(
+            {
+                "silence_events": self.silence_events,
+                "null_diagnostic_events": self.null_diagnostic_events,
+                "fe_certificates": self.fe_certificates,
+                "mean_null_pe": (
+                    sum(self.null_pe.values()) / max(1, len(self.null_pe))
+                ),
+                "likelihood_sources": len(
+                    {source for source, _vote in self.src_vote_up}
+                    | {source for source, _vote in self.src_vote_down}
+                ),
+            }
+        )
+        return stats
