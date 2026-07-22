@@ -124,3 +124,62 @@ def test_relevance_gate_rejects_misattribution_and_keeps_direct_evidence():
     assert is_relevant("Apple's new product ships next month", "AAPL")
     assert not is_relevant("Judge revives Obama-era ban on coal sales", "AAPL")
     assert is_relevant("Nvidia announces a new AI platform", "NVDA")
+
+
+def test_wave_xviii_zero_trust_reproduces_sensory_model():
+    from collections import defaultdict
+
+    from relevance import RelevanceFinanceNewsStream
+    from tcm import SensoryGatedCellular, WaveXVIIITrustCellular
+    from evaluate import CELL_PARAMS
+
+    data = ROOT / "benchmarks" / "realdata_finance" / "data"
+    left = SensoryGatedCellular(**CELL_PARAMS)
+    right = WaveXVIIITrustCellular(mistrust_gain=0.0, correct_relaxation=0.0, **CELL_PARAMS)
+    left_q, right_q = defaultdict(list), defaultdict(list)
+    stream = RelevanceFinanceNewsStream(data)
+
+    for event in stream.events[:120]:
+        for feedback in left_q.pop(event.t, []):
+            left.feedback(feedback)
+        for feedback in right_q.pop(event.t, []):
+            right.feedback(feedback)
+        lp, lt = left.predict(event.key, event.reports, event.t)
+        rp, rt = right.predict(event.key, event.reports, event.t)
+        assert np.isclose(lp, rp)
+        left_q[event.t + 1].append(
+            {"key": event.key, "reports": event.reports, "truth": event.truth,
+             "pred": lp, "trace": lt, "time": event.t + 1}
+        )
+        right_q[event.t + 1].append(
+            {"key": event.key, "reports": event.reports, "truth": event.truth,
+             "pred": rp, "trace": rt, "time": event.t + 1}
+        )
+
+
+def test_wave_xviii_confident_error_changes_all_three_next_decision_controls():
+    from tcm import WaveXVIIITrustCellular
+    from evaluate import CELL_PARAMS
+
+    model = WaveXVIIITrustCellular(**CELL_PARAMS)
+    key = (17, 0)
+    model.feedback({"key": key, "reports": [], "truth": 0, "trace": {"p": 0.9, "active": []}})
+    assert model.mistrust[key] > model.recruit_threshold
+
+    _, trace = model.predict(key, [(0, 0, 1), (1, 0, 0)], t=1)
+    assert trace["hazard"] >= trace["base_hazard"]
+    assert trace["extra_recruited"] == 1
+    assert trace["anchor_scale"] < 1.0
+    assert trace["fresh_evidence_floor"] > 0.0
+
+
+def test_wave_xviii_confident_success_relaxes_only_its_item():
+    from tcm import WaveXVIIITrustCellular
+    from evaluate import CELL_PARAMS
+
+    model = WaveXVIIITrustCellular(**CELL_PARAMS)
+    key_a, key_b = (1, 0), (2, 0)
+    model.mistrust[key_a] = 0.8
+    model.feedback({"key": key_a, "reports": [], "truth": 1, "trace": {"p": 0.9, "active": []}})
+    assert 0.0 <= model.mistrust[key_a] < 0.8
+    assert model.mistrust[key_b] == 0.0
