@@ -182,6 +182,7 @@ persistence as intelligence.**
 
 | Doc | Role |
 |---|---|
+| [`README.md`](README.md) | Index of all docs in this folder |
 | [`TCM_Vision_and_Technical_Report.pdf`](TCM_Vision_and_Technical_Report.pdf) | Canonical Vision & Technical Report |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Frozen mechanisms + known failure modes |
 | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) | How to run / reproduce on `main` |
