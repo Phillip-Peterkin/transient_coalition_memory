@@ -69,6 +69,10 @@ finance win and the active experimental front end — **not** a Wave XI
 replacement and **not** a regime-generality claim. Protocol and scores:
 [`../benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md`](../benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md).
 
+Synthetic adversarial boss (sealed ACI on Wave XI `World` seeds): **FAIL**
+vs frozen Wave XI and fair graph under predeclared slacks. See
+[`../benchmarks/aci_boss/REPORT_BOSS.md`](../benchmarks/aci_boss/REPORT_BOSS.md).
+
 ### Historical experimental lineage (not active)
 
 - `SensoryGatedCellular` — first fresh-company PASS (relevance; flip 28.1%).

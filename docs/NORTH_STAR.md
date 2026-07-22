@@ -255,8 +255,14 @@ Implementation: `tcm.ActiveCoalitionCellular` (alias
 - **Bake status:** active experimental real-data TCM. **Not** a Wave XI
   foundation replacement. **Not** a regime-generality claim (no Weather
   harness; synthetic adversarial identity of Wave XI unchanged).
-- confirmation8 is spent; do not retune on it. Next foundation-level claims
-  need synthetic/adversarial regression and trustworthy-source regime tests.
+- confirmation8 is spent; do not retune on it.
+- Synthetic adversarial boss (`benchmarks/aci_boss/`, Wave XI seeds
+  `15300`–`15303`, sealed defaults): **FAIL** — fresh acc 0.960 vs Wave XI
+  0.986 (−2.6 pts), changed-fact 0.929 vs 0.966 (−3.7 pts); also below fair
+  graph on both. See
+  [`REPORT_BOSS.md`](../benchmarks/aci_boss/REPORT_BOSS.md). Foundation
+  replacement remains blocked. Weather still unavailable as the true
+  trustworthy-source final boss.
 
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where
