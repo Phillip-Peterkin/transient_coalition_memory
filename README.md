@@ -39,6 +39,10 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
   predeclared gate (flip **52.6%**, pred-up 53.7%). Wave XI remains the frozen
   synthetic reference — ACI is not a foundation replacement. See
   [`benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md`](benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md).
+- Synthetic adversarial boss (sealed ACI on Wave XI worlds): **FAIL** — fresh
+  acc 0.960 vs Wave XI 0.986; changed-fact 0.929 vs 0.966. Protocol and
+  writeup: [`benchmarks/aci_boss/`](benchmarks/aci_boss/). Weather (true
+  trustworthy-source final) is still unavailable in-repo.
 - Earlier sealed steps kept as lineage: relevance front end (confirmation
   flip 28.1%); silence escape (confirmation4 flip 52.2%). Wave XVIII and
   diagnostic-contrast ports failed their gates and are not promoted.
