@@ -290,3 +290,37 @@ def test_skew_correction_penalizes_all_positive_not_mixed_and_preserves_sign():
     p_mix, tr_mix = model.predict(key, [(0, 0, 1), (0, 0, 0)], t=2)
     assert tr_mix["skew_penalty"] == 0.0
     assert p_mix == tr_mix["p_raw"]
+
+
+def test_silence_escape_releases_attractor_without_using_previous_label():
+    from tcm import SilenceEscapeCellular
+    from evaluate import CELL_PARAMS
+
+    model = SilenceEscapeCellular(
+        pe_floor=0.35,
+        pe_span=0.50,
+        rho_gain=0.30,
+        max_hazard=0.70,
+        apply_to_all_positive=True,
+        **CELL_PARAMS,
+    )
+    key = (11, 0)
+    model.cf[(key, 1)] = 3.0
+    model.cs[(key, 1)] = 3.0
+    model.cf[(key, 0)] = 0.0
+    model.cs[(key, 0)] = 0.0
+    model.err_ewma[key] = 0.8
+
+    p_silent, tr_silent = model.predict(key, [], t=1)
+    assert tr_silent["stop_reason"] == "silence_escape"
+    assert tr_silent["escape_hazard"] > 0
+    # High PE should pull away from confident up-memory.
+    assert p_silent < tr_silent["memory_p"]
+
+    p_cheer, tr_cheer = model.predict(key, [(0, 0, 1)], t=2)
+    assert tr_cheer["stop_reason"] == "silence_escape"
+
+    # Mixed evidence keeps the clean path (not silence escape).
+    p_mix, tr_mix = model.predict(key, [(0, 0, 1), (1, 0, 0)], t=3)
+    assert tr_mix.get("stop_reason") != "silence_escape"
+    assert 0.0 <= p_mix <= 1.0

@@ -316,6 +316,136 @@ class SkewCorrectedCellular(CleanEvidenceCellular):
         return stats
 
 
+class SilenceEscapeCellular(CleanEvidenceCellular):
+    """Release sticky memory when sensation is absent or cheerleader-null.
+
+    Autopsy of real flip misses: under sensory silence, memory is
+    *anti*-correlated with the next move.  The attractor seals the old regime
+    exactly when the world is changing.
+
+    Mechanism (HRF / fitted-dynamics aligned):
+
+    - Treat no relevant reports, and optionally all-Positive cheerleader
+      coalitions, as null sensation.
+    - Estimate a local escape hazard from precision-weighted prediction-error
+      EWMA and optional belief AR(1) criticality (|rho|).
+    - Mix memory toward the anti-memory hypothesis with that hazard.
+    - When real mixed/negative reports arrive, fall through to clean evidence
+      (sign-preserving, delayed trust). Never uses the previous label.
+    """
+
+    name = "silence_escape_cellular"
+
+    def __init__(
+        self,
+        *,
+        pe_floor: float = 0.35,
+        pe_span: float = 0.50,
+        rho_gain: float = 0.30,
+        max_hazard: float = 0.70,
+        apply_to_all_positive: bool = True,
+        err_beta: float = 0.30,
+        **params,
+    ):
+        super().__init__(**params)
+        self.pe_floor = float(pe_floor)
+        self.pe_span = float(pe_span)
+        self.rho_gain = float(rho_gain)
+        self.max_hazard = float(max_hazard)
+        self.apply_to_all_positive = bool(apply_to_all_positive)
+        self.err_beta = float(err_beta)
+        self.err_ewma = defaultdict(lambda: 0.5)
+        self.belief_hist = defaultdict(list)
+        self.escape_events = 0
+
+    def _is_null_sensation(self, reports) -> bool:
+        if not reports:
+            return True
+        if self.apply_to_all_positive and all(vote == 1 for _, _, vote in reports):
+            return True
+        return False
+
+    def _rho(self, key) -> float:
+        hist = self.belief_hist[key]
+        if len(hist) < 4:
+            return 0.0
+        x = hist[-4:-1]
+        y = hist[-3:]
+        mx = sum(x) / len(x)
+        my = sum(y) / len(y)
+        num = sum((a - mx) * (b - my) for a, b in zip(x, y))
+        den = sum((a - mx) ** 2 for a in x)
+        if den <= EPS:
+            return 0.0
+        return float(min(1.0, abs(num / den)))
+
+    def _escape_hazard(self, key) -> float:
+        pe = self.err_ewma[key]
+        hazard = max(0.0, (pe - self.pe_floor) / max(EPS, self.pe_span))
+        if self.rho_gain:
+            hazard += self.rho_gain * self._rho(key)
+        return float(min(self.max_hazard, hazard))
+
+    def _memory_probability(self, key) -> float:
+        memory_log_odds = (
+            self.wf * (self.cf[(key, 1)] - self.cf[(key, 0)])
+            + self.ws * (self.cs[(key, 1)] - self.cs[(key, 0)])
+        )
+        return _sigmoid(memory_log_odds / max(self.temp, EPS))
+
+    def _track_belief(self, key) -> None:
+        fast = self.cf[(key, 1)] - self.cf[(key, 0)]
+        hist = self.belief_hist[key]
+        hist.append(fast)
+        if len(hist) > 8:
+            del hist[0]
+
+    def predict(self, key, reports, t):
+        if not self._is_null_sensation(reports):
+            probability, trace = super().predict(key, reports, t)
+            self._track_belief(key)
+            return probability, trace
+
+        memory_p = self._memory_probability(key)
+        hazard = self._escape_hazard(key)
+        probability = (1.0 - hazard) * memory_p + hazard * (1.0 - memory_p)
+        self.infer_reads += 1.0
+        if hazard > 0:
+            self.escape_events += 1
+        self._track_belief(key)
+        return probability, {
+            "key": key,
+            "p": probability,
+            "active": [],
+            "used": 0,
+            "contradiction": 0.0,
+            "hazard": hazard,
+            "required": 0,
+            "certificate_shift": 0.0,
+            "stop_reason": "silence_escape",
+            "shadow_mass": (0.0, 0.0),
+            "memory_p": memory_p,
+            "escape_hazard": hazard,
+            "err_ewma": self.err_ewma[key],
+            "rho": self._rho(key),
+        }
+
+    def feedback(self, event):
+        key = event["key"]
+        probability = float(event["trace"]["p"])
+        truth = int(event["truth"])
+        self.err_ewma[key] = (
+            (1.0 - self.err_beta) * self.err_ewma[key]
+            + self.err_beta * abs(truth - probability)
+        )
+        super().feedback(event)
+
+    def stats(self):
+        stats = super().stats()
+        stats["escape_events"] = self.escape_events
+        return stats
+
+
 class WaveXVIIITrustCellular(SensoryGatedCellular):
     """Development-only per-item prediction-error-driven trust mechanism.
 

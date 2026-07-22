@@ -3,6 +3,7 @@
 from .experimental import (
     CleanEvidenceCellular,
     SensoryGatedCellular,
+    SilenceEscapeCellular,
     SkewCorrectedCellular,
     WaveXVIIITrustCellular,
 )
@@ -13,6 +14,7 @@ __all__ = [
     "CleanEvidenceCellular",
     "FairProvGraph",
     "SensoryGatedCellular",
+    "SilenceEscapeCellular",
     "SkewCorrectedCellular",
     "WaveXVIIITrustCellular",
 ]

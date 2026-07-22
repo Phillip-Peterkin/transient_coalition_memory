@@ -40,6 +40,14 @@ from all-Positive coalitions. Contact-tail looked strong (~47% flip), but the
 predeclared virgin `confirmation3` look **failed** (42.2% flip, no gain vs
 clean). Details: `REPORT_SKEW.md`, `REPORT_SKEW_CONFIRMATION.md`.
 
+### Silence escape (development freeze candidate)
+
+`tcm.SilenceEscapeCellular`: when sensation is null (empty or all-Positive),
+prediction-error + belief criticality releases sticky memory toward
+anti-memory. Contact-tail selected cell: flip **49.1%** (+8.2 pts vs clean,
+p≈0.003), pred-up ~49%. **Not confirmed** — needs a new virgin universe.
+Details: `REPORT_SILENCE_ESCAPE.md`.
+
 ## Setup
 
 ```bash
@@ -92,6 +100,8 @@ resamples) for accuracy and flip detection. Writeup: `REPORT_ABLATION.md`.
   the new purity / performance markers
 - `REPORT_SKEW.md` — publisher Positive base-rate correction (contact only)
 - `REPORT_SKEW_CONFIRMATION.md` — virgin confirmation3 **fail** (42.2% flip)
+- `REPORT_SILENCE_ESCAPE.md` — PE/rho null-sensation escape (dev freeze;
+  awaiting sealed confirmation)
 
 ## Process honesty
 
