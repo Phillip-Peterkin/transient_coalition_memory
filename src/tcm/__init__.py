@@ -2,6 +2,7 @@
 
 from .experimental import (
     CleanEvidenceCellular,
+    DiagnosticContrastCellular,
     SensoryGatedCellular,
     SilenceEscapeCellular,
     SkewCorrectedCellular,
@@ -12,6 +13,7 @@ from .reference import BatchedReserveCellular, FairProvGraph
 __all__ = [
     "BatchedReserveCellular",
     "CleanEvidenceCellular",
+    "DiagnosticContrastCellular",
     "FairProvGraph",
     "SensoryGatedCellular",
     "SilenceEscapeCellular",

@@ -446,6 +446,182 @@ class SilenceEscapeCellular(CleanEvidenceCellular):
         return stats
 
 
+class DiagnosticContrastCellular(SilenceEscapeCellular):
+    """Bake DCAI architectural laws into the silence-escape cell.
+
+    Not a wrapper stack. Laws live on the same sensation → PE → hazard →
+    transition path:
+
+    1. Slot preservation — a report that only paraphrases the current memory
+       direction slot is not diagnostic sensation (`preserve_cloud`). Kept
+       *with* the confirmed cheerleader-null law (all-Positive is null); using
+       slot-null alone reopens publisher up-skew.
+    2. Typed operator fire + paraphrase demotion — on real slot-edit
+       sensation, memory-agreeing reports are demoted in recruitment so
+       confirming paraphrases cannot seal the attractor.
+    3. Escape hazard stays the silence-escape PE+|ρ| sum by default.
+       Noisy-OR survival over those two scalars failed contact screens
+       (`use_survival_hazard=True`); span-style survival needs a richer local
+       defect substrate than this binary feed currently provides.
+    """
+
+    name = "diagnostic_contrast_cellular"
+
+    def __init__(
+        self,
+        *,
+        slot_preserve_scale: float = 0.50,
+        use_slot_null: bool = True,
+        use_survival_hazard: bool = False,
+        **params,
+    ):
+        super().__init__(**params)
+        self.slot_preserve_scale = float(slot_preserve_scale)
+        self.use_slot_null = bool(use_slot_null)
+        self.use_survival_hazard = bool(use_survival_hazard)
+        self.operator_counts = defaultdict(int)
+        self.slot_demotions = 0
+
+    def _memory_side(self, key):
+        preference = (
+            self.wf * (self.cf[(key, 1)] - self.cf[(key, 0)])
+            + self.ws * (self.cs[(key, 1)] - self.cs[(key, 0)])
+        )
+        if abs(preference) <= EPS:
+            return None
+        return 1 if preference > 0 else 0
+
+    @staticmethod
+    def _noisy_or(hazards) -> float:
+        survival = 1.0
+        for hazard in hazards:
+            clamped = min(1.0, max(0.0, float(hazard)))
+            survival *= 1.0 - clamped
+        return 1.0 - survival
+
+    def _operator_state(self, key, reports) -> dict:
+        if not reports:
+            return {
+                "operators": ("absence",),
+                "null": True,
+                "edit_votes": (),
+                "preserve_votes": (),
+            }
+        # Confirmed silence-escape cheerleader law — keep it.
+        if self.apply_to_all_positive and all(vote == 1 for _, _, vote in reports):
+            return {
+                "operators": ("cheerleader_null",),
+                "null": True,
+                "edit_votes": (),
+                "preserve_votes": tuple(vote for _, _, vote in reports),
+            }
+
+        memory_side = self._memory_side(key)
+        votes = [vote for _, _, vote in reports]
+        if memory_side is None:
+            mixed = len(set(votes)) > 1
+            return {
+                "operators": (("fusion_conflict",) if mixed else ("uncommitted_cloud",)),
+                "null": False,
+                "edit_votes": tuple(votes),
+                "preserve_votes": (),
+            }
+
+        edit_votes = tuple(vote for vote in votes if vote != memory_side)
+        preserve_votes = tuple(vote for vote in votes if vote == memory_side)
+        if self.use_slot_null and not edit_votes:
+            return {
+                "operators": ("preserve_cloud",),
+                "null": True,
+                "edit_votes": (),
+                "preserve_votes": preserve_votes,
+            }
+        operators = ["direction_swap"] if edit_votes else ["uncommitted_cloud"]
+        if preserve_votes and edit_votes:
+            operators.append("fusion_conflict")
+        return {
+            "operators": tuple(operators),
+            "null": False,
+            "edit_votes": edit_votes,
+            "preserve_votes": preserve_votes,
+        }
+
+    def _escape_hazard(self, key) -> float:
+        pe = self.err_ewma[key]
+        pe_hazard = max(0.0, (pe - self.pe_floor) / max(EPS, self.pe_span))
+        rho_hazard = self.rho_gain * self._rho(key) if self.rho_gain else 0.0
+        if self.use_survival_hazard:
+            hazard = self._noisy_or([pe_hazard, rho_hazard])
+        else:
+            hazard = pe_hazard + rho_hazard
+        return float(min(self.max_hazard, hazard))
+
+    def _rows(self, key, reports):
+        rows = CleanEvidenceCellular._rows(self, key, reports)
+        if self.slot_preserve_scale >= 1.0 - EPS:
+            return rows
+        memory_side = self._memory_side(key)
+        if memory_side is None:
+            return rows
+        scaled = []
+        for abs_strength, signed_strength, source, context, vote, claim_key in rows:
+            if vote == memory_side:
+                signed_strength = signed_strength * self.slot_preserve_scale
+                abs_strength = abs(signed_strength)
+                self.slot_demotions += 1
+            scaled.append(
+                (abs_strength, signed_strength, source, context, vote, claim_key)
+            )
+        scaled.sort(key=lambda row: row[0], reverse=True)
+        return scaled
+
+    def predict(self, key, reports, t):
+        state = self._operator_state(key, reports)
+        for operator in state["operators"]:
+            self.operator_counts[operator] += 1
+        if state["null"]:
+            memory_p = self._memory_probability(key)
+            hazard = self._escape_hazard(key)
+            probability = (1.0 - hazard) * memory_p + hazard * (1.0 - memory_p)
+            self.infer_reads += 1.0
+            if hazard > 0:
+                self.escape_events += 1
+            self._track_belief(key)
+            return probability, {
+                "key": key,
+                "p": probability,
+                "active": [],
+                "used": 0,
+                "contradiction": 0.0,
+                "hazard": hazard,
+                "required": 0,
+                "certificate_shift": 0.0,
+                "stop_reason": "diagnostic_contrast_escape",
+                "shadow_mass": (0.0, 0.0),
+                "memory_p": memory_p,
+                "escape_hazard": hazard,
+                "err_ewma": self.err_ewma[key],
+                "rho": self._rho(key),
+                "operators": state["operators"],
+            }
+
+        probability, trace = CleanEvidenceCellular.predict(self, key, reports, t)
+        self._track_belief(key)
+        trace = dict(trace)
+        trace["operators"] = state["operators"]
+        return probability, trace
+
+    def stats(self):
+        stats = super().stats()
+        stats.update(
+            {
+                "slot_demotions": self.slot_demotions,
+                "operator_counts": dict(self.operator_counts),
+            }
+        )
+        return stats
+
+
 class WaveXVIIITrustCellular(SensoryGatedCellular):
     """Development-only per-item prediction-error-driven trust mechanism.
 
