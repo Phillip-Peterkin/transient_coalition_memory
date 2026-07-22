@@ -1,0 +1,136 @@
+{
+  "protocol": "diagnostic_contrast_confirmation_v1",
+  "fixed_candidate": "SessionRelevanceFinanceNewsStream + DiagnosticContrastCellular({'pe_floor': 0.35, 'pe_span': 0.5, 'rho_gain': 0.3, 'max_hazard': 0.7, 'apply_to_all_positive': True, 'slot_preserve_scale': 0.5, 'use_slot_null': True, 'use_survival_hazard': False})",
+  "baselines": {
+    "clean": "CleanEvidenceCellular",
+    "silence_escape": "SilenceEscapeCellular({'pe_floor': 0.35, 'pe_span': 0.5, 'rho_gain': 0.3, 'max_hazard': 0.7, 'apply_to_all_positive': True})"
+  },
+  "universe": "confirmation5_universe",
+  "stream": {
+    "n_events": 1566,
+    "n_symbols": 30,
+    "n_sources": 10,
+    "n_days": 281,
+    "contact_events": 1002,
+    "holdout_events": 564,
+    "flip_events": 760,
+    "truth_up_rate": 0.4776500638569604,
+    "mean_reports": 0.8186462324393359,
+    "mean_sites": 0.7286079182630907,
+    "multi_source_frac": 0.10472541507024266,
+    "mean_source_agreement": 0.8607780612244899,
+    "sources": {
+      "0": "benzinga",
+      "1": "feeds2",
+      "2": "finance",
+      "3": "fool",
+      "4": "globenewswire",
+      "5": "investing",
+      "6": "investorplace",
+      "7": "marketbeat",
+      "8": "marketwatch",
+      "9": "profitconfidential"
+    },
+    "sensory_gate": "explicit_company_mention_in_title",
+    "session_protocol": "close_cutoff_america_new_york",
+    "flip_definition": "adjacent_trading_session",
+    "duplicate_symbol_session_events": 0,
+    "news_event_gap_mean": 5.400390625,
+    "news_event_gap_frac_1": 0.3001302083333333,
+    "news_event_gap_frac_gt_1": 0.6998697916666666,
+    "flip_events_adjacent_session": 760,
+    "events_without_relevant_reports": 631,
+    "relevant_article_fraction": 0.5665046398585948,
+    "assigned_article_fraction": 1.0,
+    "dropped_unassigned_articles": 0,
+    "company_patterns": 164,
+    "session_timezone": "America/New_York",
+    "session_close": "16:00"
+  },
+  "warmup": "first 70% of dates; causal state only, not scored",
+  "confirmation": {
+    "clean_baseline": {
+      "n": 564,
+      "accuracy": 0.5212765957446809,
+      "flip_accuracy": 0.4626865671641791,
+      "nonflip_accuracy": 0.5743243243243243,
+      "flip_n": 268,
+      "brier": 0.25517198994358103,
+      "ece": 0.07465618309361285,
+      "pred_up_rate": 0.6843971631205674,
+      "avg_activated": 0.5797872340425532
+    },
+    "silence_escape": {
+      "n": 564,
+      "accuracy": 0.46631205673758863,
+      "flip_accuracy": 0.4626865671641791,
+      "nonflip_accuracy": 0.46959459459459457,
+      "flip_n": 268,
+      "brier": 0.25025447660028777,
+      "ece": 0.058033262460419545,
+      "pred_up_rate": 0.5407801418439716,
+      "avg_activated": 0.0673758865248227
+    },
+    "diagnostic_contrast": {
+      "n": 564,
+      "accuracy": 0.4734042553191489,
+      "flip_accuracy": 0.47761194029850745,
+      "nonflip_accuracy": 0.46959459459459457,
+      "flip_n": 268,
+      "brier": 0.2508229879348191,
+      "ece": 0.04679266911040818,
+      "pred_up_rate": 0.5301418439716312,
+      "avg_activated": 0.05319148936170213
+    },
+    "paired": {
+      "vs_clean_accuracy": {
+        "delta": -0.047872340425531915,
+        "lo": -0.10638297872340426,
+        "hi": 0.010638297872340425,
+        "p": 0.112
+      },
+      "vs_clean_flip": {
+        "delta": 0.014925373134328358,
+        "lo": -0.06716417910447761,
+        "hi": 0.09701492537313433,
+        "p": 0.672
+      },
+      "vs_silence_accuracy": {
+        "delta": 0.0070921985815602835,
+        "lo": -0.014184397163120567,
+        "hi": 0.028368794326241134,
+        "p": 0.452
+      },
+      "vs_silence_flip": {
+        "delta": 0.014925373134328358,
+        "lo": -0.007462686567164179,
+        "hi": 0.03731343283582089,
+        "p": 0.154
+      }
+    },
+    "bootstrap_confidence_intervals": {
+      "clean_flip": {
+        "mean": 0.4626865671641791,
+        "lo": 0.40298507462686567,
+        "hi": 0.5223880597014925
+      },
+      "silence_flip": {
+        "mean": 0.4626865671641791,
+        "lo": 0.40298507462686567,
+        "hi": 0.5223880597014925
+      },
+      "candidate_flip": {
+        "mean": 0.47761194029850745,
+        "lo": 0.417910447761194,
+        "hi": 0.5373134328358209
+      }
+    },
+    "passes_predeclared_gate": false,
+    "gate": {
+      "flip_accuracy_min": 0.45,
+      "accuracy_max_drop_vs_clean": 0.01,
+      "pred_up_rate_max": 0.65,
+      "nonflip_accuracy_min": 0.5
+    }
+  }
+}

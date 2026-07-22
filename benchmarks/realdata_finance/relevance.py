@@ -29,6 +29,7 @@ COMPANY_PATTERNS = {
     "AAL": (r"\bamerican airlines\b",),
     "AAPL": (r"\bapple\b",),
     "ADBE": (r"\badobe\b",),
+    "AFRM": (r"\baffirm\b",),
     "ALB": (r"\balbemarle\b",),
     "AMAT": (r"\bapplied materials\b",),
     "AMD": (r"\bamd\b", r"\badvanced micro devices\b"),
@@ -45,8 +46,11 @@ COMPANY_PATTERNS = {
     "BIIB": (r"\bbiogen\b",),
     "BMY": (r"\bbristol[- ]myers\b",),
     "BKNG": (r"\bbooking holdings\b", r"\bbooking\.com\b"),
+    "BNTX": (r"\bbiontech\b",),
     "CBOE": (r"\bcboe\b", r"\bchicago board options\b"),
     "CCI": (r"\bcrown castle\b",),
+    "CCL": (r"\bcarnival\b",),
+    "CHWY": (r"\bchewy\b",),
     "CI": (r"\bcigna\b",),
     "CMG": (r"\bchipotle\b",),
     "CNI": (r"\bcanadian national\b", r"\bcn railway\b", r"\bcn rail\b"),
@@ -65,7 +69,7 @@ COMPANY_PATTERNS = {
     "DG": (r"\bdollar general\b",),
     "DIS": (r"\bdisney\b",),
     "DKNG": (r"\bdraftkings\b",),
-    "DOCU": (r"\bdocuSign\b", r"\bdocusign\b"),
+    "DOCU": (r"\bdocusign\b",),
     "DVN": (r"\bdevon energy\b",),
     "EA": (r"\belectronic arts\b",),
     "ED": (r"\bconsolidated edison\b", r"\bcon edison\b"),
@@ -185,8 +189,6 @@ COMPANY_PATTERNS = {
     "XPEV": (r"\bxpeng\b",),
     "ZM": (r"\bzoom video\b", r"\bzoom\b"),
     "ZS": (r"\bzscaler\b",),
-    "BNTX": (r"\bbiontech\b",),
-    "CCL": (r"\bcarnival\b",),
 }
 
 
