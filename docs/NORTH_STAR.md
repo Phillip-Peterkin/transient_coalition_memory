@@ -294,6 +294,20 @@ majority 0.999 / Wave XI 0.990) and is slower wall-clock than ACI/Wave XI
 while remaining activation-sparser. See
 [`REPORT.md`](../benchmarks/truth_discovery/REPORT.md).
 
+### 20. Causal delayed-feedback source aggregation — DBSA-v1 pilot failed
+The coherent task is not static truth discovery: given named reports at time
+`t`, predict before a delayed label arrives, then adapt through source drift
+and dependence. DBSA-v1 gives every method the same packets and 14-event
+feedback delay across independent, copied, drift, recurring-crossover,
+adversarial, and missingness worlds.
+
+First sealed pilot (24 fixed seeds × 800 events): **FAIL** for Aware. A
+fading causal per-source Beta reliability filter wins Brier in every
+nontrivial drift world; Aware fails its Fixed-Share non-inferiority and
+post-shift recovery gates. It remains sparse downstream (about five of 12
+reports activated) but is slower. No DBSA parameter retune follows the first
+look. See [`REPORT_PILOT.md`](../benchmarks/dbsa/REPORT_PILOT.md).
+
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where
 it is genuinely state of the art on accuracy, cost, and calibration — but it
