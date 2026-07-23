@@ -24,8 +24,10 @@ Resources are a **Pareto frontier** (no hard activation threshold).
 
 - Contract screen (24-seed, sealed post-rebuild): **FAIL** —
   [`REPORT_CONTRACT_SCREEN.md`](REPORT_CONTRACT_SCREEN.md)
-- Leadership synthetic contract (200-seed): **FAIL** —
+- Leadership synthetic contract (200-seed, pre-fix): **FAIL** —
   [`REPORT_CONTRACT_200.md`](REPORT_CONTRACT_200.md)
+- Leadership synthetic contract (200-seed, after push): **PASS** —
+  [`REPORT_CONTRACT_200_PUSH.md`](REPORT_CONTRACT_200_PUSH.md)
 - Gate bug fix (false “no evidence” on large agreeing batches):
   [`REPORT_GATE_BUG.md`](REPORT_GATE_BUG.md)
 - Source-trust regime pack:
