@@ -24,7 +24,7 @@ def test_all_preregistered_worlds_generate_delayed_named_reports():
 
 
 def test_feedback_is_not_available_before_its_declared_delay():
-    events = generate("independent_stable", seed=11, rounds=DELAY)
+    events = generate("independent_stable", seed=11, rounds=DELAY + 1)[:DELAY]
     model = FadingSourceBayes()
     result = run_model(events, model)
     assert result["model_stats"]["updates"] == 0
