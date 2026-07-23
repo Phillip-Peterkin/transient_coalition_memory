@@ -1,0 +1,95 @@
+{
+  "protocol": "relevance_confirmation_v1",
+  "fixed_candidate": "source calibration + correlation discount + explicit title relevance + memory fallback",
+  "stream": {
+    "n_events": 1496,
+    "n_symbols": 29,
+    "n_sources": 10,
+    "n_days": 280,
+    "contact_events": 975,
+    "holdout_events": 521,
+    "flip_events": 735,
+    "truth_up_rate": 0.47794117647058826,
+    "mean_reports": 0.518048128342246,
+    "mean_sites": 0.4659090909090909,
+    "multi_source_frac": 0.045454545454545456,
+    "mean_source_agreement": 0.8233618233618234,
+    "sources": {
+      "0": "benzinga",
+      "1": "feeds2",
+      "2": "finance",
+      "3": "fool",
+      "4": "globenewswire",
+      "5": "investing",
+      "6": "investorplace",
+      "7": "itbusiness",
+      "8": "marketbeat",
+      "9": "marketwatch"
+    },
+    "sensory_gate": "explicit_company_mention_in_title",
+    "relevant_article_fraction": 0.38964303670186023,
+    "events_without_relevant_reports": 886
+  },
+  "warmup": "first 70% of dates; causal state only, not scored",
+  "confirmation": {
+    "calibrated_baseline": {
+      "n": 521,
+      "accuracy": 0.4932821497120921,
+      "flip_accuracy": 0.22134387351778656,
+      "nonflip_accuracy": 0.75,
+      "flip_n": 253,
+      "brier": 0.2556534755428585,
+      "ece": 0.05162168640811568,
+      "pred_up_rate": 0.5393474088291746,
+      "avg_activated": 1.126679462571977
+    },
+    "relevance_gated": {
+      "n": 521,
+      "accuracy": 0.5201535508637236,
+      "flip_accuracy": 0.28063241106719367,
+      "nonflip_accuracy": 0.746268656716418,
+      "flip_n": 253,
+      "brier": 0.25583155083490516,
+      "ece": 0.07076844841702684,
+      "pred_up_rate": 0.4817658349328215,
+      "avg_activated": 0.4049904030710173
+    },
+    "paired_vs_calibrated_baseline": {
+      "accuracy": {
+        "delta": 0.026871401151631478,
+        "lo": -0.003838771593090211,
+        "hi": 0.05950095969289827,
+        "p": 0.0836
+      },
+      "flip_accuracy": {
+        "delta": 0.05928853754940711,
+        "lo": 0.011857707509881422,
+        "hi": 0.1067193675889328,
+        "p": 0.0064
+      }
+    },
+    "bootstrap_confidence_intervals": {
+      "baseline_accuracy": {
+        "mean": 0.4932821497120921,
+        "lo": 0.4510556621880998,
+        "hi": 0.5355086372360844
+      },
+      "gated_accuracy": {
+        "mean": 0.5201535508637236,
+        "lo": 0.4779270633397313,
+        "hi": 0.564299424184261
+      },
+      "baseline_flip": {
+        "mean": 0.22134387351778656,
+        "lo": 0.17391304347826086,
+        "hi": 0.2727272727272727
+      },
+      "gated_flip": {
+        "mean": 0.28063241106719367,
+        "lo": 0.22529644268774704,
+        "hi": 0.33992094861660077
+      }
+    },
+    "passes_predeclared_gate": true
+  }
+}
