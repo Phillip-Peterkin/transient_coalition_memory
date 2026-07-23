@@ -33,6 +33,9 @@ def test_sealed_defaults_match_confirmation8_freeze():
     assert cell.null_err_beta == 0.30
     assert cell.force_all_positive_null is True
     assert cell.fe_cert_slack == 0.0
+    assert cell.source_forget == 1.0
+    assert cell.source_share == 0.0
+    assert cell.source_shift_window == 0
 
 
 def test_empty_and_cheerleader_use_null_channel():
@@ -146,3 +149,120 @@ def test_feedback_updates_likelihood_tables():
     )
     assert cell.src_vote_up[("z", 1)] > cell.laplace
     assert math.isfinite(cell.cf[(key, 1)])
+
+
+def test_default_source_trust_pack_preserves_sealed_accumulation():
+    cell = ActiveCoalitionCellular(**CELL_PARAMS)
+    assert cell.source_forget == 1.0
+    assert cell.source_share == 0.0
+    assert cell.source_shift_window == 0
+    key = (0, 0)
+    for _ in range(10):
+        cell.feedback(
+            {
+                "key": key,
+                "truth": 1,
+                "reports": [("z", 0, 1)],
+                "trace": {"p": 0.6, "prior_p": 0.5, "stop_reason": "budget"},
+                "time": 1,
+            }
+        )
+    # No fading / floor / shift: 10 exact increments on top of Laplace.
+    assert approx(cell.src_vote_up[("z", 1)], cell.laplace + 10.0)
+    assert cell.source_shift_events == 0
+
+
+def test_source_forget_lets_recent_regime_dominate():
+    cell = ActiveCoalitionCellular(source_forget=0.9, **CELL_PARAMS)
+    key = (0, 0)
+    # Long good regime: source always right saying 1 when truth is 1.
+    for step in range(40):
+        cell.feedback(
+            {
+                "key": key,
+                "truth": 1,
+                "reports": [("z", 0, 1)],
+                "trace": {"p": 0.7, "prior_p": 0.5, "stop_reason": "budget"},
+                "time": step,
+            }
+        )
+    good_delta = cell._report_delta("z", 1)
+    # Regime flip: source now always wrong (still says 1 when truth is 0).
+    for step in range(40, 80):
+        cell.feedback(
+            {
+                "key": key,
+                "truth": 0,
+                "reports": [("z", 0, 1)],
+                "trace": {"p": 0.7, "prior_p": 0.5, "stop_reason": "budget"},
+                "time": step,
+            }
+        )
+    flipped_delta = cell._report_delta("z", 1)
+    assert good_delta > 0.2
+    assert flipped_delta < 0.0
+
+
+def test_source_share_keeps_escape_hatch_both_ways():
+    cell = ActiveCoalitionCellular(source_forget=1.0, source_share=0.05, **CELL_PARAMS)
+    key = (0, 0)
+    for step in range(30):
+        cell.feedback(
+            {
+                "key": key,
+                "truth": 1,
+                "reports": [("hero", 0, 1)],
+                "trace": {"p": 0.7, "prior_p": 0.5, "stop_reason": "budget"},
+                "time": step,
+            }
+        )
+    # Floor mix prevents pure one-hot accumulation; opposite cell stays alive.
+    assert cell.src_vote_up[("hero", 0)] > cell.laplace * 0.5
+    for step in range(30, 50):
+        cell.feedback(
+            {
+                "key": key,
+                "truth": 0,
+                "reports": [("hero", 0, 1)],
+                "trace": {"p": 0.7, "prior_p": 0.5, "stop_reason": "budget"},
+                "time": step,
+            }
+        )
+    # After disgrace, saying 1 should no longer look strongly "up".
+    assert cell._report_delta("hero", 1) < 0.5
+
+
+def test_source_shift_hard_discounts_persona_change():
+    cell = ActiveCoalitionCellular(
+        source_forget=1.0,
+        source_share=0.0,
+        source_shift_window=8,
+        source_shift_gap=0.30,
+        source_shift_discount=0.10,
+        **CELL_PARAMS,
+    )
+    key = (0, 0)
+    for step in range(40):
+        cell.feedback(
+            {
+                "key": key,
+                "truth": 1,
+                "reports": [("z", 0, 1)],
+                "trace": {"p": 0.7, "prior_p": 0.5, "stop_reason": "budget"},
+                "time": step,
+            }
+        )
+    before = cell.src_vote_up[("z", 1)]
+    for step in range(40, 55):
+        cell.feedback(
+            {
+                "key": key,
+                "truth": 0,
+                "reports": [("z", 0, 1)],
+                "trace": {"p": 0.7, "prior_p": 0.5, "stop_reason": "budget"},
+                "time": step,
+            }
+        )
+    assert cell.source_shift_events >= 1
+    # Hard discount must have bitten the old good mass, not only added wrongs.
+    assert cell.src_vote_up[("z", 1)] < before

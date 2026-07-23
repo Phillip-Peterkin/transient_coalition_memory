@@ -1195,6 +1195,18 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         fe_cert_slack: float = 0.0,
         use_correlation_discount: bool = True,
         force_all_positive_null: bool = True,
+        # Source-trust regime tracking (all default off = sealed confirmation8).
+        # 1) Constant fade before each update (baseline repair).
+        source_forget: float = 1.0,
+        # 2) Fixed-Share-style never-zero floor: mix toward Laplace so a
+        #    disgraced source can re-earn trust and a hero can be disowned.
+        source_share: float = 0.0,
+        # 3) Shift-triggered hard discount: per-source mini change-point
+        #    (Mnemosheath idea pointed at sources). window 0 = disabled.
+        source_shift_window: int = 0,
+        source_shift_gap: float = 0.35,
+        source_shift_discount: float = 0.15,
+        source_shift_long_beta: float = 0.05,
         **params,
     ):
         super().__init__(**params)
@@ -1208,6 +1220,20 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         self.fe_cert_slack = float(fe_cert_slack)
         self.use_correlation_discount = bool(use_correlation_discount)
         self.force_all_positive_null = bool(force_all_positive_null)
+        self.source_forget = float(source_forget)
+        self.source_share = float(source_share)
+        self.source_shift_window = int(source_shift_window)
+        self.source_shift_gap = float(source_shift_gap)
+        self.source_shift_discount = float(source_shift_discount)
+        self.source_shift_long_beta = float(source_shift_long_beta)
+        if not (0.0 < self.source_forget <= 1.0):
+            raise ValueError("source_forget must be in (0, 1]")
+        if not (0.0 <= self.source_share <= 1.0):
+            raise ValueError("source_share must be in [0, 1]")
+        if self.source_shift_window < 0:
+            raise ValueError("source_shift_window must be >= 0")
+        if not (0.0 < self.source_shift_discount <= 1.0):
+            raise ValueError("source_shift_discount must be in (0, 1]")
 
         # Likelihood tables: counts of (source said vote | truth).
         self.src_vote_up = defaultdict(lambda: self.laplace)
@@ -1215,6 +1241,11 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         # Global backoff (pooled over sources) for sparse publishers.
         self.global_vote_up = {0: self.laplace, 1: self.laplace}
         self.global_vote_down = {0: self.laplace, 1: self.laplace}
+
+        # Per-source recent errors for shift detection.
+        self.src_recent_err = defaultdict(list)
+        self.src_long_err = defaultdict(lambda: 0.5)
+        self.source_shift_events = 0
 
         # Null-channel precision: PE EWMA under emptiness / non-diagnostic
         # clouds. High PE ⇒ continuation hypothesis failing ⇒ anti-prior mix.
@@ -1463,14 +1494,7 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
             )
 
         if reports:
-            for source, _context, vote in reports:
-                vote = int(vote)
-                if truth == 1:
-                    self.src_vote_up[(source, vote)] += 1.0
-                    self.global_vote_up[vote] += 1.0
-                else:
-                    self.src_vote_down[(source, vote)] += 1.0
-                    self.global_vote_down[vote] += 1.0
+            self._update_source_likelihoods(reports, truth)
 
         # Prior update only — evidence tables above are the likelihood organ.
         probability = float(trace["p"])
@@ -1487,6 +1511,91 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
             self.learn_writes += 4.0
         self.last_fb[key] = event.get("time", self.last_fb[key])
 
+    def _scale_source_counts(self, source, factor: float) -> None:
+        for vote_side in (0, 1):
+            self.src_vote_up[(source, vote_side)] *= factor
+            self.src_vote_down[(source, vote_side)] *= factor
+
+    def _mix_source_toward_prior(self, source) -> None:
+        """Never-zero floor: keep a small escape hatch in both directions."""
+        share = self.source_share
+        if share <= 0.0:
+            return
+        keep = 1.0 - share
+        prior = self.laplace
+        for vote_side in (0, 1):
+            self.src_vote_up[(source, vote_side)] = (
+                keep * self.src_vote_up[(source, vote_side)] + share * prior
+            )
+            self.src_vote_down[(source, vote_side)] = (
+                keep * self.src_vote_down[(source, vote_side)] + share * prior
+            )
+
+    def _maybe_shift_reset(self, source, wrong: float) -> None:
+        """Hard-discount history when recent errors look like a new persona."""
+        window = self.source_shift_window
+        if window <= 0:
+            return
+        recent = self.src_recent_err[source]
+        recent.append(float(wrong))
+        if len(recent) > window:
+            del recent[0 : len(recent) - window]
+
+        long_err = float(self.src_long_err[source])
+        if len(recent) >= window:
+            recent_err = sum(recent) / len(recent)
+            # Compare against the long-run rate *before* folding in this point.
+            if recent_err - long_err >= self.source_shift_gap:
+                self._scale_source_counts(source, self.source_shift_discount)
+                self.source_shift_events += 1
+                # Restart the short window so one cluster does not re-fire.
+                self.src_recent_err[source] = []
+                long_err = recent_err
+
+        beta = self.source_shift_long_beta
+        self.src_long_err[source] = (1.0 - beta) * long_err + beta * float(wrong)
+
+    def _update_source_likelihoods(self, reports, truth: int) -> None:
+        """Regime-aware source trust: fade → shift reset → count → floor mix."""
+        truth = int(truth)
+        # Global table fades once per released packet (not once per source).
+        if self.source_forget < 1.0:
+            fade = self.source_forget
+            for vote_side in (0, 1):
+                self.global_vote_up[vote_side] *= fade
+                self.global_vote_down[vote_side] *= fade
+
+        faded = set()
+        for source, _context, vote in reports:
+            vote = int(vote)
+            wrong = float(vote != truth)
+            if source not in faded:
+                if self.source_forget < 1.0:
+                    self._scale_source_counts(source, self.source_forget)
+                faded.add(source)
+            self._maybe_shift_reset(source, wrong)
+
+            if truth == 1:
+                self.src_vote_up[(source, vote)] += 1.0
+                self.global_vote_up[vote] += 1.0
+            else:
+                self.src_vote_down[(source, vote)] += 1.0
+                self.global_vote_down[vote] += 1.0
+
+            self._mix_source_toward_prior(source)
+
+        if self.source_share > 0.0:
+            keep = 1.0 - self.source_share
+            prior = self.laplace
+            for vote_side in (0, 1):
+                self.global_vote_up[vote_side] = (
+                    keep * self.global_vote_up[vote_side] + self.source_share * prior
+                )
+                self.global_vote_down[vote_side] = (
+                    keep * self.global_vote_down[vote_side]
+                    + self.source_share * prior
+                )
+
     def stats(self):
         stats = super().stats()
         stats.update(
@@ -1494,6 +1603,9 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
                 "silence_events": self.silence_events,
                 "null_diagnostic_events": self.null_diagnostic_events,
                 "fe_certificates": self.fe_certificates,
+                "source_shift_events": self.source_shift_events,
+                "source_forget": self.source_forget,
+                "source_share": self.source_share,
                 "mean_null_pe": (
                     sum(self.null_pe.values()) / max(1, len(self.null_pe))
                 ),

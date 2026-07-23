@@ -60,6 +60,13 @@ ACI_PARAMS = {
     "null_err_beta": 0.30,
     "force_all_positive_null": True,
     "fe_cert_slack": 0.0,
+    # Source-trust regime pack (cell defaults stay off = sealed confirmation8):
+    # constant fade + never-zero floor + per-source shift hard-discount.
+    "source_forget": 0.985,
+    "source_share": 0.03,
+    "source_shift_window": 12,
+    "source_shift_gap": 0.35,
+    "source_shift_discount": 0.15,
 }
 AWARE_PARAMS = {
     key: value for key, value in ACI_PARAMS.items() if key != "force_all_positive_null"
