@@ -2,10 +2,13 @@
 
 Frozen synthetic reference: `BatchedReserveCellular` (Wave XI).
 Active real-data experimental model: `ActiveCoalitionCellular` (ACI).
+Awareness organ (experimental): `AwareCoalitionCellular` + `Mnemosheath`.
 """
 
+from .awareness import Mnemosheath
 from .experimental import (
     ActiveCoalitionCellular,
+    AwareCoalitionCellular,
     CleanEvidenceCellular,
     DiagnosticContrastCellular,
     SensoryGatedCellular,
@@ -21,10 +24,12 @@ ActiveExperimentalCellular = ActiveCoalitionCellular
 __all__ = [
     "ActiveCoalitionCellular",
     "ActiveExperimentalCellular",
+    "AwareCoalitionCellular",
     "BatchedReserveCellular",
     "CleanEvidenceCellular",
     "DiagnosticContrastCellular",
     "FairProvGraph",
+    "Mnemosheath",
     "SensoryGatedCellular",
     "SilenceEscapeCellular",
     "SkewCorrectedCellular",

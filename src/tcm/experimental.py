@@ -5,6 +5,11 @@ Active experimental model (finance-confirmed):
     Pair with `SessionRelevanceFinanceNewsStream`. Sealed on virgin
     confirmation8; Wave XI reference stays frozen.
 
+Context-awareness organ (experimental, maturing):
+    `AwareCoalitionCellular` — ACI + Mnemosheath (1→2→4→12 bit distinctions).
+    Learns whether agreement is evidence or cheerleader null. See
+    `docs/MNEMOSHEATH.md`.
+
 Historical / ancestor cells kept for regression and protocol archives:
     `SensoryGatedCellular`, `CleanEvidenceCellular`, `SilenceEscapeCellular`,
     and failed screens (`SkewCorrectedCellular`, `DiagnosticContrastCellular`,
@@ -1479,3 +1484,112 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
             }
         )
         return stats
+
+
+class AwareCoalitionCellular(ActiveCoalitionCellular):
+    """ACI + Mnemosheath — live memory with maturing context awareness.
+
+    Keeps every ACI law. Replaces regime-blind `force_all_positive_null` with
+    an online diagnosticity sheath that grows 1→2→4→12 distinction bits.
+    Unanimous agreement becomes evidence when the sheath learns it is
+    diagnostic; cheerleader unanimity still routes to null.
+    """
+
+    name = "aware_coalition_cellular"
+
+    def __init__(self, **params):
+        # Awareness owns unanimous routing; do not hard-force all-Positive null.
+        params = dict(params)
+        params["force_all_positive_null"] = False
+        super().__init__(**params)
+        from .awareness import Mnemosheath
+
+        self.sheath = Mnemosheath()
+        self.awareness_evidence_routes = 0
+        self.awareness_null_routes = 0
+
+    def _batch_cues(self, key, reports, max_delta: float, prior_p: float):
+        return self.sheath.sense_cues(
+            reports,
+            max_delta=max_delta,
+            min_delta=self.min_delta,
+            null_pe=float(self.null_pe[key]),
+            prior_p=prior_p,
+        )
+
+    def _is_null_batch(self, reports, max_delta: float) -> bool:
+        if not reports:
+            return True
+        if max_delta < self.min_delta:
+            return True
+        votes = [int(vote) for _, _, vote in reports]
+        unanimous = len(set(votes)) == 1
+        if not unanimous:
+            return False
+        # Sheath decides: diagnostic consensus → evidence; coin-flip → null.
+        cues = getattr(self, "_pending_cues", None)
+        if cues is None:
+            cues = self.sheath.sense_cues(
+                reports,
+                max_delta=max_delta,
+                min_delta=self.min_delta,
+                null_pe=0.5,
+                prior_p=0.5,
+            )
+        if self.sheath.agreement_is_evidence(cues):
+            self.awareness_evidence_routes += 1
+            return False
+        self.awareness_null_routes += 1
+        return True
+
+    def _null_hazard(self, key) -> float:
+        base = super()._null_hazard(key)
+        return self.sheath.mix_null_hazard(base, self.max_silence_hazard)
+
+    def predict(self, key, reports, t):
+        prior_lo = self._prior_log_odds(key)
+        prior_p = _sigmoid(prior_lo)
+        rows = self._evidence_rows(reports)[: self.max_k] if reports else []
+        max_delta = rows[0][0] if rows else 0.0
+        cues = self._batch_cues(key, reports, max_delta, prior_p)
+        self._pending_cues = cues
+        self.sheath.vote_context(cues)
+        probability, trace = super().predict(key, reports, t)
+        trace = dict(trace)
+        trace["awareness"] = {
+            "cues": {name: bool(flag) for name, flag in cues.items() if flag},
+            "diagnosticity": self.sheath.diagnosticity(cues),
+            "context_log_odds": self.sheath.context_log_odds,
+            "bits": self.sheath.bit_count,
+            "stage_cap": self.sheath.stage_cap,
+        }
+        trace["awareness_cues"] = cues
+        if reports:
+            votes = [int(vote) for _, _, vote in reports]
+            trace["majority_vote"] = int(sum(votes) >= (len(votes) / 2)) if votes else None
+        else:
+            trace["majority_vote"] = None
+        return probability, trace
+
+    def feedback(self, event):
+        trace = event["trace"]
+        cues = trace.get("awareness_cues")
+        if cues is not None:
+            self.sheath.feedback(
+                cues,
+                majority_vote=trace.get("majority_vote"),
+                truth=int(event["truth"]),
+            )
+        super().feedback(event)
+
+    def stats(self):
+        stats = super().stats()
+        stats.update(
+            {
+                "awareness": self.sheath.stats(),
+                "awareness_evidence_routes": self.awareness_evidence_routes,
+                "awareness_null_routes": self.awareness_null_routes,
+            }
+        )
+        return stats
+
