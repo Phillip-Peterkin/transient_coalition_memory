@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -38,10 +39,17 @@ class CleanWeatherStream:
         self.forecasts = pd.read_parquet(
             data_dir / "forecasts_daily_previous_day1.parquet"
         )
-        self.models = list(MODELS)
+        meta_path = data_dir / "download_meta.json"
+        if meta_path.exists():
+            meta = json.loads(meta_path.read_text())
+            self.models = list(meta["models"])
+            self.city_symbols = [city["symbol"] for city in meta["cities"]]
+        else:
+            self.models = list(MODELS)
+            self.city_symbols = [symbol for symbol, *_rest in CITIES]
         self.source_index = {model: index for index, model in enumerate(self.models)}
         self.symbol_index = {
-            symbol: index for index, (symbol, *_rest) in enumerate(CITIES)
+            symbol: index for index, symbol in enumerate(self.city_symbols)
         }
         self.events = self._build_events(contact_frac)
 
@@ -52,7 +60,7 @@ class CleanWeatherStream:
         fcst["date"] = pd.to_datetime(fcst["date"])
 
         events: list[WeatherEvent] = []
-        for symbol, *_rest in CITIES:
+        for symbol in self.city_symbols:
             o = obs[obs["symbol"] == symbol].sort_values("date").reset_index(drop=True)
             f = fcst[fcst["symbol"] == symbol].set_index("date")
             if len(o) < 3:

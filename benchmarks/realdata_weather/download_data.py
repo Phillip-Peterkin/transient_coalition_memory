@@ -105,11 +105,16 @@ def daily_forecast_max(hourly: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def main() -> None:
-    DATA.mkdir(parents=True, exist_ok=True)
+def download_universe(
+    cities: list[tuple[str, float, float, str]],
+    out_dir: Path,
+    *,
+    universe: str = "contact_bed",
+) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
     obs_parts = []
     fcst_parts = []
-    for symbol, lat, lon, name in CITIES:
+    for symbol, lat, lon, name in cities:
         print(f"fetch {symbol} ({name}) …")
         obs = fetch_archive_daily(lat, lon)
         obs.insert(0, "symbol", symbol)
@@ -123,10 +128,16 @@ def main() -> None:
 
     observations = pd.concat(obs_parts, ignore_index=True)
     forecasts = pd.concat(fcst_parts, ignore_index=True)
-    observations.to_parquet(DATA / "observations_daily.parquet", index=False)
-    forecasts.to_parquet(DATA / "forecasts_daily_previous_day1.parquet", index=False)
+    # Keep only complete locked models (drop sparse columns if any).
+    keep_models = [model for model in MODELS if forecasts[model].notna().mean() >= 0.99]
+    if keep_models != list(MODELS):
+        print("warning: dropping incomplete models", set(MODELS) - set(keep_models))
+    forecasts = forecasts[["symbol", "date", *keep_models]]
+    observations.to_parquet(out_dir / "observations_daily.parquet", index=False)
+    forecasts.to_parquet(out_dir / "forecasts_daily_previous_day1.parquet", index=False)
 
     meta = {
+        "universe": universe,
         "source_forecasts": "Open-Meteo Previous Runs API",
         "source_observations": "Open-Meteo Archive API (ERA5 daily)",
         "lead": "previous_day1_only",
@@ -135,7 +146,7 @@ def main() -> None:
         "timezone": TIMEZONE,
         "start_date": START_DATE,
         "end_date": END_DATE,
-        "models": MODELS,
+        "models": keep_models,
         "cities": [
             {
                 "symbol": symbol,
@@ -143,7 +154,7 @@ def main() -> None:
                 "lon": lon,
                 "name": name,
             }
-            for symbol, lat, lon, name in CITIES
+            for symbol, lat, lon, name in cities
         ],
         "n_observation_rows": int(len(observations)),
         "n_forecast_rows": int(len(forecasts)),
@@ -154,10 +165,14 @@ def main() -> None:
             "same_valid_time_nowcast_as_evidence",
         ],
     }
-    (DATA / "download_meta.json").write_text(json.dumps(meta, indent=2))
-    print("wrote", DATA / "observations_daily.parquet")
-    print("wrote", DATA / "forecasts_daily_previous_day1.parquet")
-    print("wrote", DATA / "download_meta.json")
+    (out_dir / "download_meta.json").write_text(json.dumps(meta, indent=2))
+    print("wrote", out_dir / "observations_daily.parquet")
+    print("wrote", out_dir / "forecasts_daily_previous_day1.parquet")
+    print("wrote", out_dir / "download_meta.json")
+
+
+def main() -> None:
+    download_universe(CITIES, DATA, universe="contact_bed")
 
 
 if __name__ == "__main__":
