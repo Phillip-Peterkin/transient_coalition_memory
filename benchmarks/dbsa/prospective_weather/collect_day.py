@@ -2,10 +2,12 @@
 """Append-only daily collector for the DBSA prospective Weather lane.
 
 Does not score models. Writes timestamped forecast snapshots + sha256 digests.
+Supports single-day and inclusive date-range backfill from the locked API.
 """
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import time
@@ -82,13 +84,19 @@ def fetch_station_day(symbol: str, lat: float, lon: float, day: date) -> dict:
     }
 
 
-def collect(day: date | None = None) -> Path:
+def collect(
+    day: date | None = None,
+    *,
+    collection_mode: str = "live",
+    skip_existing: bool = False,
+) -> Path | None:
     assert_disjoint()
     day = day or datetime.now(timezone.utc).date()
-    # Collect tomorrow's forecast plane issued as previous_day1 for day+1 when
-    # available; for the immutable start we snapshot today's UTC calendar day.
     day_dir = LEDGER / day.isoformat()
     if day_dir.exists():
+        if skip_existing:
+            print(f"skip existing ledger day {day_dir}")
+            return None
         raise SystemExit(
             f"refusing to rewrite existing ledger day {day_dir}; append-only"
         )
@@ -101,7 +109,7 @@ def collect(day: date | None = None) -> Path:
         row = fetch_station_day(symbol, lat, lon, day)
         row["name"] = name
         stations.append(row)
-        time.sleep(0.35)
+        time.sleep(0.25)
 
     artifact = {
         "protocol": "dbsa_prospective_weather_v1",
@@ -110,6 +118,7 @@ def collect(day: date | None = None) -> Path:
         "models": MODELS,
         "stations": stations,
         "scoring_forbidden": True,
+        "collection_mode": collection_mode,
     }
     raw = _canonical_bytes(artifact)
     digest = hashlib.sha256(raw).hexdigest()
@@ -126,6 +135,7 @@ def collect(day: date | None = None) -> Path:
         "path": str(artifact_path.relative_to(ROOT)),
         "n_stations": len(stations),
         "n_models": len(MODELS),
+        "collection_mode": collection_mode,
     }
     with INDEX.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(index_row, sort_keys=True) + "\n")
@@ -134,8 +144,40 @@ def collect(day: date | None = None) -> Path:
     return artifact_path
 
 
+def collect_range(start: date, end: date, *, collection_mode: str) -> list[Path]:
+    if end < start:
+        raise SystemExit("--to must be on or after --from")
+    written: list[Path] = []
+    day = start
+    while day <= end:
+        path = collect(day, collection_mode=collection_mode, skip_existing=True)
+        if path is not None:
+            written.append(path)
+        day += timedelta(days=1)
+    return written
+
+
 def main() -> None:
-    collect()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--day", type=date.fromisoformat, default=None)
+    parser.add_argument("--from", dest="date_from", type=date.fromisoformat, default=None)
+    parser.add_argument("--to", dest="date_to", type=date.fromisoformat, default=None)
+    parser.add_argument(
+        "--mode",
+        choices=("live", "archive_backfill"),
+        default=None,
+        help="Defaults to archive_backfill for ranges, live for single/today.",
+    )
+    args = parser.parse_args()
+    if args.date_from or args.date_to:
+        if not (args.date_from and args.date_to):
+            parser.error("--from and --to must be used together")
+        mode = args.mode or "archive_backfill"
+        written = collect_range(args.date_from, args.date_to, collection_mode=mode)
+        print(f"wrote {len(written)} new forecast days")
+        return
+    mode = args.mode or "live"
+    collect(args.day, collection_mode=mode)
 
 
 if __name__ == "__main__":
