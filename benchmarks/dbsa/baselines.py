@@ -159,11 +159,22 @@ class AdaHedge(_Baseline):
         if eta <= EPS or len(sources) == 1:
             mass = 1.0 / len(sources)
             return {source: mass for source in sources}
+        # Stable softmax: shift by min cumulative loss to avoid underflow.
+        min_loss = min(self.cumulative_loss[source] for source in sources)
         unnormalized = {
-            source: math.exp(-eta * self.cumulative_loss[source]) for source in sources
+            source: math.exp(-eta * (self.cumulative_loss[source] - min_loss))
+            for source in sources
         }
         total = sum(unnormalized.values())
-        return {source: weight / max(EPS, total) for source, weight in unnormalized.items()}
+        if total <= EPS:
+            winners = [
+                source
+                for source in sources
+                if self.cumulative_loss[source] <= min_loss + EPS
+            ]
+            mass = 1.0 / len(winners)
+            return {source: (mass if source in winners else 0.0) for source in sources}
+        return {source: weight / total for source, weight in unnormalized.items()}
 
     def predict(self, key, reports, t):
         del key, t
@@ -195,15 +206,13 @@ class AdaHedge(_Baseline):
         if eta <= EPS:
             mix_loss = expected_loss
         else:
-            mix_loss = (
-                -math.log(
-                    sum(
-                        posterior[source] * math.exp(-eta * losses[source])
-                        for source in sources
-                    )
-                )
-                / eta
+            # Stable mix loss: -η^{-1} log ∑ p_i e^{-η ℓ_i}
+            min_awake_loss = min(losses[source] for source in sources)
+            mix_mass = sum(
+                posterior[source] * math.exp(-eta * (losses[source] - min_awake_loss))
+                for source in sources
             )
+            mix_loss = min_awake_loss - math.log(max(EPS, mix_mass)) / eta
         self.alpha += max(0.0, expected_loss - mix_loss)
         for source in sources:
             self.cumulative_loss[source] += losses[source]
