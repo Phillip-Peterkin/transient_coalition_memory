@@ -28,9 +28,10 @@ Resources are a **Pareto frontier** (no hard activation threshold).
   [`REPORT_CONTRACT_200.md`](REPORT_CONTRACT_200.md)
 - Gate bug fix (false “no evidence” on large agreeing batches):
   [`REPORT_GATE_BUG.md`](REPORT_GATE_BUG.md)
-- Source-trust regime pack (fade + floor + shift reset):
-  [`REPORT_SOURCE_FORGET.md`](REPORT_SOURCE_FORGET.md) — 5/6 worlds
-  non-inferior; correlated still FAIL
+- Source-trust regime pack:
+  [`REPORT_SOURCE_FORGET.md`](REPORT_SOURCE_FORGET.md)
+- Push screen (fade + floor + shift + dependence/copy-skip): **PASS** —
+  [`REPORT_SCREEN_PUSH.md`](REPORT_SCREEN_PUSH.md)
 - Exploratory pre-contract pilot: diagnostic only —
   [`REPORT_PILOT.md`](REPORT_PILOT.md)
 
