@@ -40,10 +40,11 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
   Open-Meteo `previous_day1` + ERA5 adjacent-day warmer; weekly-median banned.
   Architecture confirmation (sealed ACI, not Wave XI) on virgin confirmation2:
   **PASS** (flip 0.733 vs silence 0.663). New bed, not recovered sandbox Weather final.
-- Experimental awareness organ: `AwareCoalitionCellular` + `Mnemosheath`
-  (maturing context distinctions + **empty curriculum** — learns under silence,
-  not only from majority labels). See [`docs/MNEMOSHEATH.md`](docs/MNEMOSHEATH.md),
-  [`docs/EMPTY_CURRICULUM.md`](docs/EMPTY_CURRICULUM.md).
+- Awareness package: `AwareCoalitionCellular` + `Mnemosheath` (context bits,
+  empty curriculum, selective cue admission). Virgin Weather **confirmation3**
+  **PASS** — flip **0.868** vs sealed ACI **0.771** (no retune). See
+  [`benchmarks/realdata_weather/REPORT_WEATHER_AWARE_CONFIRMATION.md`](benchmarks/realdata_weather/REPORT_WEATHER_AWARE_CONFIRMATION.md),
+  [`docs/MNEMOSHEATH.md`](docs/MNEMOSHEATH.md).
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*

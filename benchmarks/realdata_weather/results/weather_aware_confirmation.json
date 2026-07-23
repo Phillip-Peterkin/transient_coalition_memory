@@ -1,0 +1,148 @@
+{
+  "protocol": "weather_aware_confirmation_v1",
+  "architecture_under_test": "AwareCoalitionCellular (ACI + Mnemosheath)",
+  "not_under_test": "BatchedReserveCellular (Wave XI synthetic reference)",
+  "candidate": "CleanWeatherStream + AwareCoalitionCellular({'min_delta': 0.15, 'max_silence_hazard': 0.55, 'null_rho_gain': 0.3, 'null_pe_floor': 0.35, 'null_pe_span': 0.5, 'null_err_beta': 0.3, 'fe_cert_slack': 0.0})",
+  "parent_architecture": "ActiveExperimentalCellular({'min_delta': 0.15, 'max_silence_hazard': 0.55, 'null_rho_gain': 0.3, 'null_pe_floor': 0.35, 'null_pe_span': 0.5, 'null_err_beta': 0.3, 'force_all_positive_null': True, 'fe_cert_slack': 0.0})",
+  "universe": "confirmation3",
+  "stream": {
+    "n_events": 6936,
+    "n_symbols": 12,
+    "n_sources": 6,
+    "n_days": 578,
+    "contact_events": 4848,
+    "holdout_events": 2088,
+    "flip_events": 3612,
+    "truth_up_rate": 0.5020184544405998,
+    "mean_reports": 6.0,
+    "majority_accuracy": 0.8292964244521338,
+    "sources": {
+      "0": "gfs_seamless",
+      "1": "ecmwf_ifs025",
+      "2": "icon_seamless",
+      "3": "gem_seamless",
+      "4": "meteofrance_seamless",
+      "5": "jma_seamless"
+    },
+    "label_rule": "tmax_obs[D+1] > tmax_obs[D]",
+    "report_lead": "previous_day1",
+    "no_weekly_median": true
+  },
+  "warmup": "first 70% of days; causal state only, not scored",
+  "feedback_delay": "first event on decision_day+2",
+  "holdout": {
+    "persistence": {
+      "n": 2088,
+      "accuracy": 0.4736590038314176,
+      "flip_accuracy": 0.0,
+      "nonflip_accuracy": 1.0,
+      "flip_n": 1099,
+      "brier": 0.5263409961685823,
+      "pred_up_rate": 0.4990421455938697,
+      "avg_activated": 0.0
+    },
+    "majority": {
+      "n": 2088,
+      "accuracy": 0.8366858237547893,
+      "flip_accuracy": 0.8553230209281165,
+      "nonflip_accuracy": 0.8159757330637007,
+      "flip_n": 1099,
+      "brier": 0.11770966368667518,
+      "pred_up_rate": 0.5181992337164751,
+      "avg_activated": 6.0
+    },
+    "silence_escape": {
+      "n": 2088,
+      "accuracy": 0.6542145593869731,
+      "flip_accuracy": 0.6906278434940856,
+      "nonflip_accuracy": 0.6137512639029322,
+      "flip_n": 1099,
+      "brier": 0.23160123247496028,
+      "pred_up_rate": 0.3204022988505747,
+      "avg_activated": 2.6470306513409962
+    },
+    "active_experimental_aci": {
+      "n": 2088,
+      "accuracy": 0.7600574712643678,
+      "flip_accuracy": 0.7707006369426752,
+      "nonflip_accuracy": 0.7482305358948432,
+      "flip_n": 1099,
+      "brier": 0.18280791108613254,
+      "pred_up_rate": 0.4042145593869732,
+      "avg_activated": 3.0704022988505746
+    },
+    "aware_coalition": {
+      "n": 2088,
+      "accuracy": 0.8467432950191571,
+      "flip_accuracy": 0.8680618744313012,
+      "nonflip_accuracy": 0.8230535894843276,
+      "flip_n": 1099,
+      "brier": 0.1541450916617832,
+      "pred_up_rate": 0.4918582375478927,
+      "avg_activated": 3.6767241379310347,
+      "awareness_bits_mean": 9.0,
+      "awareness_bits_max": 9,
+      "awareness_evidence_routes": 3235,
+      "awareness_null_routes": 0,
+      "grown_cues": [
+        "against_prior_side",
+        "agree_with_prior_side",
+        "high_agree",
+        "mixed",
+        "unanimous_neg",
+        "unanimous_pos",
+        "wide_margin"
+      ]
+    }
+  },
+  "paired": {
+    "vs_aci_accuracy": {
+      "delta": 0.08668582375478927,
+      "lo": 0.07423371647509579,
+      "hi": 0.10009578544061302,
+      "p": 0.0
+    },
+    "vs_aci_flip": {
+      "delta": 0.09736123748862602,
+      "lo": 0.0791628753412193,
+      "hi": 0.11555959963603275,
+      "p": 0.0
+    },
+    "vs_silence_accuracy": {
+      "delta": 0.1925287356321839,
+      "lo": 0.17097701149425287,
+      "hi": 0.21455938697318008,
+      "p": 0.0
+    },
+    "vs_silence_flip": {
+      "delta": 0.17743403093721566,
+      "lo": 0.14740673339399454,
+      "hi": 0.20746132848043677,
+      "p": 0.0
+    },
+    "vs_persistence_accuracy": {
+      "delta": 0.37308429118773945,
+      "lo": 0.3457854406130268,
+      "hi": 0.4003831417624521,
+      "p": 0.0
+    },
+    "vs_majority_accuracy": {
+      "delta": 0.010057471264367816,
+      "lo": 0.003352490421455939,
+      "hi": 0.017241379310344827,
+      "p": 0.0032
+    }
+  },
+  "gate": {
+    "checks": {
+      "flip_ge_0.45": true,
+      "flip_ge_sealed_aci": true,
+      "flip_ge_silence_lineage": true,
+      "acc_vs_persistence": true,
+      "pred_up_le_0.65": true,
+      "nonflip_ge_0.50": true
+    },
+    "passes": true
+  },
+  "passes_predeclared_gate": true
+}

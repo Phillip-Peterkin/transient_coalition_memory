@@ -40,5 +40,8 @@ confirmatory for locked models only.
 - **Architecture confirmation** on virgin `confirmation2`: **PASS** — sealed
   ACI vs persistence / majority / silence lineage. See
   `REPORT_WEATHER_ARCHITECTURE_CONFIRMATION.md`
+- **Aware confirmation** on virgin `confirmation3`: **PASS** — ACI +
+  Mnemosheath vs sealed ACI / silence / persistence. Flip **0.868** vs ACI
+  **0.771**. See `REPORT_WEATHER_AWARE_CONFIRMATION.md`
 
 Still **not** a claim of recovering the original sandbox Weather final.
