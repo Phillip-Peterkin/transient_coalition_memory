@@ -1280,12 +1280,28 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         weight = max(0.0, n_source) / (max(0.0, n_source) + self.source_backoff)
         return weight * source_delta + (1.0 - weight) * global_delta
 
+    def _max_raw_abs_delta(self, reports) -> float:
+        """Largest per-source |Δ| before agreement/correlation discount.
+
+        The null gate (`min_delta`) asks whether any single source is
+        informative. That question must not be answered with a value that has
+        already been divided by coalition size — otherwise large agreeing
+        batches falsely look empty and fall into the anti-prior null channel.
+        Correlation discount still applies when *summing* evidence below.
+        """
+        if not reports:
+            return 0.0
+        return max(
+            abs(self._report_delta(source, int(vote))) for source, _, vote in reports
+        )
+
     def _evidence_rows(self, reports):
         scale = (
             self._correlation_scale(reports) if self.use_correlation_discount else 1.0
         )
         rows = []
         for source, context, vote in reports:
+            # Discount applies to accumulation / certificate mass only.
             delta = self._report_delta(source, int(vote)) * scale
             rows.append((abs(delta), delta, source, context, int(vote)))
         rows.sort(key=lambda row: row[0], reverse=True)
@@ -1340,7 +1356,9 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         prior_p = _sigmoid(prior_lo)
 
         rows = self._evidence_rows(reports)[: self.max_k] if reports else []
-        max_delta = rows[0][0] if rows else 0.0
+        # Gate on raw per-source strength; scaled row mass is for summing only.
+        max_delta = self._max_raw_abs_delta(reports)
+        max_delta_scaled = rows[0][0] if rows else 0.0
 
         if self._is_null_batch(reports, max_delta):
             probability, hazard = self._silence_posterior(key, prior_p)
@@ -1368,6 +1386,7 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
                 "stop_reason": stop_reason,
                 "shadow_mass": (0.0, 0.0),
                 "max_delta": max_delta,
+                "max_delta_scaled": max_delta_scaled,
                 "null_pe": self.null_pe[key],
             }
 
@@ -1420,6 +1439,7 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
             "stop_reason": stop_reason,
             "shadow_mass": (0.0, 0.0),
             "max_delta": max_delta,
+            "max_delta_scaled": max_delta_scaled,
             "unread_mass": suffix_abs[len(active)] if active else 0.0,
         }
 
@@ -1552,8 +1572,9 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
     def predict(self, key, reports, t):
         prior_lo = self._prior_log_odds(key)
         prior_p = _sigmoid(prior_lo)
-        rows = self._evidence_rows(reports)[: self.max_k] if reports else []
-        max_delta = rows[0][0] if rows else 0.0
+        # Cues / low_delta must see raw per-source strength, not the
+        # coalition-discounted mass used when summing agreeing votes.
+        max_delta = self._max_raw_abs_delta(reports)
         cues = self._batch_cues(key, reports, max_delta, prior_p)
         self._pending_cues = cues
         # Phase 1: emptiness is a sensory event — stash lesson before truth.
