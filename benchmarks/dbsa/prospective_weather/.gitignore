@@ -1,0 +1,4 @@
+# Keep ledger artifacts tracked (append-only provenance).
+# Ignore local collector caches only.
+__pycache__/
+*.pyc
