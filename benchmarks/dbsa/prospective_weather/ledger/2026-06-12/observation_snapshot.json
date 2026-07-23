@@ -1,0 +1,128 @@
+{
+  "collected_at_utc": "2026-07-23T06:30:44.523450+00:00",
+  "day_utc": "2026-06-12",
+  "protocol": "dbsa_prospective_weather_obs_v1",
+  "scoring_forbidden": true,
+  "stations": [
+    {
+      "day": "2026-06-12",
+      "lat": 33.749,
+      "lon": -84.388,
+      "name": "Atlanta",
+      "source_api": "open-meteo-archive",
+      "symbol": "ATL",
+      "tmax_obs": 32.5,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": 39.9526,
+      "lon": -75.1652,
+      "name": "Philadelphia",
+      "source_api": "open-meteo-archive",
+      "symbol": "PHL",
+      "tmax_obs": 35.7,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": 44.9778,
+      "lon": -93.265,
+      "name": "Minneapolis",
+      "source_api": "open-meteo-archive",
+      "symbol": "MSP",
+      "tmax_obs": 24.8,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": 48.1351,
+      "lon": 11.582,
+      "name": "Munich",
+      "source_api": "open-meteo-archive",
+      "symbol": "MUC",
+      "tmax_obs": 16.1,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": 38.7223,
+      "lon": -9.1393,
+      "name": "Lisbon",
+      "source_api": "open-meteo-archive",
+      "symbol": "LIS",
+      "tmax_obs": 35.4,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": 60.1699,
+      "lon": 24.9384,
+      "name": "Helsinki",
+      "source_api": "open-meteo-archive",
+      "symbol": "HEL",
+      "tmax_obs": 15.3,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": 25.033,
+      "lon": 121.5654,
+      "name": "Taipei",
+      "source_api": "open-meteo-archive",
+      "symbol": "TPE",
+      "tmax_obs": 27.9,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": 3.139,
+      "lon": 101.6869,
+      "name": "Kuala Lumpur",
+      "source_api": "open-meteo-archive",
+      "symbol": "KUL",
+      "tmax_obs": 34.0,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": -12.0464,
+      "lon": -77.0428,
+      "name": "Lima",
+      "source_api": "open-meteo-archive",
+      "symbol": "LIM",
+      "tmax_obs": 23.2,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": -1.2921,
+      "lon": 36.8219,
+      "name": "Nairobi",
+      "source_api": "open-meteo-archive",
+      "symbol": "NBO",
+      "tmax_obs": 25.8,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": -31.9505,
+      "lon": 115.8605,
+      "name": "Perth",
+      "source_api": "open-meteo-archive",
+      "symbol": "PER",
+      "tmax_obs": 15.2,
+      "variable": "temperature_2m_max"
+    },
+    {
+      "day": "2026-06-12",
+      "lat": 25.2048,
+      "lon": 55.2708,
+      "name": "Dubai",
+      "source_api": "open-meteo-archive",
+      "symbol": "DXB",
+      "tmax_obs": 36.9,
+      "variable": "temperature_2m_max"
+    }
+  ]
+}

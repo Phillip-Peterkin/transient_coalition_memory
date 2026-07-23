@@ -87,3 +87,7 @@ and hash-sealed. This is disclosed in scoring outputs
 
 Collection may be live or archive-backfill. Scoring opens only when the
 conditions above all hold; then `evaluate_weather.py` may run once.
+
+**First open:** 2026-07-23 after 60-day archive backfill + observations.
+Result: `../results/dbsa_weather_prospective_sealed.json` /
+`../REPORT_WEATHER_PROSPECTIVE.md` (non-inferiority FAIL; no retune).
