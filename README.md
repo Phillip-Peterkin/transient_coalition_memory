@@ -29,23 +29,17 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
 - Strongest **shipped** evidence is synthetic (this repo). Results support continued testing; they do **not** establish independent validation or superiority on real-world memory tasks.
 - Sandbox contact with real data (stock, weather) — **ahead of what is frozen here** — exposed a regime boundary: TCM is strong in adversarial/noisy-source regimes and weak (often worst) in trustworthy-source, fast-crossing regimes. Flip detection, not headline accuracy, is the core failure. See the complete ledger in [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md).
 - In-repo finance/news harness ([`benchmarks/realdata_finance/`](benchmarks/realdata_finance/)): locked Wave XI on a 2022–2023 multi-publisher news → next-day direction stream again shows weak flip detection (~0.18 holdout) despite a small accuracy edge over persistence. Persistence is ~50% here (not the old stock artifact).
-- A brain-shaped temporary investigation circuit was then tested on a fresh,
-  disjoint company universe. Its +1.5-point flip gain was uncertain and failed
-  its pre-set gate, so it is **not** treated as a shipped cure.
 - Active experimental real-data model: `tcm.ActiveCoalitionCellular` (ACI) with
-  `SessionRelevanceFinanceNewsStream`. Prior stays out of report strength;
-  null sensation is a PE+|ρ| channel; free-energy certification stops unread
-  mass that cannot flip the posterior. Virgin confirmation8 **passed** the
-  predeclared gate (flip **52.6%**, pred-up 53.7%). Wave XI remains the frozen
-  synthetic reference — ACI is not a foundation replacement. See
+  `SessionRelevanceFinanceNewsStream`. Virgin confirmation8 **passed** the
+  predeclared gate (flip **52.6%**). Wave XI remains the frozen synthetic
+  reference. See
   [`benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md`](benchmarks/realdata_finance/REPORT_ACTIVE_COALITION_CONFIRMATION.md).
-- Synthetic adversarial boss (sealed ACI on Wave XI worlds): **FAIL** — fresh
-  acc 0.960 vs Wave XI 0.986; changed-fact 0.929 vs 0.966. Protocol and
-  writeup: [`benchmarks/aci_boss/`](benchmarks/aci_boss/). Weather (true
-  trustworthy-source final) is still unavailable in-repo.
-- Earlier sealed steps kept as lineage: relevance front end (confirmation
-  flip 28.1%); silence escape (confirmation4 flip 52.2%). Wave XVIII and
-  diagnostic-contrast ports failed their gates and are not promoted.
+- Synthetic adversarial boss (sealed ACI on Wave XI worlds): **FAIL** — see
+  [`benchmarks/aci_boss/`](benchmarks/aci_boss/).
+- Clean Weather harness ([`benchmarks/realdata_weather/`](benchmarks/realdata_weather/)):
+  Open-Meteo `previous_day1` multi-model forecasts + ERA5 adjacent-day warmer
+  labels; weekly-median lookahead banned. New bed (not recovered sandbox
+  Weather final). Confirmatory ACI scoring is protocol-first and separate.
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*
@@ -62,12 +56,14 @@ Author: Phillip Peterkin
 | [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) | Exact run instructions, including `main`-branch path gotchas |
 | [`AGENTS.md`](AGENTS.md) | Cursor Cloud / agent operating notes |
 | [`benchmarks/runtime/README.md`](benchmarks/runtime/README.md) | Wall-clock benchmark |
-| [`benchmarks/realdata_finance/`](benchmarks/realdata_finance/) | Finance/news real-data harness (active) |
+| [`benchmarks/realdata_finance/`](benchmarks/realdata_finance/) | Finance/news real-data harness |
+| [`benchmarks/realdata_weather/`](benchmarks/realdata_weather/) | Clean Weather harness (trustworthy-source) |
 | `benchmarks/wave*/REPORT.md` | Frozen historical wave reports (archival; do not rewrite) |
 
 ## Repository structure
 
 - `benchmarks/wave4` through `benchmarks/wave12` preserve the experimental history, reports, raw results, and summaries.
+- `benchmarks/realdata_weather/` is a **clean** live Weather harness (Open-Meteo previous-run forecasts + ERA5 labels; weekly-median lookahead banned). See its `PROTOCOL.md`.
 - `src/tcm` exposes frozen Wave XI references (`BatchedReserveCellular`, `FairProvGraph`) and the active real-data experimental model (`ActiveCoalitionCellular` / `ActiveExperimentalCellular`).
 - `tests/` contains lightweight invariance tests.
 

@@ -40,12 +40,6 @@ Cure priority for future work (see fidelity rules in [`NORTH_STAR.md`](NORTH_STA
 
 Real-data reproduction of the flip failure (locked Wave XI, no cures): [`../benchmarks/realdata_finance/REPORT.md`](../benchmarks/realdata_finance/REPORT.md).
 
-A brain-shaped prediction-error / temporary-investigation circuit was tested
-after source calibration but **did not** clear its predeclared fresh-company
-confirmation gate (flip +1.5 points, uncertain); it remains experimental and
-is not part of the active model. See
-[`../benchmarks/realdata_finance/REPORT_TRANSITION.md`](../benchmarks/realdata_finance/REPORT_TRANSITION.md).
-
 ## Active real-data experimental model
 
 `tcm.ActiveCoalitionCellular` (alias `ActiveExperimentalCellular`) is the
@@ -81,3 +75,16 @@ vs frozen Wave XI and fair graph under predeclared slacks. See
 - Wave XVIII / skew / diagnostic-contrast — failed gates; not promoted.
 
 See [`../benchmarks/realdata_finance/README.md`](../benchmarks/realdata_finance/README.md).
+
+## Clean Weather harness (new bed)
+
+[`../benchmarks/realdata_weather/`](../benchmarks/realdata_weather/) locks a
+trustworthy-source stream that refuses the old silver-standard taints:
+
+- reports = multi-model Open-Meteo **`previous_day1`** daily max forecasts
+- labels = ERA5 adjacent-day warmer (`tmax[D+1] > tmax[D]`) — **no** weekly median
+- cities / dates / models predeclared in `cities.py` + `PROTOCOL.md`
+
+This is a new clean bed, not a claim of recovering any prior sandbox Weather
+final. No mechanism may be tuned against it before a written confirmation
+protocol.
