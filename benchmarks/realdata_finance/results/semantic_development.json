@@ -1,0 +1,351 @@
+{
+  "protocol": "contact_tail_semantic_development_v1",
+  "n_scored_days": 60,
+  "results": {
+    "calibrated_baseline": {
+      "accuracy": 0.48166259168704156,
+      "flip_accuracy": 0.22123893805309736,
+      "nonflip_accuracy": 0.7039274924471299,
+      "avg_activated": 1.5378973105134475,
+      "pred_up_rate": 0.5982070089649552,
+      "n": 1227,
+      "flip_n": 565
+    },
+    "novelty_055_history_6": {
+      "accuracy": 0.4849225753871231,
+      "flip_accuracy": 0.22123893805309736,
+      "nonflip_accuracy": 0.7099697885196374,
+      "avg_activated": 1.5354523227383863,
+      "pred_up_rate": 0.5965770171149144,
+      "n": 1227,
+      "flip_n": 565
+    },
+    "novelty_070_history_6": {
+      "accuracy": 0.4873675631621842,
+      "flip_accuracy": 0.23008849557522124,
+      "nonflip_accuracy": 0.7069486404833837,
+      "avg_activated": 1.5338223308883456,
+      "pred_up_rate": 0.5973920130399348,
+      "n": 1227,
+      "flip_n": 565
+    },
+    "novelty_085_history_6": {
+      "accuracy": 0.48247758761206194,
+      "flip_accuracy": 0.22300884955752212,
+      "nonflip_accuracy": 0.7039274924471299,
+      "avg_activated": 1.5264873675631623,
+      "pred_up_rate": 0.5941320293398533,
+      "n": 1227,
+      "flip_n": 565
+    },
+    "novelty_055_history_12": {
+      "accuracy": 0.48573757131214346,
+      "flip_accuracy": 0.2247787610619469,
+      "nonflip_accuracy": 0.7084592145015106,
+      "avg_activated": 1.533007334963325,
+      "pred_up_rate": 0.5973920130399348,
+      "n": 1227,
+      "flip_n": 565
+    },
+    "novelty_070_history_12": {
+      "accuracy": 0.48573757131214346,
+      "flip_accuracy": 0.2247787610619469,
+      "nonflip_accuracy": 0.7084592145015106,
+      "avg_activated": 1.5289323553382232,
+      "pred_up_rate": 0.5925020374898126,
+      "n": 1227,
+      "flip_n": 565
+    },
+    "novelty_085_history_12": {
+      "accuracy": 0.48655256723716384,
+      "flip_accuracy": 0.22831858407079647,
+      "nonflip_accuracy": 0.7069486404833837,
+      "avg_activated": 1.5354523227383863,
+      "pred_up_rate": 0.5982070089649552,
+      "n": 1227,
+      "flip_n": 565
+    }
+  },
+  "vs_calibrated_baseline": {
+    "novelty_055_history_6": {
+      "accuracy": {
+        "delta": 0.0032599837000814994,
+        "lo": -0.0008149959250203749,
+        "hi": 0.008149959250203748,
+        "p": 0.09
+      },
+      "flip_accuracy": {
+        "delta": 0.0,
+        "lo": -0.007079646017699115,
+        "hi": 0.007079646017699115,
+        "p": 0.776
+      }
+    },
+    "novelty_070_history_6": {
+      "accuracy": {
+        "delta": 0.0057049714751426246,
+        "lo": 0.0,
+        "hi": 0.011409942950285249,
+        "p": 0.025
+      },
+      "flip_accuracy": {
+        "delta": 0.008849557522123894,
+        "lo": 0.0,
+        "hi": 0.017699115044247787,
+        "p": 0.015
+      }
+    },
+    "novelty_085_history_6": {
+      "accuracy": {
+        "delta": 0.0008149959250203749,
+        "lo": -0.0057049714751426246,
+        "hi": 0.007334963325183374,
+        "p": 0.729
+      },
+      "flip_accuracy": {
+        "delta": 0.0017699115044247787,
+        "lo": -0.010619469026548672,
+        "hi": 0.01415929203539823,
+        "p": 0.637
+      }
+    },
+    "novelty_055_history_12": {
+      "accuracy": {
+        "delta": 0.004074979625101874,
+        "lo": -0.0008149959250203749,
+        "hi": 0.008964955175224124,
+        "p": 0.063
+      },
+      "flip_accuracy": {
+        "delta": 0.0035398230088495575,
+        "lo": -0.005309734513274336,
+        "hi": 0.012389380530973451,
+        "p": 0.261
+      }
+    },
+    "novelty_070_history_12": {
+      "accuracy": {
+        "delta": 0.004074979625101874,
+        "lo": -0.0016299918500407497,
+        "hi": 0.010594947025264874,
+        "p": 0.146
+      },
+      "flip_accuracy": {
+        "delta": 0.0035398230088495575,
+        "lo": -0.007079646017699115,
+        "hi": 0.012389380530973451,
+        "p": 0.389
+      }
+    },
+    "novelty_085_history_12": {
+      "accuracy": {
+        "delta": 0.004889975550122249,
+        "lo": -0.0016299918500407497,
+        "hi": 0.011430317848410648,
+        "p": 0.118
+      },
+      "flip_accuracy": {
+        "delta": 0.007079646017699115,
+        "lo": -0.0035398230088495575,
+        "hi": 0.019469026548672566,
+        "p": 0.136
+      }
+    }
+  },
+  "semantic_streams": {
+    "novelty_055_history_6": {
+      "n_events": 6121,
+      "n_symbols": 38,
+      "n_sources": 12,
+      "n_days": 286,
+      "contact_events": 3832,
+      "holdout_events": 2289,
+      "flip_events": 2641,
+      "truth_up_rate": 0.4963241300441104,
+      "mean_reports": 2.4933834340793988,
+      "mean_sites": 1.546479333442248,
+      "multi_source_frac": 0.3782061754615259,
+      "mean_source_agreement": 0.837298278270006,
+      "sources": {
+        "0": "benzinga",
+        "1": "feeds2",
+        "2": "finance",
+        "3": "fool",
+        "4": "globenewswire",
+        "5": "investing",
+        "6": "investorplace",
+        "7": "itbusiness",
+        "8": "marketbeat",
+        "9": "marketwatch",
+        "10": "profitconfidential",
+        "11": "reutersagency"
+      },
+      "semantic_context": "causal_title_jaccard_novelty",
+      "novelty_threshold": 0.55,
+      "history_size": 6,
+      "novel_report_fraction": 0.9385401651159743
+    },
+    "novelty_070_history_6": {
+      "n_events": 6121,
+      "n_symbols": 38,
+      "n_sources": 12,
+      "n_days": 286,
+      "contact_events": 3832,
+      "holdout_events": 2289,
+      "flip_events": 2641,
+      "truth_up_rate": 0.4963241300441104,
+      "mean_reports": 2.4933834340793988,
+      "mean_sites": 1.546479333442248,
+      "multi_source_frac": 0.3782061754615259,
+      "mean_source_agreement": 0.837298278270006,
+      "sources": {
+        "0": "benzinga",
+        "1": "feeds2",
+        "2": "finance",
+        "3": "fool",
+        "4": "globenewswire",
+        "5": "investing",
+        "6": "investorplace",
+        "7": "itbusiness",
+        "8": "marketbeat",
+        "9": "marketwatch",
+        "10": "profitconfidential",
+        "11": "reutersagency"
+      },
+      "semantic_context": "causal_title_jaccard_novelty",
+      "novelty_threshold": 0.7,
+      "history_size": 6,
+      "novel_report_fraction": 0.9128554580002621
+    },
+    "novelty_085_history_6": {
+      "n_events": 6121,
+      "n_symbols": 38,
+      "n_sources": 12,
+      "n_days": 286,
+      "contact_events": 3832,
+      "holdout_events": 2289,
+      "flip_events": 2641,
+      "truth_up_rate": 0.4963241300441104,
+      "mean_reports": 2.4933834340793988,
+      "mean_sites": 1.546479333442248,
+      "multi_source_frac": 0.3782061754615259,
+      "mean_source_agreement": 0.837298278270006,
+      "sources": {
+        "0": "benzinga",
+        "1": "feeds2",
+        "2": "finance",
+        "3": "fool",
+        "4": "globenewswire",
+        "5": "investing",
+        "6": "investorplace",
+        "7": "itbusiness",
+        "8": "marketbeat",
+        "9": "marketwatch",
+        "10": "profitconfidential",
+        "11": "reutersagency"
+      },
+      "semantic_context": "causal_title_jaccard_novelty",
+      "novelty_threshold": 0.85,
+      "history_size": 6,
+      "novel_report_fraction": 0.7387629406368759
+    },
+    "novelty_055_history_12": {
+      "n_events": 6121,
+      "n_symbols": 38,
+      "n_sources": 12,
+      "n_days": 286,
+      "contact_events": 3832,
+      "holdout_events": 2289,
+      "flip_events": 2641,
+      "truth_up_rate": 0.4963241300441104,
+      "mean_reports": 2.4933834340793988,
+      "mean_sites": 1.546479333442248,
+      "multi_source_frac": 0.3782061754615259,
+      "mean_source_agreement": 0.837298278270006,
+      "sources": {
+        "0": "benzinga",
+        "1": "feeds2",
+        "2": "finance",
+        "3": "fool",
+        "4": "globenewswire",
+        "5": "investing",
+        "6": "investorplace",
+        "7": "itbusiness",
+        "8": "marketbeat",
+        "9": "marketwatch",
+        "10": "profitconfidential",
+        "11": "reutersagency"
+      },
+      "semantic_context": "causal_title_jaccard_novelty",
+      "novelty_threshold": 0.55,
+      "history_size": 12,
+      "novel_report_fraction": 0.9229458786528634
+    },
+    "novelty_070_history_12": {
+      "n_events": 6121,
+      "n_symbols": 38,
+      "n_sources": 12,
+      "n_days": 286,
+      "contact_events": 3832,
+      "holdout_events": 2289,
+      "flip_events": 2641,
+      "truth_up_rate": 0.4963241300441104,
+      "mean_reports": 2.4933834340793988,
+      "mean_sites": 1.546479333442248,
+      "multi_source_frac": 0.3782061754615259,
+      "mean_source_agreement": 0.837298278270006,
+      "sources": {
+        "0": "benzinga",
+        "1": "feeds2",
+        "2": "finance",
+        "3": "fool",
+        "4": "globenewswire",
+        "5": "investing",
+        "6": "investorplace",
+        "7": "itbusiness",
+        "8": "marketbeat",
+        "9": "marketwatch",
+        "10": "profitconfidential",
+        "11": "reutersagency"
+      },
+      "semantic_context": "causal_title_jaccard_novelty",
+      "novelty_threshold": 0.7,
+      "history_size": 12,
+      "novel_report_fraction": 0.8848774734635041
+    },
+    "novelty_085_history_12": {
+      "n_events": 6121,
+      "n_symbols": 38,
+      "n_sources": 12,
+      "n_days": 286,
+      "contact_events": 3832,
+      "holdout_events": 2289,
+      "flip_events": 2641,
+      "truth_up_rate": 0.4963241300441104,
+      "mean_reports": 2.4933834340793988,
+      "mean_sites": 1.546479333442248,
+      "multi_source_frac": 0.3782061754615259,
+      "mean_source_agreement": 0.837298278270006,
+      "sources": {
+        "0": "benzinga",
+        "1": "feeds2",
+        "2": "finance",
+        "3": "fool",
+        "4": "globenewswire",
+        "5": "investing",
+        "6": "investorplace",
+        "7": "itbusiness",
+        "8": "marketbeat",
+        "9": "marketwatch",
+        "10": "profitconfidential",
+        "11": "reutersagency"
+      },
+      "semantic_context": "causal_title_jaccard_novelty",
+      "novelty_threshold": 0.85,
+      "history_size": 12,
+      "novel_report_fraction": 0.6412658891364172
+    }
+  },
+  "selection_rule": "flip gain >= 0.03, accuracy drop < 0.01, prediction-up rate <= 0.65; confirmation requires a fresh ticker universe.",
+  "selected_for_fresh_confirmation": null
+}

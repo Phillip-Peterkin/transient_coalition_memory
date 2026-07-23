@@ -1,0 +1,137 @@
+{
+  "protocol": "active_coalition_confirmation_v1",
+  "fixed_candidate": "SessionRelevanceFinanceNewsStream + ActiveCoalitionCellular({'min_delta': 0.15, 'max_silence_hazard': 0.55, 'null_rho_gain': 0.3, 'null_pe_floor': 0.35, 'null_pe_span': 0.5, 'null_err_beta': 0.3, 'force_all_positive_null': True, 'fe_cert_slack': 0.0})",
+  "baselines": {
+    "clean": "CleanEvidenceCellular",
+    "silence_escape": "SilenceEscapeCellular({'pe_floor': 0.35, 'pe_span': 0.5, 'rho_gain': 0.3, 'max_hazard': 0.7, 'apply_to_all_positive': True})"
+  },
+  "universe": "confirmation8_universe",
+  "stream": {
+    "n_events": 1723,
+    "n_symbols": 30,
+    "n_sources": 11,
+    "n_days": 280,
+    "contact_events": 1062,
+    "holdout_events": 661,
+    "flip_events": 858,
+    "truth_up_rate": 0.4434126523505514,
+    "mean_reports": 0.7782936738247244,
+    "mean_sites": 0.6030179918746372,
+    "multi_source_frac": 0.0812536273940801,
+    "mean_source_agreement": 0.7270882123341139,
+    "sources": {
+      "0": "benzinga",
+      "1": "feeds2",
+      "2": "finance",
+      "3": "fool",
+      "4": "globenewswire",
+      "5": "investing",
+      "6": "investorplace",
+      "7": "itbusiness",
+      "8": "marketbeat",
+      "9": "marketwatch",
+      "10": "profitconfidential"
+    },
+    "sensory_gate": "explicit_company_mention_in_title",
+    "session_protocol": "close_cutoff_america_new_york",
+    "flip_definition": "adjacent_trading_session",
+    "duplicate_symbol_session_events": 0,
+    "news_event_gap_mean": 4.871234494979326,
+    "news_event_gap_frac_1": 0.3337271116361488,
+    "news_event_gap_frac_gt_1": 0.6662728883638511,
+    "flip_events_adjacent_session": 858,
+    "events_without_relevant_reports": 845,
+    "relevant_article_fraction": 0.4703612767450018,
+    "assigned_article_fraction": 1.0,
+    "dropped_unassigned_articles": 0,
+    "company_patterns": 224,
+    "session_timezone": "America/New_York",
+    "session_close": "16:00"
+  },
+  "warmup": "first 70% of dates; causal state only, not scored",
+  "confirmation": {
+    "clean_baseline": {
+      "n": 661,
+      "accuracy": 0.49924357034795763,
+      "flip_accuracy": 0.4583333333333333,
+      "nonflip_accuracy": 0.5358166189111748,
+      "flip_n": 312,
+      "brier": 0.2565420806764717,
+      "ece": 0.07068664567135648,
+      "pred_up_rate": 0.5915279878971256,
+      "avg_activated": 0.5506807866868382
+    },
+    "silence_escape": {
+      "n": 661,
+      "accuracy": 0.518910741301059,
+      "flip_accuracy": 0.49038461538461536,
+      "nonflip_accuracy": 0.5444126074498568,
+      "flip_n": 312,
+      "brier": 0.25030933987043025,
+      "ece": 0.06436439702659923,
+      "pred_up_rate": 0.49016641452344933,
+      "avg_activated": 0.11800302571860817
+    },
+    "active_coalition": {
+      "n": 661,
+      "accuracy": 0.5173978819969742,
+      "flip_accuracy": 0.5256410256410257,
+      "nonflip_accuracy": 0.5100286532951289,
+      "flip_n": 312,
+      "brier": 0.24982400757036943,
+      "ece": 0.062145071031294394,
+      "pred_up_rate": 0.5370650529500757,
+      "avg_activated": 0.007564296520423601
+    },
+    "paired": {
+      "vs_clean_accuracy": {
+        "delta": 0.018154311649016642,
+        "lo": -0.036308623298033284,
+        "hi": 0.07110438729198185,
+        "p": 0.4956
+      },
+      "vs_clean_flip": {
+        "delta": 0.0673076923076923,
+        "lo": -0.01282051282051282,
+        "hi": 0.14743589743589744,
+        "p": 0.0932
+      },
+      "vs_silence_accuracy": {
+        "delta": -0.0015128593040847202,
+        "lo": -0.03177004538577912,
+        "hi": 0.02723146747352496,
+        "p": 0.8748
+      },
+      "vs_silence_flip": {
+        "delta": 0.035256410256410256,
+        "lo": -0.00641025641025641,
+        "hi": 0.07371794871794872,
+        "p": 0.076
+      }
+    },
+    "bootstrap_confidence_intervals": {
+      "clean_flip": {
+        "mean": 0.4583333333333333,
+        "lo": 0.40384615384615385,
+        "hi": 0.5128205128205128
+      },
+      "silence_flip": {
+        "mean": 0.49038461538461536,
+        "lo": 0.4358974358974359,
+        "hi": 0.5480769230769231
+      },
+      "candidate_flip": {
+        "mean": 0.5256410256410257,
+        "lo": 0.47115384615384615,
+        "hi": 0.5801282051282052
+      }
+    },
+    "passes_predeclared_gate": true,
+    "gate": {
+      "flip_accuracy_min": 0.45,
+      "accuracy_max_drop_vs_clean": 0.01,
+      "pred_up_rate_max": 0.65,
+      "nonflip_accuracy_min": 0.5
+    }
+  }
+}
