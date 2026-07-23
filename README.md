@@ -18,6 +18,7 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
 ## Repository structure
 
 - `benchmarks/wave4` through `benchmarks/wave12` preserve the experimental history, reports, raw results, and summaries.
+- `benchmarks/realdata_weather/` is a **clean** live Weather harness (Open-Meteo previous-run forecasts + ERA5 labels; weekly-median lookahead banned). See its `PROTOCOL.md`.
 - `src/tcm` exposes the frozen Wave XI reference classes.
 - `docs/ARCHITECTURE.md` explains the mechanisms.
 - `docs/REPRODUCIBILITY.md` gives exact run instructions.
