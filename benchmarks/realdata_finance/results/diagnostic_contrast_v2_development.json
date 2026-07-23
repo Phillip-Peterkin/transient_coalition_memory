@@ -1,0 +1,174 @@
+{
+  "protocol": "finance_diagnostic_contrast_v2_development_v1",
+  "mechanism": "Slot-null ownership; cheerleader skew inside edits; local edit survival; certificate contrast vs nearest false belief.",
+  "grid": [
+    {
+      "cheerleader_contrast_scale": 1.0,
+      "contrast_margin": 0.08,
+      "survival_gain": 1.0
+    },
+    {
+      "cheerleader_contrast_scale": 1.5,
+      "contrast_margin": 0.08,
+      "survival_gain": 1.0
+    },
+    {
+      "cheerleader_contrast_scale": 1.0,
+      "contrast_margin": 0.08,
+      "survival_gain": 0.5
+    },
+    {
+      "cheerleader_contrast_scale": 1.5,
+      "contrast_margin": 0.05,
+      "survival_gain": 1.0
+    }
+  ],
+  "selection": "Among gate passers vs clean (flip>=0.45, acc drop<0.01, up<=0.65, nonflip>=0.50) pick max (flip-silence, flip, nonflip, acc).",
+  "cells": {
+    "clean_baseline": {
+      "accuracy": 0.503584229390681,
+      "flip_accuracy": 0.40823970037453183,
+      "nonflip_accuracy": 0.5910652920962199,
+      "avg_activated": 0.7974910394265233,
+      "pred_up_rate": 0.696236559139785,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "silence_escape": {
+      "accuracy": 0.5062724014336918,
+      "flip_accuracy": 0.49063670411985016,
+      "nonflip_accuracy": 0.520618556701031,
+      "avg_activated": 0.18100358422939067,
+      "pred_up_rate": 0.48566308243727596,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "v2_chs1_cm0.08_sg1": {
+      "accuracy": 0.5170250896057348,
+      "flip_accuracy": 0.5337078651685393,
+      "nonflip_accuracy": 0.5017182130584192,
+      "avg_activated": 0.5403225806451613,
+      "pred_up_rate": 0.5806451612903226,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "v2_chs1.5_cm0.08_sg1": {
+      "accuracy": 0.5170250896057348,
+      "flip_accuracy": 0.5337078651685393,
+      "nonflip_accuracy": 0.5017182130584192,
+      "avg_activated": 0.5403225806451613,
+      "pred_up_rate": 0.5806451612903226,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "v2_chs1_cm0.08_sg0.5": {
+      "accuracy": 0.5170250896057348,
+      "flip_accuracy": 0.5337078651685393,
+      "nonflip_accuracy": 0.5017182130584192,
+      "avg_activated": 0.5394265232974911,
+      "pred_up_rate": 0.5806451612903226,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "v2_chs1.5_cm0.05_sg1": {
+      "accuracy": 0.5170250896057348,
+      "flip_accuracy": 0.5337078651685393,
+      "nonflip_accuracy": 0.5017182130584192,
+      "avg_activated": 0.5367383512544803,
+      "pred_up_rate": 0.5806451612903226,
+      "n": 1116,
+      "flip_n": 534
+    }
+  },
+  "paired": {
+    "v2_chs1_cm0.08_sg1": {
+      "vs_clean_accuracy": {
+        "delta": 0.013440860215053764,
+        "lo": -0.021527777777777778,
+        "hi": 0.051075268817204304,
+        "p": 0.439
+      },
+      "vs_clean_flip": {
+        "delta": 0.1254681647940075,
+        "lo": 0.07303370786516854,
+        "hi": 0.17790262172284643,
+        "p": 0.0
+      },
+      "vs_silence_flip": {
+        "delta": 0.04307116104868914,
+        "lo": -0.003745318352059925,
+        "hi": 0.0898876404494382,
+        "p": 0.057
+      }
+    },
+    "v2_chs1.5_cm0.08_sg1": {
+      "vs_clean_accuracy": {
+        "delta": 0.013440860215053764,
+        "lo": -0.024193548387096774,
+        "hi": 0.0492831541218638,
+        "p": 0.448
+      },
+      "vs_clean_flip": {
+        "delta": 0.1254681647940075,
+        "lo": 0.0749063670411985,
+        "hi": 0.176076779026217,
+        "p": 0.0
+      },
+      "vs_silence_flip": {
+        "delta": 0.04307116104868914,
+        "lo": -0.003745318352059925,
+        "hi": 0.0898876404494382,
+        "p": 0.06
+      }
+    },
+    "v2_chs1_cm0.08_sg0.5": {
+      "vs_clean_accuracy": {
+        "delta": 0.013440860215053764,
+        "lo": -0.022401433691756272,
+        "hi": 0.0492831541218638,
+        "p": 0.476
+      },
+      "vs_clean_flip": {
+        "delta": 0.1254681647940075,
+        "lo": 0.07298689138576779,
+        "hi": 0.1797752808988764,
+        "p": 0.0
+      },
+      "vs_silence_flip": {
+        "delta": 0.04307116104868914,
+        "lo": -0.0056179775280898875,
+        "hi": 0.08801498127340825,
+        "p": 0.069
+      }
+    },
+    "v2_chs1.5_cm0.05_sg1": {
+      "vs_clean_accuracy": {
+        "delta": 0.013440860215053764,
+        "lo": -0.02331989247311828,
+        "hi": 0.05109767025089594,
+        "p": 0.476
+      },
+      "vs_clean_flip": {
+        "delta": 0.1254681647940075,
+        "lo": 0.0749063670411985,
+        "hi": 0.1760299625468165,
+        "p": 0.0
+      },
+      "vs_silence_flip": {
+        "delta": 0.04307116104868914,
+        "lo": -0.0056179775280898875,
+        "hi": 0.09176029962546817,
+        "p": 0.064
+      }
+    }
+  },
+  "winners": [
+    "v2_chs1_cm0.08_sg1",
+    "v2_chs1.5_cm0.08_sg1",
+    "v2_chs1_cm0.08_sg0.5",
+    "v2_chs1.5_cm0.05_sg1"
+  ],
+  "selected_winner": "v2_chs1_cm0.08_sg1",
+  "passes_development_gate": true,
+  "note": "Contact-tail only. Fresh confirmation requires confirmation6 and a frozen one-shot protocol \u2014 not this script."
+}
