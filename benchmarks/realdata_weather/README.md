@@ -34,7 +34,11 @@ confirmatory for locked models only.
 
 ## Status
 
-Purity lock **PASS**. Sealed ACI Weather confirmation **FAIL** (flip 0.783 vs
-Wave XI 0.845; missed +5pt lift gate). See
-`REPORT_WEATHER_ACI_CONFIRMATION.md`. No retune. Still **not** a claim of
-recovering the original sandbox Weather final.
+- Purity lock **PASS**
+- Wrong-yardstick look (gate vs Wave XI) on first bed: **FAIL** — see
+  `REPORT_WEATHER_ACI_CONFIRMATION.md` (Wave XI is not the architecture under test)
+- **Architecture confirmation** on virgin `confirmation2`: **PASS** — sealed
+  ACI vs persistence / majority / silence lineage. See
+  `REPORT_WEATHER_ARCHITECTURE_CONFIRMATION.md`
+
+Still **not** a claim of recovering the original sandbox Weather final.

@@ -262,12 +262,15 @@ Implementation: `tcm.ActiveCoalitionCellular` (alias
   graph on both. See
   [`REPORT_BOSS.md`](../benchmarks/aci_boss/REPORT_BOSS.md).
 - Clean Weather bed (`benchmarks/realdata_weather/`): Open-Meteo
-  `previous_day1` + ERA5 adjacent-day warmer; weekly-median banned. Sealed
-  ACI confirmation **FAIL** — holdout flip 0.783 vs Wave XI 0.845 (missed
-  +5pt lift gate) though absolute flip ≥0.45 and accuracy held vs persistence.
-  See [`REPORT_WEATHER_ACI_CONFIRMATION.md`](../benchmarks/realdata_weather/REPORT_WEATHER_ACI_CONFIRMATION.md).
-  New bed, not recovered sandbox Weather final. Foundation / regime-generality
-  claims remain blocked.
+  `previous_day1` + ERA5 adjacent-day warmer; weekly-median banned.
+  - Wrong yardstick (gate vs Wave XI) on first bed: **FAIL** — see
+    [`REPORT_WEATHER_ACI_CONFIRMATION.md`](../benchmarks/realdata_weather/REPORT_WEATHER_ACI_CONFIRMATION.md).
+  - Architecture-under-test look (sealed ACI vs persistence / majority /
+    silence lineage) on virgin `confirmation2`: **PASS** — flip **0.733**
+    (≥ silence 0.663; ≥0.45; acc vs persistence held). See
+    [`REPORT_WEATHER_ARCHITECTURE_CONFIRMATION.md`](../benchmarks/realdata_weather/REPORT_WEATHER_ARCHITECTURE_CONFIRMATION.md).
+  New bed, not recovered sandbox Weather final. Wave XI remains synthetic
+  reference only for real-data architecture claims.
 
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where
