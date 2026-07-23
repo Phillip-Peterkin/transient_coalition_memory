@@ -92,10 +92,14 @@ Same reports and delayed labels for all:
 1. Persistence
 2. Equal-weight majority
 3. Delayed Fixed-Share Hedge (queue-release updates)
-4. Fading online source-reliability Bayes
-5. Agreement-discounted fading Bayes
-6. Sealed `ActiveExperimentalCellular` (ACI)
-7. `AwareCoalitionCellular`
+4. Delayed AdaHedge (queue-release updates; adaptive η)
+5. Fading online source-reliability Bayes
+6. Agreement-discounted fading Bayes
+7. Sealed `ActiveExperimentalCellular` (ACI)
+8. `AwareCoalitionCellular`
+
+Primary non-inferiority remains against **Fixed-Share**. AdaHedge is an
+additional expert-tracking row under the same delay discipline.
 
 ## Sealed screening gate (contract rebuild)
 
@@ -118,5 +122,6 @@ weather lane (`prospective_weather/`) before any regime-general claim.
 
 Started under `prospective_weather/`: append-only, timestamped, daily-hashed
 collection of six NWP sources on an immutable station roster disjoint from
-spent Weather beds. Scoring that lane is forbidden until the collection
-protocol’s sealed look is declared separately.
+spent Weather beds. Sealed scoring contract:
+[`prospective_weather/SCORING_PROTOCOL.md`](prospective_weather/SCORING_PROTOCOL.md)
+(closed until open conditions; no scoring yet).

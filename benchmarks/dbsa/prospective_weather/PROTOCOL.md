@@ -19,10 +19,14 @@ cross-domain requirement, not a retune surface.
 2. Artifact includes forecast snapshot JSON + `sha256` of canonical bytes
 3. `ledger/INDEX.jsonl` appends one line per successful collection
 4. Never rewrite a prior day directory; corrections append a new dated note
-5. No model evaluation imports this ledger until a separate sealed scoring
-   protocol is written
+5. No model evaluation imports this ledger until the sealed scoring protocol
+   is **opened** — see [`SCORING_PROTOCOL.md`](SCORING_PROTOCOL.md)
 
 ## Why start now
 
 Prospective means waiting for real forecasts and real outcomes. Starting the
 immutable pipeline today is what makes a future sealed look possible.
+
+Scoring protocol is drafted and **closed** until open conditions in
+`SCORING_PROTOCOL.md` are met (60 collection days, sealed labels, prior
+200-seed synthetic artifact).

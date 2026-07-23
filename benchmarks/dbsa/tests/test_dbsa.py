@@ -10,7 +10,7 @@ REPO = ROOT.parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(REPO / "src"))
 
-from baselines import FadingSourceBayes, FixedShareHedge
+from baselines import AdaHedge, FadingSourceBayes, FixedShareHedge
 from contract_simulator import WORLD_NAMES, generate
 from evaluate import BRIER_NONINFERIORITY_DELTA, run_model
 
@@ -37,6 +37,21 @@ def test_fixed_share_updates_only_on_queue_release():
     model = FixedShareHedge()
     result = run_model(events, model)
     assert result["model_stats"]["updates"] == 0
+
+
+def test_ada_hedge_updates_only_on_queue_release():
+    events = generate("independent_stable", seed=11, rounds=15)[:14]
+    model = AdaHedge()
+    result = run_model(events, model)
+    assert result["model_stats"]["updates"] == 0
+
+
+def test_ada_hedge_learns_after_delay_release():
+    events = generate("independent_stable", seed=11, rounds=40)
+    model = AdaHedge()
+    result = run_model(events, model)
+    assert result["model_stats"]["updates"] > 0
+    assert result["model_stats"]["ada_hedge_alpha"] >= 0.0
 
 
 def test_noninferiority_delta_is_locked():

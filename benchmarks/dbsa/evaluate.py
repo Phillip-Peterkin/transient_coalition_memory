@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(REPO / "src"))
 
 from baselines import (  # noqa: E402
+    AdaHedge,
     AgreementDiscountedBayes,
     FadingSourceBayes,
     FixedShareHedge,
@@ -70,6 +71,7 @@ def _method_factories():
         "persistence": Persistence,
         "majority": Majority,
         "fixed_share_hedge": FixedShareHedge,
+        "ada_hedge": AdaHedge,
         "fading_source_bayes": FadingSourceBayes,
         "agreement_discounted_bayes": AgreementDiscountedBayes,
         "active_experimental_aci": lambda: ActiveExperimentalCellular(

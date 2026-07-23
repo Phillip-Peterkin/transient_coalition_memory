@@ -122,6 +122,102 @@ class FixedShareHedge(_Baseline):
         return {**super().stats(), "memory_states": len(self.weights)}
 
 
+class AdaHedge(_Baseline):
+    """Sleeping-expert AdaHedge with adaptive learning rate.
+
+    Textbook AdaHedge assumes immediate losses. Under DBSA delays this row
+    updates **only when the shared evaluator queue releases the label**
+    (`due_t`). It never sees same-step oracle losses.
+
+    Mixability-gap adaptation follows the standard cumulative-gap schedule:
+    ``η = sqrt((ln K) / α)`` with ``α`` the cumulative mixability gap over
+    awake experts on each released packet.
+    """
+
+    name = "ada_hedge"
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.cumulative_loss: dict[int, float] = {}
+        self.alpha = 0.0
+        self.last_eta = 0.0
+
+    def _ensure(self, source: int) -> None:
+        if source not in self.cumulative_loss:
+            self.cumulative_loss[source] = 0.0
+
+    def _eta(self, awake_count: int) -> float:
+        if awake_count <= 1:
+            return 0.0
+        if self.alpha <= EPS:
+            return math.sqrt(math.log(awake_count) / EPS)
+        return math.sqrt(math.log(awake_count) / self.alpha)
+
+    def _posterior(self, sources: list[int]) -> dict[int, float]:
+        eta = self._eta(len(sources))
+        self.last_eta = eta
+        if eta <= EPS or len(sources) == 1:
+            mass = 1.0 / len(sources)
+            return {source: mass for source in sources}
+        unnormalized = {
+            source: math.exp(-eta * self.cumulative_loss[source]) for source in sources
+        }
+        total = sum(unnormalized.values())
+        return {source: weight / max(EPS, total) for source, weight in unnormalized.items()}
+
+    def predict(self, key, reports, t):
+        del key, t
+        sources = []
+        votes = {}
+        for source, _, vote in reports:
+            source = int(source)
+            self._ensure(source)
+            sources.append(source)
+            votes[source] = int(vote)
+        posterior = self._posterior(sources)
+        probability = sum(posterior[source] * votes[source] for source in sources)
+        return self._trace(probability, reports)
+
+    def feedback(self, event) -> None:
+        truth = int(event["truth"])
+        sources = []
+        losses = {}
+        for source, _, vote in event["reports"]:
+            source = int(source)
+            self._ensure(source)
+            sources.append(source)
+            losses[source] = float(int(vote) != truth)
+        if not sources:
+            return
+        posterior = self._posterior(sources)
+        eta = self.last_eta
+        expected_loss = sum(posterior[source] * losses[source] for source in sources)
+        if eta <= EPS:
+            mix_loss = expected_loss
+        else:
+            mix_loss = (
+                -math.log(
+                    sum(
+                        posterior[source] * math.exp(-eta * losses[source])
+                        for source in sources
+                    )
+                )
+                / eta
+            )
+        self.alpha += max(0.0, expected_loss - mix_loss)
+        for source in sources:
+            self.cumulative_loss[source] += losses[source]
+        self.updates += len(sources)
+
+    def stats(self) -> dict:
+        return {
+            **super().stats(),
+            "memory_states": len(self.cumulative_loss),
+            "ada_hedge_alpha": self.alpha,
+            "ada_hedge_eta": self.last_eta,
+        }
+
+
 class FadingSourceBayes(_Baseline):
     """Past-only Beta reliability filter; optional agreement dependence shrink."""
 

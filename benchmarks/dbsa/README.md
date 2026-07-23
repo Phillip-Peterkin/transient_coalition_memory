@@ -20,15 +20,24 @@ Non-inferiority: **δ = 0.005** with one-sided 97.5% paired-seed CI.
 Expert baselines update **only on queue release**.  
 Resources are a **Pareto frontier** (no hard activation threshold).
 
-## Exploratory legacy pilot
+## Results
 
-[`REPORT_PILOT.md`](REPORT_PILOT.md) + `results/dbsa_v1_pilot.json` used the
-pre-contract generator. Diagnostic only — **not** sealed DBSA-v1.
+- Contract screen (24-seed, sealed post-rebuild): **FAIL** —
+  [`REPORT_CONTRACT_SCREEN.md`](REPORT_CONTRACT_SCREEN.md)
+- Leadership contract (200-seed): see
+  [`REPORT_CONTRACT_200.md`](REPORT_CONTRACT_200.md) when present
+- Exploratory pre-contract pilot: diagnostic only —
+  [`REPORT_PILOT.md`](REPORT_PILOT.md)
 
-## Run contract screen
+## Run contract screen / leadership
 
 ```bash
+# Screening (24 seeds)
 python benchmarks/dbsa/evaluate.py --seeds 24 --rounds 800
+
+# Leadership synthetic contract (200 seeds)
+python benchmarks/dbsa/evaluate.py --seeds 200 --rounds 800 \
+  --out benchmarks/dbsa/results/dbsa_v1_contract_200.json
 ```
 
 ## Start / continue prospective weather collection
@@ -37,5 +46,5 @@ python benchmarks/dbsa/evaluate.py --seeds 24 --rounds 800
 python benchmarks/dbsa/prospective_weather/collect_day.py
 ```
 
-Append-only under `prospective_weather/ledger/`. Do not score that lane until
-a sealed scoring protocol is written.
+Append-only under `prospective_weather/ledger/`. Scoring is sealed/closed —
+see [`prospective_weather/SCORING_PROTOCOL.md`](prospective_weather/SCORING_PROTOCOL.md).
