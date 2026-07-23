@@ -115,8 +115,10 @@ Aware is screening-promising only if **all** hold:
 
 Failure is recorded without retuning DBSA-v1 parameters or ACI/Aware knobs.
 
-Leadership still requires the 200-seed contract run **and** the prospective
-weather lane (`prospective_weather/`) before any regime-general claim.
+Leadership synthetic contract: 200-seed run after the source-trust /
+dependence push is recorded in `REPORT_CONTRACT_200_PUSH.md`. Cross-domain
+claim still requires the prospective weather lane (`prospective_weather/`)
+before any regime-general claim.
 
 ## Prospective weather lane
 
