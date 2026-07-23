@@ -1207,6 +1207,11 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         source_shift_gap: float = 0.35,
         source_shift_discount: float = 0.15,
         source_shift_long_beta: float = 0.05,
+        # 4) Observable copy-skipping: if two sources almost always agree,
+        #    do not recruit both as independent evidence (default off).
+        use_source_redundancy: bool = False,
+        source_redundant_agree: float = 0.90,
+        source_redundant_min_pairs: int = 8,
         **params,
     ):
         super().__init__(**params)
@@ -1226,6 +1231,9 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         self.source_shift_gap = float(source_shift_gap)
         self.source_shift_discount = float(source_shift_discount)
         self.source_shift_long_beta = float(source_shift_long_beta)
+        self.use_source_redundancy = bool(use_source_redundancy)
+        self.source_redundant_agree = float(source_redundant_agree)
+        self.source_redundant_min_pairs = int(source_redundant_min_pairs)
         if not (0.0 < self.source_forget <= 1.0):
             raise ValueError("source_forget must be in (0, 1]")
         if not (0.0 <= self.source_share <= 1.0):
@@ -1246,6 +1254,11 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         self.src_recent_err = defaultdict(list)
         self.src_long_err = defaultdict(lambda: 0.5)
         self.source_shift_events = 0
+
+        # Observable pairwise agreement for copy-skipping.
+        self.pair_agree = defaultdict(float)
+        self.pair_both = defaultdict(float)
+        self.source_redundant_skips = 0
 
         # Null-channel precision: PE EWMA under emptiness / non-diagnostic
         # clouds. High PE ⇒ continuation hypothesis failing ⇒ anti-prior mix.
@@ -1272,6 +1285,48 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         agreement = agreeing_pairs / total_pairs if total_pairs else 0.0
         effective_count = 1.0 + (len(votes) - 1) * (1.0 - agreement)
         return effective_count / len(reports)
+
+    @staticmethod
+    def _pair_key(left, right):
+        return (left, right) if left < right else (right, left)
+
+    def _record_source_pairs(self, reports) -> None:
+        if not self.use_source_redundancy or len(reports) < 2:
+            return
+        entries = [(source, int(vote)) for source, _, vote in reports]
+        for index, (source_a, vote_a) in enumerate(entries):
+            for source_b, vote_b in entries[index + 1 :]:
+                key = self._pair_key(source_a, source_b)
+                self.pair_both[key] += 1.0
+                if vote_a == vote_b:
+                    self.pair_agree[key] += 1.0
+
+    def _is_redundant_source(self, source, active_sources) -> bool:
+        if not self.use_source_redundancy or not active_sources:
+            return False
+        for other in active_sources:
+            key = self._pair_key(source, other)
+            both = self.pair_both[key]
+            if both < self.source_redundant_min_pairs:
+                continue
+            if self.pair_agree[key] / both >= self.source_redundant_agree:
+                return True
+        return False
+
+    def _diversify_rows(self, rows):
+        """Drop historical near-copies so certificate unread mass is honest."""
+        if not self.use_source_redundancy:
+            return rows
+        diverse = []
+        active_sources = []
+        for row in rows:
+            source = row[2]
+            if self._is_redundant_source(source, active_sources):
+                self.source_redundant_skips += 1
+                continue
+            diverse.append(row)
+            active_sources.append(source)
+        return diverse
 
     def _prior_log_odds(self, key) -> float:
         return (
@@ -1327,13 +1382,16 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         )
 
     def _evidence_rows(self, reports):
-        scale = (
-            self._correlation_scale(reports) if self.use_correlation_discount else 1.0
-        )
+        """Raw per-source rows for recruitment / certificate.
+
+        Agreement discount must NOT shrink rows before the certificate stops —
+        otherwise a large copy-coalition is certified after reading a few
+        shrunken scraps and keeps only a fraction of one source's evidence.
+        Discount is applied once to the active sum after recruitment.
+        """
         rows = []
         for source, context, vote in reports:
-            # Discount applies to accumulation / certificate mass only.
-            delta = self._report_delta(source, int(vote)) * scale
+            delta = self._report_delta(source, int(vote))
             rows.append((abs(delta), delta, source, context, int(vote)))
         rows.sort(key=lambda row: row[0], reverse=True)
         self.preview_ops += self.header_cost * len(rows)
@@ -1386,10 +1444,14 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         prior_lo = self._prior_log_odds(key)
         prior_p = _sigmoid(prior_lo)
 
-        rows = self._evidence_rows(reports)[: self.max_k] if reports else []
-        # Gate on raw per-source strength; scaled row mass is for summing only.
+        rows = self._evidence_rows(reports) if reports else []
+        rows = self._diversify_rows(rows)[: self.max_k]
+        # Gate on raw per-source strength.
         max_delta = self._max_raw_abs_delta(reports)
-        max_delta_scaled = rows[0][0] if rows else 0.0
+        batch_scale = (
+            self._correlation_scale(reports) if self.use_correlation_discount else 1.0
+        )
+        max_delta_scaled = max_delta * batch_scale
 
         if self._is_null_batch(reports, max_delta):
             probability, hazard = self._silence_posterior(key, prior_p)
@@ -1418,25 +1480,26 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
                 "shadow_mass": (0.0, 0.0),
                 "max_delta": max_delta,
                 "max_delta_scaled": max_delta_scaled,
+                "correlation_scale": batch_scale,
                 "null_pe": self.null_pe[key],
             }
 
-        # Suffix of unread absolute evidence mass for free-energy certificate.
+        # Certificate / recruitment in raw |Δ| space on diversified rows.
         count = len(rows)
         suffix_abs = [0.0] * (count + 1)
         for index in range(count - 1, -1, -1):
             suffix_abs[index] = suffix_abs[index + 1] + rows[index][0]
 
         active = []
-        evidence_lo = 0.0
+        raw_evidence_lo = 0.0
         stop_reason = "budget"
         for index, row in enumerate(rows):
             abs_delta, delta, source, context, vote = row
             active.append(row)
-            evidence_lo += delta
+            raw_evidence_lo += delta
             self.activation_ops += 1.0
             self.ops += 2
-            posterior_lo = prior_lo + evidence_lo
+            posterior_lo = prior_lo + raw_evidence_lo
             unread = suffix_abs[index + 1]
             # Certificate: unread discrimination cannot flip the commitment.
             if len(active) >= self.min_k and abs(posterior_lo) > unread + self.fe_cert_slack:
@@ -1444,6 +1507,18 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
                 self.fe_certificates += 1
                 break
 
+        # Shrink the *active* sum by effective coalition size among actives.
+        # Using len(active) (not the full batch) keeps one source-worth of
+        # evidence when copies are certified early.
+        active_reports = [
+            (source, context, vote) for _abs, _delta, source, context, vote in active
+        ]
+        active_scale = (
+            self._correlation_scale(active_reports)
+            if self.use_correlation_discount and active_reports
+            else 1.0
+        )
+        evidence_lo = raw_evidence_lo * active_scale
         posterior_lo = prior_lo + evidence_lo
         probability = _sigmoid(posterior_lo)
         pos = sum(delta for _, delta, _, _, _ in active if delta >= 0)
@@ -1458,6 +1533,7 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
             "prior_p": prior_p,
             "prior_lo": prior_lo,
             "evidence_lo": evidence_lo,
+            "raw_evidence_lo": raw_evidence_lo,
             "active": [
                 (source, context, vote, (key, vote), abs_delta)
                 for abs_delta, delta, source, context, vote in active
@@ -1470,7 +1546,8 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
             "stop_reason": stop_reason,
             "shadow_mass": (0.0, 0.0),
             "max_delta": max_delta,
-            "max_delta_scaled": max_delta_scaled,
+            "max_delta_scaled": max_delta * active_scale,
+            "correlation_scale": active_scale,
             "unread_mass": suffix_abs[len(active)] if active else 0.0,
         }
 
@@ -1494,6 +1571,7 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
             )
 
         if reports:
+            self._record_source_pairs(reports)
             self._update_source_likelihoods(reports, truth)
 
         # Prior update only — evidence tables above are the likelihood organ.
@@ -1604,6 +1682,7 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
                 "null_diagnostic_events": self.null_diagnostic_events,
                 "fe_certificates": self.fe_certificates,
                 "source_shift_events": self.source_shift_events,
+                "source_redundant_skips": self.source_redundant_skips,
                 "source_forget": self.source_forget,
                 "source_share": self.source_share,
                 "mean_null_pe": (

@@ -60,13 +60,15 @@ ACI_PARAMS = {
     "null_err_beta": 0.30,
     "force_all_positive_null": True,
     "fe_cert_slack": 0.0,
-    # Source-trust regime pack (cell defaults stay off = sealed confirmation8):
-    # constant fade + never-zero floor + per-source shift hard-discount.
-    "source_forget": 0.985,
+    # Source-trust + dependence pack (cell defaults stay off = sealed confirmation8).
+    "source_forget": 0.98,
     "source_share": 0.03,
-    "source_shift_window": 12,
-    "source_shift_gap": 0.35,
-    "source_shift_discount": 0.15,
+    "source_shift_window": 8,
+    "source_shift_gap": 0.28,
+    "source_shift_discount": 0.12,
+    "use_source_redundancy": True,
+    "source_redundant_agree": 0.90,
+    "source_redundant_min_pairs": 8,
 }
 AWARE_PARAMS = {
     key: value for key, value in ACI_PARAMS.items() if key != "force_all_positive_null"
