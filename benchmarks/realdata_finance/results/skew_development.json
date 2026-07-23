@@ -1,0 +1,146 @@
+{
+  "protocol": "finance_skew_correction_development_v1",
+  "rejected": "last_truth mean-reversion on cheerleader coalitions: it predicts the opposite of the previous label and hacks flip accuracy while destroying non-flip accuracy.",
+  "mechanism": "For all-Positive coalitions, subtract scale * mean[logit(P_emit+) - logit(0.5)] from the decision logit. Report signs remain preserved.",
+  "scale_grid": [
+    1.0,
+    1.25,
+    1.5
+  ],
+  "stream": {
+    "n_events": 5464,
+    "n_symbols": 38,
+    "n_sources": 12,
+    "n_days": 286,
+    "contact_events": 3474,
+    "holdout_events": 1990,
+    "flip_events": 2631,
+    "truth_up_rate": 0.4987188872620791,
+    "mean_reports": 1.2748901903367496,
+    "mean_sites": 0.861822840409956,
+    "multi_source_frac": 0.18667642752562225,
+    "mean_source_agreement": 0.7960523656173166,
+    "sources": {
+      "0": "benzinga",
+      "1": "feeds2",
+      "2": "finance",
+      "3": "fool",
+      "4": "globenewswire",
+      "5": "investing",
+      "6": "investorplace",
+      "7": "itbusiness",
+      "8": "marketbeat",
+      "9": "marketwatch",
+      "10": "profitconfidential",
+      "11": "reutersagency"
+    },
+    "sensory_gate": "explicit_company_mention_in_title",
+    "session_protocol": "close_cutoff_america_new_york",
+    "flip_definition": "adjacent_trading_session",
+    "duplicate_symbol_session_events": 0,
+    "news_event_gap_mean": 1.986361960928861,
+    "news_event_gap_frac_1": 0.6479911537043863,
+    "news_event_gap_frac_gt_1": 0.3520088462956137,
+    "flip_events_adjacent_session": 2631,
+    "events_without_relevant_reports": 2191,
+    "relevant_article_fraction": 0.45642772900013107,
+    "assigned_article_fraction": 1.0,
+    "dropped_unassigned_articles": 0,
+    "company_patterns": 67,
+    "session_timezone": "America/New_York",
+    "session_close": "16:00"
+  },
+  "cells": {
+    "clean_baseline": {
+      "accuracy": 0.503584229390681,
+      "flip_accuracy": 0.40823970037453183,
+      "nonflip_accuracy": 0.5910652920962199,
+      "avg_activated": 0.7974910394265233,
+      "pred_up_rate": 0.696236559139785,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "skew_scale_1": {
+      "accuracy": 0.48655913978494625,
+      "flip_accuracy": 0.4363295880149813,
+      "nonflip_accuracy": 0.5326460481099656,
+      "avg_activated": 0.9139784946236559,
+      "pred_up_rate": 0.35125448028673834,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "skew_scale_1.25": {
+      "accuracy": 0.492831541218638,
+      "flip_accuracy": 0.46254681647940077,
+      "nonflip_accuracy": 0.520618556701031,
+      "avg_activated": 0.9283154121863799,
+      "pred_up_rate": 0.3467741935483871,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "skew_scale_1.5": {
+      "accuracy": 0.4946236559139785,
+      "flip_accuracy": 0.47191011235955055,
+      "nonflip_accuracy": 0.5154639175257731,
+      "avg_activated": 0.9310035842293907,
+      "pred_up_rate": 0.3575268817204301,
+      "n": 1116,
+      "flip_n": 534
+    }
+  },
+  "paired_vs_clean": {
+    "skew_scale_1": {
+      "accuracy": {
+        "delta": -0.017025089605734768,
+        "lo": -0.06003584229390681,
+        "hi": 0.02867383512544803,
+        "p": 0.449
+      },
+      "flip_accuracy": {
+        "delta": 0.028089887640449437,
+        "lo": -0.035580524344569285,
+        "hi": 0.0898876404494382,
+        "p": 0.417
+      }
+    },
+    "skew_scale_1.25": {
+      "accuracy": {
+        "delta": -0.010752688172043012,
+        "lo": -0.05557795698924731,
+        "hi": 0.034050179211469536,
+        "p": 0.599
+      },
+      "flip_accuracy": {
+        "delta": 0.054307116104868915,
+        "lo": -0.0149812734082397,
+        "hi": 0.12172284644194757,
+        "p": 0.105
+      }
+    },
+    "skew_scale_1.5": {
+      "accuracy": {
+        "delta": -0.008960573476702509,
+        "lo": -0.053763440860215055,
+        "hi": 0.04121863799283154,
+        "p": 0.689
+      },
+      "flip_accuracy": {
+        "delta": 0.06367041198501873,
+        "lo": -0.0056179775280898875,
+        "hi": 0.13295880149812733,
+        "p": 0.064
+      }
+    }
+  },
+  "gate": {
+    "flip_accuracy_min": 0.45,
+    "pred_up_rate_max": 0.65,
+    "accuracy_max_drop": 0.01
+  },
+  "winners": [
+    "skew_scale_1.5"
+  ],
+  "selected_winner": "skew_scale_1.5",
+  "passes_development_gate": true,
+  "note": "Contact-tail only. A winner still needs a fresh-company confirmation. Prediction-up may land well below 50% after full cheerleader correction; that mirror bias is reported, not hidden."
+}
