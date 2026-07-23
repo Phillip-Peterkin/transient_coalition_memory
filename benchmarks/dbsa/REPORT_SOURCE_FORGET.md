@@ -21,9 +21,27 @@ unchanged:
 Delayed-aggregation evaluator (`evaluate.py`) turns the pack on for ACI/Aware.
 Cell defaults remain `forget=1`, `share=0`, `shift_window=0`.
 
+## 24-seed screen after the pack
+
+Overall gate still **FAIL** (recovery on abrupt drift + correlated world).
+
+Non-inferiority vs delayed Fixed-Share (δ=0.005 CI):
+
+| world | pass? |
+|---|---|
+| independent_stable | yes |
+| abrupt_drift | yes |
+| recurring_crossover | yes |
+| adversarial_switch | yes |
+| bursty_missing | yes |
+| correlated_stable | **no** |
+
+Was 2/6 before source-trust work; now **5/6**. Correlated/copying sources
+remain the open wound. Fading source-Bayes still leads raw score there.
+
 ## Honesty
 
 - Not a silent rewrite of spent Weather/Finance confirmation wins
 - Direction: keep improving with use under drift — not “already flawless”
-- Screen artifact after this pack:
+- Screen artifact:
   `results/dbsa_v1_contract_screen_source_forget.json`

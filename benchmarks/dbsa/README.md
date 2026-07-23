@@ -27,8 +27,10 @@ Resources are a **Pareto frontier** (no hard activation threshold).
 - Leadership synthetic contract (200-seed): **FAIL** —
   [`REPORT_CONTRACT_200.md`](REPORT_CONTRACT_200.md)
 - Gate bug fix (false “no evidence” on large agreeing batches):
-  [`REPORT_GATE_BUG.md`](REPORT_GATE_BUG.md) — helps correlated worlds;
-  overall screen still FAIL
+  [`REPORT_GATE_BUG.md`](REPORT_GATE_BUG.md)
+- Source-trust regime pack (fade + floor + shift reset):
+  [`REPORT_SOURCE_FORGET.md`](REPORT_SOURCE_FORGET.md) — 5/6 worlds
+  non-inferior; correlated still FAIL
 - Exploratory pre-contract pilot: diagnostic only —
   [`REPORT_PILOT.md`](REPORT_PILOT.md)
 
