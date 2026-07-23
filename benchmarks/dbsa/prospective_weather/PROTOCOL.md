@@ -30,3 +30,20 @@ immutable pipeline today is what makes a future sealed look possible.
 Scoring protocol is drafted and **closed** until open conditions in
 `SCORING_PROTOCOL.md` are met (60 collection days, sealed labels, prior
 200-seed synthetic artifact).
+
+## Collect
+
+```bash
+# live today
+python benchmarks/dbsa/prospective_weather/collect_day.py
+
+# archive backfill (consecutive days)
+python benchmarks/dbsa/prospective_weather/collect_day.py \
+  --from 2026-05-25 --to 2026-07-23 --mode archive_backfill
+
+# ERA5/archive observations for labels
+python benchmarks/dbsa/prospective_weather/collect_observations.py \
+  --from 2026-05-25 --to 2026-07-24
+```
+
+Score only via `evaluate_weather.py` after open conditions pass.

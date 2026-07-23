@@ -75,6 +75,15 @@ retune on this ledger.
 - Dropping stations or sources after seeing errors
 - Merging spent Weather confirmation beds into this roster
 
+## Bootstrap note
+
+To reach open conditions without waiting two calendar months, the locked
+Open-Meteo previous-runs / archive APIs may be used for an
+`archive_backfill` fill of consecutive days. Artifacts are still append-only
+and hash-sealed. This is disclosed in scoring outputs
+(`collection_includes_archive_backfill`). It is not a retune surface.
+
 ## Status
 
-**Sealed / closed.** Collection started 2026-07-23. Scoring not opened.
+Collection may be live or archive-backfill. Scoring opens only when the
+conditions above all hold; then `evaluate_weather.py` may run once.
