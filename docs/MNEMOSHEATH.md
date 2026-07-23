@@ -26,10 +26,17 @@
 
 See also [`EMPTY_CURRICULUM.md`](EMPTY_CURRICULUM.md), [`CUE_NEEDLE.md`](CUE_NEEDLE.md).
 
+## Sealed Weather look
+
+Virgin `confirmation3` (disjoint cities; protocol written first): **PASS**.
+Aware flip **0.868** vs sealed ACI **0.771**. See
+[`REPORT_WEATHER_AWARE_CONFIRMATION.md`](../benchmarks/realdata_weather/REPORT_WEATHER_AWARE_CONFIRMATION.md).
+Universe spent — no retune.
+
 ## What this is not
 
-Not transformers. Not RAG. Not pymdp. Not a retune of confirmation8.
-Not a Weather knob tweak. Online awareness only.
+Not transformers. Not RAG. Not pymdp. Not a retune of confirmation8 /
+confirmation2 / confirmation3. Not a Weather knob tweak. Online awareness only.
 
 ## Evolution rule
 

@@ -269,6 +269,12 @@ Implementation: `tcm.ActiveCoalitionCellular` (alias
     silence lineage) on virgin `confirmation2`: **PASS** — flip **0.733**
     (≥ silence 0.663; ≥0.45; acc vs persistence held). See
     [`REPORT_WEATHER_ARCHITECTURE_CONFIRMATION.md`](../benchmarks/realdata_weather/REPORT_WEATHER_ARCHITECTURE_CONFIRMATION.md).
+  - Aware package (`AwareCoalitionCellular` + Mnemosheath) on virgin
+    `confirmation3`: **PASS** — flip **0.868** vs sealed ACI **0.771**
+    (+9.7 pts, p≈0); also clears silence / persistence / pred-up / nonflip
+    gates. See
+    [`REPORT_WEATHER_AWARE_CONFIRMATION.md`](../benchmarks/realdata_weather/REPORT_WEATHER_AWARE_CONFIRMATION.md).
+    confirmation3 is spent; do not retune on it.
   New bed, not recovered sandbox Weather final. Wave XI remains synthetic
   reference only for real-data architecture claims.
 
