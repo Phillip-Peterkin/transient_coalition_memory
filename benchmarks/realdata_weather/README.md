@@ -34,6 +34,7 @@ confirmatory for locked models only.
 
 ## Status
 
-Harness + purity lock only. Scoring active experimental ACI against this bed is
-a separate, protocol-first confirmatory step after the active-experimental bake
-is merged — and still is **not** a claim of recovering the original Weather final.
+Purity lock **PASS**. Sealed ACI Weather confirmation **FAIL** (flip 0.783 vs
+Wave XI 0.845; missed +5pt lift gate). See
+`REPORT_WEATHER_ACI_CONFIRMATION.md`. No retune. Still **not** a claim of
+recovering the original sandbox Weather final.

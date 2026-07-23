@@ -38,8 +38,8 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
   [`benchmarks/aci_boss/`](benchmarks/aci_boss/).
 - Clean Weather harness ([`benchmarks/realdata_weather/`](benchmarks/realdata_weather/)):
   Open-Meteo `previous_day1` multi-model forecasts + ERA5 adjacent-day warmer
-  labels; weekly-median lookahead banned. New bed (not recovered sandbox
-  Weather final). Confirmatory ACI scoring is protocol-first and separate.
+  labels; weekly-median lookahead banned. Sealed ACI confirmation **FAIL**
+  (flip 0.783 vs Wave XI 0.845). New bed, not recovered sandbox Weather final.
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*
