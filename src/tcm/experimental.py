@@ -1487,18 +1487,16 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
 
 
 class AwareCoalitionCellular(ActiveCoalitionCellular):
-    """ACI + Mnemosheath — live memory with maturing context awareness.
+    """ACI + Mnemosheath — awareness that learns under emptiness.
 
-    Keeps every ACI law. Replaces regime-blind `force_all_positive_null` with
-    an online diagnosticity sheath that grows 1→2→4→12 distinction bits.
-    Unanimous agreement becomes evidence when the sheath learns it is
-    diagnostic; cheerleader unanimity still routes to null.
+    Keeps every ACI law. Agreement bits learn cheerleader vs consensus.
+    Silence bits use a two-phase curriculum: prime on empty predict, complete
+    when truth arrives (change vs stay). No separate tutor stack.
     """
 
     name = "aware_coalition_cellular"
 
     def __init__(self, **params):
-        # Awareness owns unanimous routing; do not hard-force all-Positive null.
         params = dict(params)
         params["force_all_positive_null"] = False
         super().__init__(**params)
@@ -1507,6 +1505,9 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         self.sheath = Mnemosheath()
         self.awareness_evidence_routes = 0
         self.awareness_null_routes = 0
+        self.time_since_evidence = defaultdict(int)
+        self.last_truth = {}
+        self.last_was_flip = defaultdict(bool)
 
     def _batch_cues(self, key, reports, max_delta: float, prior_p: float):
         return self.sheath.sense_cues(
@@ -1515,6 +1516,9 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             min_delta=self.min_delta,
             null_pe=float(self.null_pe[key]),
             prior_p=prior_p,
+            time_since_evidence=int(self.time_since_evidence[key]),
+            prev_truth=self.last_truth.get(key),
+            last_was_flip=bool(self.last_was_flip[key]),
         )
 
     def _is_null_batch(self, reports, max_delta: float) -> bool:
@@ -1526,7 +1530,6 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         unanimous = len(set(votes)) == 1
         if not unanimous:
             return False
-        # Sheath decides: diagnostic consensus → evidence; coin-flip → null.
         cues = getattr(self, "_pending_cues", None)
         if cues is None:
             cues = self.sheath.sense_cues(
@@ -1553,33 +1556,54 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         max_delta = rows[0][0] if rows else 0.0
         cues = self._batch_cues(key, reports, max_delta, prior_p)
         self._pending_cues = cues
+        # Phase 1: emptiness is a sensory event — stash lesson before truth.
+        self.sheath.prime_absence(
+            key,
+            cues,
+            prev_truth=self.last_truth.get(key),
+            time_since_evidence=int(self.time_since_evidence[key]),
+        )
         self.sheath.vote_context(cues)
+        if reports:
+            self.time_since_evidence[key] = 0
+        else:
+            self.time_since_evidence[key] = int(self.time_since_evidence[key]) + 1
         probability, trace = super().predict(key, reports, t)
         trace = dict(trace)
         trace["awareness"] = {
             "cues": {name: bool(flag) for name, flag in cues.items() if flag},
             "diagnosticity": self.sheath.diagnosticity(cues),
+            "absence_change_rate": self.sheath.absence_change_rate(cues),
             "context_log_odds": self.sheath.context_log_odds,
             "bits": self.sheath.bit_count,
             "stage_cap": self.sheath.stage_cap,
+            "empty_lessons": self.sheath.empty_lessons,
         }
         trace["awareness_cues"] = cues
         if reports:
             votes = [int(vote) for _, _, vote in reports]
-            trace["majority_vote"] = int(sum(votes) >= (len(votes) / 2)) if votes else None
+            trace["majority_vote"] = (
+                int(sum(votes) >= (len(votes) / 2)) if votes else None
+            )
         else:
             trace["majority_vote"] = None
         return probability, trace
 
     def feedback(self, event):
+        key = event["key"]
+        truth = int(event["truth"])
         trace = event["trace"]
         cues = trace.get("awareness_cues")
         if cues is not None:
             self.sheath.feedback(
                 cues,
                 majority_vote=trace.get("majority_vote"),
-                truth=int(event["truth"]),
+                truth=truth,
+                key=key,
             )
+        prev = self.last_truth.get(key)
+        self.last_was_flip[key] = prev is not None and int(prev) != truth
+        self.last_truth[key] = truth
         super().feedback(event)
 
     def stats(self):

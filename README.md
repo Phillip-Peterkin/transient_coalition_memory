@@ -41,7 +41,9 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
   Architecture confirmation (sealed ACI, not Wave XI) on virgin confirmation2:
   **PASS** (flip 0.733 vs silence 0.663). New bed, not recovered sandbox Weather final.
 - Experimental awareness organ: `AwareCoalitionCellular` + `Mnemosheath`
-  (maturing 1→12 bit context distinctions). See [`docs/MNEMOSHEATH.md`](docs/MNEMOSHEATH.md).
+  (maturing context distinctions + **empty curriculum** — learns under silence,
+  not only from majority labels). See [`docs/MNEMOSHEATH.md`](docs/MNEMOSHEATH.md),
+  [`docs/EMPTY_CURRICULUM.md`](docs/EMPTY_CURRICULUM.md).
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*

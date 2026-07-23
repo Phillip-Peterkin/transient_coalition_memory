@@ -6,10 +6,11 @@ from tcm import AwareCoalitionCellular, Mnemosheath
 from tcm.awareness import STAGE_CAPS
 
 
-def test_starts_at_one_bit_pulse():
+def test_starts_with_agreement_and_empty_pulses():
     sheath = Mnemosheath()
-    assert sheath.bit_count == 1
-    assert sheath.bits[0].cue == "unanimous"
+    cues = {bit.cue for bit in sheath.bits}
+    assert "unanimous" in cues
+    assert "empty" in cues
     assert sheath.stage_cap == STAGE_CAPS[0]
 
 
