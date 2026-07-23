@@ -1,0 +1,101 @@
+{
+  "universe": "confirmation2",
+  "source_forecasts": "Open-Meteo Previous Runs API",
+  "source_observations": "Open-Meteo Archive API (ERA5 daily)",
+  "lead": "previous_day1_only",
+  "label_rule": "tmax_obs[D+1] > tmax_obs[D]",
+  "vote_rule": "tmax_fcst_prev_day1[D+1] > tmax_obs[D]",
+  "timezone": "UTC",
+  "start_date": "2024-06-01",
+  "end_date": "2025-12-31",
+  "models": [
+    "gfs_seamless",
+    "ecmwf_ifs025",
+    "icon_seamless",
+    "gem_seamless",
+    "meteofrance_seamless",
+    "jma_seamless"
+  ],
+  "cities": [
+    {
+      "symbol": "LAX",
+      "lat": 34.0522,
+      "lon": -118.2437,
+      "name": "Los Angeles"
+    },
+    {
+      "symbol": "MIA",
+      "lat": 25.7617,
+      "lon": -80.1918,
+      "name": "Miami"
+    },
+    {
+      "symbol": "TOR",
+      "lat": 43.6532,
+      "lon": -79.3832,
+      "name": "Toronto"
+    },
+    {
+      "symbol": "PAR",
+      "lat": 48.8566,
+      "lon": 2.3522,
+      "name": "Paris"
+    },
+    {
+      "symbol": "MAD",
+      "lat": 40.4168,
+      "lon": -3.7038,
+      "name": "Madrid"
+    },
+    {
+      "symbol": "ROM",
+      "lat": 41.9028,
+      "lon": 12.4964,
+      "name": "Rome"
+    },
+    {
+      "symbol": "SEL",
+      "lat": 37.5665,
+      "lon": 126.978,
+      "name": "Seoul"
+    },
+    {
+      "symbol": "BKK",
+      "lat": 13.7563,
+      "lon": 100.5018,
+      "name": "Bangkok"
+    },
+    {
+      "symbol": "MEX",
+      "lat": 19.4326,
+      "lon": -99.1332,
+      "name": "Mexico City"
+    },
+    {
+      "symbol": "AKL",
+      "lat": -36.8485,
+      "lon": 174.7633,
+      "name": "Auckland"
+    },
+    {
+      "symbol": "IST",
+      "lat": 41.0082,
+      "lon": 28.9784,
+      "name": "Istanbul"
+    },
+    {
+      "symbol": "RUH",
+      "lat": 24.7136,
+      "lon": 46.6753,
+      "name": "Riyadh"
+    }
+  ],
+  "n_observation_rows": 6948,
+  "n_forecast_rows": 6948,
+  "forbidden": [
+    "weekly_median_threshold",
+    "undisclosed_city_filter",
+    "analysis_as_report",
+    "same_valid_time_nowcast_as_evidence"
+  ]
+}
