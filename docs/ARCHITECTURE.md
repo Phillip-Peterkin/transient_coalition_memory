@@ -23,3 +23,16 @@ Wave XI replaces repeated scalar recurrences inside each answer coalition with t
 ## Calibration
 
 Wave XII evaluates temperature, Platt, and isotonic post-hoc calibration. The substrate, gate, and learning rules remain locked. Temperature scaling improves probability reliability without altering the binary decisions.
+
+## Clean Weather harness (new bed)
+
+[`../benchmarks/realdata_weather/`](../benchmarks/realdata_weather/) locks a
+trustworthy-source stream that refuses the old silver-standard taints:
+
+- reports = multi-model Open-Meteo **`previous_day1`** daily max forecasts
+- labels = ERA5 adjacent-day warmer (`tmax[D+1] > tmax[D]`) — **no** weekly median
+- cities / dates / models predeclared in `cities.py` + `PROTOCOL.md`
+
+This is a new clean bed, not a claim of recovering any prior sandbox Weather
+final. No mechanism may be tuned against it before a written confirmation
+protocol.
