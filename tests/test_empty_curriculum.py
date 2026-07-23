@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from tcm import AwareCoalitionCellular, Mnemosheath
-from tcm.awareness import SILENCE_CUES
 
 
 CELL = dict(
@@ -37,7 +36,6 @@ def test_sheath_seeds_empty_pulse_not_only_agreement():
 def test_empty_predict_primes_and_feedback_teaches_without_majority():
     cell = AwareCoalitionCellular(**CELL)
     key = (0, 0)
-    # Establish a previous truth so change/stay is defined.
     cell.last_truth[key] = 0
     p, tr = cell.predict(key, [], t=0)
     assert tr["stop_reason"] == "silence_channel"
@@ -48,7 +46,7 @@ def test_empty_predict_primes_and_feedback_teaches_without_majority():
     cell.feedback(
         {
             "key": key,
-            "truth": 1,  # change after emptiness
+            "truth": 1,
             "reports": [],
             "trace": tr,
             "time": 1,
@@ -68,7 +66,7 @@ def test_empty_stay_lowers_change_rate():
         cell.feedback(
             {
                 "key": key,
-                "truth": 1,  # stay
+                "truth": 1,
                 "reports": [],
                 "trace": tr,
                 "time": 1,
@@ -78,29 +76,35 @@ def test_empty_stay_lowers_change_rate():
     assert empty_bit.change_rate() < 0.45
 
 
-def test_silence_bits_mature_from_vacancy_structure():
-    sheath = Mnemosheath(dwell=3, split_merit=0.05)
-    key = "k"
-    for step in range(60):
+def test_selective_silence_growth_only_when_vacancy_predicts():
+    """Predictive vacancy cue admits; coin-flip companion does not."""
+    sheath = Mnemosheath(
+        seed_cues=("empty",),
+        candidate_cues=("empty", "vac_signal", "vac_noise"),
+        grow_caps=(0, 1),
+        n_min=40,
+        merit_hi=0.18,
+        lead_hi=0.08,
+        noise_floor=0.05,
+        hysteresis=5,
+    )
+    for step in range(400):
+        changed = step % 2  # balanced but vac_signal tracks it with noise
+        # Make vac_signal strongly predictive of change.
+        import random
+
+        random.seed(step + 99)
         cues = {
             "empty": True,
-            "long_vacancy": step % 2 == 0,
-            "fresh_vacancy": step % 2 == 1,
-            "empty_after_flip": step % 3 == 0,
-            "empty_after_stay": step % 3 != 0,
-            "high_pe": step % 4 == 0,
+            "vac_signal": random.random() < (0.9 if changed else 0.1),
+            "vac_noise": random.random() < 0.5,
         }
-        sheath.prime_absence(key, cues, prev_truth=0, time_since_evidence=step % 5)
-        # Alternate change/stay
+        sheath.prime_absence("k", cues, prev_truth=0, time_since_evidence=2)
         sheath.feedback(
-            cues,
-            majority_vote=None,
-            truth=1 if step % 2 == 0 else 0,
-            key=key,
+            cues, majority_vote=None, truth=(1 if changed else 0), key="k"
         )
-    silence = [bit for bit in sheath.bits if bit.cue in SILENCE_CUES]
-    assert len(silence) >= 2
-    assert sheath.empty_lessons >= 20
+    assert sheath.grown_cues() == {"vac_signal"}, sheath.stats()
+    assert "vac_noise" not in sheath.grown_cues()
 
 
 def test_prior_still_out_of_report_delta_with_empty_curriculum():

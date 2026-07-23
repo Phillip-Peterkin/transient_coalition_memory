@@ -16,14 +16,15 @@
 `tcm.Mnemosheath` + `tcm.AwareCoalitionCellular`
 
 - Seeds **two pulses**: `unanimous` (agreement) + `empty` (absence)
-- Mitosis when a bit earns persistence + merit → stages **2, 4, 12**
+- **Selective admission** (cleanup): candidates compete; only delayed-merit
+  winners become grown bits (30-cue needle: 2 signal / 28 noise)
 - Agreement diagnosticity: is unanimity evidence or cheerleader null?
 - **Empty curriculum** (council #2): prime on empty predict; complete on truth
   with change-vs-stay labels — learns under emptiness, not from nothing
 - Context log-odds mixes null hazard only
 - ACI evidence laws untouched (prior-free Δ, FE certify, LR tables)
 
-See also [`EMPTY_CURRICULUM.md`](EMPTY_CURRICULUM.md).
+See also [`EMPTY_CURRICULUM.md`](EMPTY_CURRICULUM.md), [`CUE_NEEDLE.md`](CUE_NEEDLE.md).
 
 ## What this is not
 
