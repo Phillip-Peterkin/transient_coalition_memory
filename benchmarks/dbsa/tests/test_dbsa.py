@@ -1,4 +1,4 @@
-"""DBSA-v1 causal protocol checks."""
+"""DBSA-v1 causal protocol checks against the contract simulator."""
 
 from __future__ import annotations
 
@@ -6,29 +6,41 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+REPO = ROOT.parents[1]
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT.parents[2] / "src"))
+sys.path.insert(0, str(REPO / "src"))
 
-from baselines import FadingSourceBayes
-from evaluate import run_model
-from simulator import DELAY, WORLD_NAMES, generate
+from baselines import FadingSourceBayes, FixedShareHedge
+from contract_simulator import WORLD_NAMES, generate
+from evaluate import BRIER_NONINFERIORITY_DELTA, run_model
 
 
 def test_all_preregistered_worlds_generate_delayed_named_reports():
     for world in WORLD_NAMES:
         events = generate(world, seed=7, rounds=80)
         assert len(events) == 80
-        assert all(event.due_t == event.t + DELAY for event in events)
+        assert all(event.due_t == event.t + 14 for event in events)
         assert all(event.reports for event in events)
         assert all(len(report) == 3 for event in events for report in event.reports)
 
 
 def test_feedback_is_not_available_before_its_declared_delay():
-    events = generate("independent_stable", seed=11, rounds=DELAY + 1)[:DELAY]
+    events = generate("independent_stable", seed=11, rounds=15)[:14]
     model = FadingSourceBayes()
     result = run_model(events, model)
     assert result["model_stats"]["updates"] == 0
-    assert result["n"] == DELAY
+    assert result["n"] == 14
+
+
+def test_fixed_share_updates_only_on_queue_release():
+    events = generate("independent_stable", seed=11, rounds=15)[:14]
+    model = FixedShareHedge()
+    result = run_model(events, model)
+    assert result["model_stats"]["updates"] == 0
+
+
+def test_noninferiority_delta_is_locked():
+    assert BRIER_NONINFERIORITY_DELTA == 0.005
 
 
 def test_same_packets_are_fully_inspected_by_causal_baseline():

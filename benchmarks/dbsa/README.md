@@ -1,27 +1,41 @@
 # DBSA-v1
 
-The coherent benchmark for TCM's actual task:
+Coherent benchmark for TCM's actual task:
 
 > **Causal delayed-feedback source aggregation under regime drift and source
 > dependence.**
 
-It is not static truth discovery. All rows see the same named source reports,
-predict before outcome arrival, and update only when the shared delayed-label
-queue releases truth.
+## Locked contract rebuild
 
-## Run
+| Piece | Location |
+|---|---|
+| Protocol | [`PROTOCOL.md`](PROTOCOL.md) |
+| World contract | [`contract/v1_worlds.json`](contract/v1_worlds.json) |
+| Simulator | [`contract_simulator.py`](contract_simulator.py) |
+| Evaluator | [`evaluate.py`](evaluate.py) |
+| Prospective weather ledger | [`prospective_weather/`](prospective_weather/) |
+
+Headline metric: **prequential Brier**.  
+Non-inferiority: **δ = 0.005** with one-sided 97.5% paired-seed CI.  
+Expert baselines update **only on queue release**.  
+Resources are a **Pareto frontier** (no hard activation threshold).
+
+## Exploratory legacy pilot
+
+[`REPORT_PILOT.md`](REPORT_PILOT.md) + `results/dbsa_v1_pilot.json` used the
+pre-contract generator. Diagnostic only — **not** sealed DBSA-v1.
+
+## Run contract screen
 
 ```bash
 python benchmarks/dbsa/evaluate.py --seeds 24 --rounds 800
 ```
 
-The first sealed pilot is a **FAIL** for Aware: see
-[`REPORT_PILOT.md`](REPORT_PILOT.md). No retune is authorized from that result.
+## Start / continue prospective weather collection
 
-## Contents
+```bash
+python benchmarks/dbsa/prospective_weather/collect_day.py
+```
 
-- `PROTOCOL.md` — frozen data-generating worlds, rows, metrics, and pilot gate
-- `simulator.py` — six deterministic, hidden-regime source worlds
-- `baselines.py` — causal baselines only
-- `evaluate.py` — one shared feedback-queue evaluator
-- `results/dbsa_v1_pilot.json` — exact first-run artifact
+Append-only under `prospective_weather/ledger/`. Do not score that lane until
+a sealed scoring protocol is written.

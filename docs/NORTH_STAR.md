@@ -294,19 +294,23 @@ majority 0.999 / Wave XI 0.990) and is slower wall-clock than ACI/Wave XI
 while remaining activation-sparser. See
 [`REPORT.md`](../benchmarks/truth_discovery/REPORT.md).
 
-### 20. Causal delayed-feedback source aggregation — DBSA-v1 pilot failed
+### 20. Causal delayed-feedback source aggregation — DBSA-v1 rebuild
 The coherent task is not static truth discovery: given named reports at time
 `t`, predict before a delayed label arrives, then adapt through source drift
-and dependence. DBSA-v1 gives every method the same packets and 14-event
-feedback delay across independent, copied, drift, recurring-crossover,
-adversarial, and missingness worlds.
+and dependence.
 
-First sealed pilot (24 fixed seeds × 800 events): **FAIL** for Aware. A
-fading causal per-source Beta reliability filter wins Brier in every
-nontrivial drift world; Aware fails its Fixed-Share non-inferiority and
-post-shift recovery gates. It remains sparse downstream (about five of 12
-reports activated) but is slower. No DBSA parameter retune follows the first
-look. See [`REPORT_PILOT.md`](../benchmarks/dbsa/REPORT_PILOT.md).
+Contract rebuild (current): worlds in
+[`contract/v1_worlds.json`](../benchmarks/dbsa/contract/v1_worlds.json);
+simulator interprets declared copy graphs, drift schedules, and delay
+distributions; headline metric is prequential Brier; non-inferiority margin
+**δ=0.005** with one-sided 97.5% paired-seed CI; expert baselines update only
+on queue release; resources are Pareto axes (no hard activation threshold).
+Prospective Weather append-only collection started under
+[`prospective_weather/`](../benchmarks/dbsa/prospective_weather/).
+
+Exploratory pre-contract pilot ([`REPORT_PILOT.md`](../benchmarks/dbsa/REPORT_PILOT.md)):
+**FAIL** for Aware vs fading causal source Bayes — diagnostic only, not the
+sealed contract screen.
 
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where

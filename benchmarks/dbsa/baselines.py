@@ -75,7 +75,12 @@ class Majority(_Baseline):
 
 
 class FixedShareHedge(_Baseline):
-    """Sleeping-expert Fixed-Share Hedge updated only at delayed label arrival."""
+    """Sleeping-expert Fixed-Share Hedge.
+
+    Textbook Fixed Share assumes immediate losses. Under DBSA delays this row
+    updates **only when the shared evaluator queue releases the label**
+    (`due_t`). It never sees same-step oracle losses.
+    """
 
     name = "fixed_share_hedge"
 

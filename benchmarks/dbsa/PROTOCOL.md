@@ -1,6 +1,10 @@
-# DBSA-v1 — causal delayed-feedback source aggregation
+# DBSA-v1 — causal delayed-feedback source aggregation (contract rebuild)
 
-Written before any DBSA-v1 scores.
+Written before any contract-simulator sealed scores.
+
+The first pilot under `simulator.py` is **exploratory only**
+(`REPORT_PILOT.md`). It is **not** a leadership result. DBSA-v1 sealed
+scoring uses only the declarative contract + `contract_simulator.py`.
 
 ## Task
 
@@ -10,88 +14,109 @@ At decision time `t`, every method receives the same packet:
 (item_key, named binary reports available at t, t)
 ```
 
-It must emit `P(truth=1)` immediately. The true label is released only at
-`t + 14` events. No method may replay a label before that release, fit on a
-future window, or use the simulator's hidden source/block/regime variables.
+It must emit `P(truth=1)` immediately. Labels enter a shared feedback queue
+and are released only at the packet’s declared `due_t`. No method may use a
+label before release, fit on a future window, or read hidden
+source/block/regime fields.
 
 This is **causal delayed-feedback source aggregation under regime drift and
-source dependence**. It is not static truth discovery: TruthFinder, CRH, and
-CATD's standard whole-dataset inference is retained only as an appendix
-reference, not a DBSA competitor.
+source dependence**. Static TruthFinder / CRH / CATD whole-dataset inference
+is appendix-only.
 
-## Simulator
+## Metric hierarchy (one leaderboard)
 
-Each world contains:
+1. **Primary (headline):** prequential **Brier** loss
+2. **Gates (must clear):** flip recall, change false-alarm rate, calibration
+   (ECE), post-shift Brier recovery
+3. **Frontier axes (not hard thresholds):** wall/CPU/peak memory, reports
+   inspected, downstream reports activated
 
-- 24 binary items with persistent latent truth
-- 12 named sources in four blocks of three
-- event-time feedback delay = 14
-- every available source report is passed unchanged to every method
+Resources are Pareto axes. There is **no** arbitrary “≤4 of 6 sources”
+activation gate. Downstream activation is reported honestly: ACI/Aware inspect
+every supplied report before selecting active ones.
 
-The six preregistered worlds are:
+## Non-inferiority margin (locked)
 
-1. `independent_stable` — independent, stationary source quality
-2. `correlated_stable` — strongly copied within-block reports
-3. `abrupt_drift` — high- and low-quality source groups exchange competence
-4. `recurring_crossover` — source competence repeatedly switches by regime
-5. `adversarial_switch` — one source block becomes anti-reliable
-6. `bursty_missing` — source blocks temporarily disappear
+Against the primary causal expert baseline (delayed Fixed-Share Hedge):
 
-The simulator exposes only generated `(key, reports, truth, due_time)` events
-to the evaluator. Hidden mechanism annotations are used only to score
-post-shift recovery after prediction.
+- Margin **δ = 0.005** Brier
+- Aware is Brier-non-inferior in a world only if the one-sided 97.5%
+  paired-seed bootstrap CI **upper bound** on
+  `(Aware Brier − FixedShare Brier)` is **≤ 0.005**
 
-## Causal leaderboard
+Raw mean gaps without a CI are not enough.
 
-All rows receive the same reports and delayed labels:
+## Delay policy for expert baselines (locked)
+
+Fixed-Share (and any later AdaHedge / Squint row) **assumes immediate losses
+in the textbook form**. Under DBSA delays they:
+
+1. predict at `t` using current weights only
+2. enqueue the packet
+3. **update weights only when the shared queue releases the label at `due_t`**
+
+They are not given same-step oracle losses. This is the BOLD-style
+queue-release adaptation, declared so the strongest expert baseline is not
+accidentally hobbled or secretly advantaged.
+
+## Simulator contract
+
+Worlds live in `contract/v1_worlds.json`. Declared parameters only:
+
+- `copy_graph` (source copying edges + probabilities)
+- `accuracy_schedule` (drift / crossover / adversarial windows)
+- `feedback_delay` (`fixed` or `geometric` distributions)
+- `availability` (default presence + burst missingness)
+- `source_blocks`, `n_items`, `n_sources`, `truth_flip_rate`
+
+`contract_simulator.py` interprets that JSON. It must not import `tcm`.
+The legacy `simulator.py` is frozen as the exploratory generator that produced
+`REPORT_PILOT.md` and is **not** used for sealed DBSA-v1 scores.
+
+Six preregistered worlds (same names as exploratory pilot):
+
+1. `independent_stable`
+2. `correlated_stable`
+3. `abrupt_drift`
+4. `recurring_crossover`
+5. `adversarial_switch`
+6. `bursty_missing`
+
+v1 sealed delay: `{"type":"fixed","events":14}` in every world. Geometric
+delay is supported by the contract schema for later stress lanes.
+
+## Causal leaderboard rows
+
+Same reports and delayed labels for all:
 
 1. Persistence
 2. Equal-weight majority
-3. Delayed Fixed-Share Hedge
+3. Delayed Fixed-Share Hedge (queue-release updates)
 4. Fading online source-reliability Bayes
 5. Agreement-discounted fading Bayes
 6. Sealed `ActiveExperimentalCellular` (ACI)
-7. `AwareCoalitionCellular` (ACI + Mnemosheath)
+7. `AwareCoalitionCellular`
 
-Fixed Share is the primary nonstationary expert-advice comparator. The two
-Bayes rows are delayed-label online truth-aggregation comparators; the
-discounted row controls for a simple report-agreement correlation correction.
-No method receives a source/block identity beyond the ordinary named source
-ID present in reports.
+## Sealed screening gate (contract rebuild)
 
-## Metrics
+`evaluate.py --seeds 24 --rounds 800` after this protocol is a screening run,
+not cross-domain leadership.
 
-Primary:
+Aware is screening-promising only if **all** hold:
 
-- prequential Brier loss
-- prequential log loss
+1. Brier non-inferior to Fixed-Share under **δ = 0.005** CI rule in every world
+2. Lower mean post-shift Brier than Fixed-Share in `abrupt_drift` and
+   `adversarial_switch`
+3. Flip-recall and change-FAR are reported (no retune if they degrade)
 
-Safety / adaptation:
+Failure is recorded without retuning DBSA-v1 parameters or ACI/Aware knobs.
 
-- accuracy
-- flip recall: `P(predicted a change | truth changed)`
-- change false-alarm rate: `P(predicted a change | truth stayed)`
-- Brier loss in the first 120 events after a declared regime switch
+Leadership still requires the 200-seed contract run **and** the prospective
+weather lane (`prospective_weather/`) before any regime-general claim.
 
-Resources:
+## Prospective weather lane
 
-- wall and CPU seconds
-- peak `tracemalloc` memory
-- raw reports inspected
-- downstream reports activated / scored
-
-`activated` is not source-acquisition cost: ACI/Aware currently inspect every
-provided report to calculate its evidence score before selecting active
-reports. Claims are therefore limited to downstream activation efficiency.
-
-## First sealed run
-
-`evaluate.py --seeds 24 --rounds 800` is the first fixed pilot. It is a
-screening run, **not** a leadership claim. The leadership-scale run is 200
-fixed seeds per world, with an independent prospective real lane added before
-claiming cross-domain leadership.
-
-The pilot calls Aware promising only if it is Brier non-inferior to
-Fixed-Share Hedge by at most 0.002 in every world *and* has lower mean
-post-shift Brier in both `abrupt_drift` and `adversarial_switch`. A failure is
-recorded without retuning DBSA-v1 parameters.
+Started under `prospective_weather/`: append-only, timestamped, daily-hashed
+collection of six NWP sources on an immutable station roster disjoint from
+spent Weather beds. Scoring that lane is forbidden until the collection
+protocol’s sealed look is declared separately.

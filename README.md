@@ -50,10 +50,11 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
   plus wall-clock efficiency vs Aware/ACI/Wave XI. See
   [`benchmarks/truth_discovery/REPORT.md`](benchmarks/truth_discovery/REPORT.md).
 - Causal source-aggregation benchmark ([`benchmarks/dbsa/`](benchmarks/dbsa/)):
-  delayed labels, source drift, copying, and equal information for every row.
-  First sealed Aware pilot: **FAIL** — fading causal source Bayes wins every
-  nontrivial drift world; Aware remains activation-sparse but slower. See
-  [`benchmarks/dbsa/REPORT_PILOT.md`](benchmarks/dbsa/REPORT_PILOT.md).
+  declarative contract simulator, delayed Fixed-Share (queue-release updates),
+  Brier primary with **δ=0.005** CI non-inferiority, resources as Pareto axes.
+  Exploratory pre-contract pilot **FAIL** (diagnostic only). Prospective
+  Weather append-only ledger started under
+  [`benchmarks/dbsa/prospective_weather/`](benchmarks/dbsa/prospective_weather/).
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*

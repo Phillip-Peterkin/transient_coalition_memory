@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the preregistered DBSA-v1 causal delayed-feedback pilot."""
+"""Run DBSA-v1 against the declarative contract simulator."""
 
 from __future__ import annotations
 
@@ -26,8 +26,11 @@ from baselines import (  # noqa: E402
     Majority,
     Persistence,
 )
-from simulator import WORLD_NAMES, Event, generate  # noqa: E402
+from contract_simulator import WORLD_NAMES, Event, generate  # noqa: E402
 from tcm import ActiveExperimentalCellular, AwareCoalitionCellular  # noqa: E402
+
+# Locked non-inferiority margin (PROTOCOL.md).
+BRIER_NONINFERIORITY_DELTA = 0.005
 
 CELL_PARAMS = {
     "lr": 0.22,
@@ -57,7 +60,9 @@ ACI_PARAMS = {
     "force_all_positive_null": True,
     "fe_cert_slack": 0.0,
 }
-AWARE_PARAMS = {key: value for key, value in ACI_PARAMS.items() if key != "force_all_positive_null"}
+AWARE_PARAMS = {
+    key: value for key, value in ACI_PARAMS.items() if key != "force_all_positive_null"
+}
 
 
 def _method_factories():
@@ -79,8 +84,25 @@ def _log_loss(probability: float, truth: int) -> float:
     return -(truth * np.log(probability) + (1 - truth) * np.log(1.0 - probability))
 
 
+def _ece(probability: np.ndarray, truth: np.ndarray, bins: int = 10) -> float:
+    edges = np.linspace(0.0, 1.0, bins + 1)
+    total = 0.0
+    n = len(probability)
+    if n == 0:
+        return float("nan")
+    for index in range(bins):
+        if index < bins - 1:
+            mask = (probability >= edges[index]) & (probability < edges[index + 1])
+        else:
+            mask = (probability >= edges[index]) & (probability <= edges[index + 1])
+        if not np.any(mask):
+            continue
+        total += abs(probability[mask].mean() - truth[mask].mean()) * (mask.sum() / n)
+    return float(total)
+
+
 def run_model(events: list[Event], model) -> dict:
-    """Replay every event in causal order with labels released at ``due_t``."""
+    """Predict first; expert/cell updates only when the shared queue releases labels."""
 
     queue: dict[int, list[dict]] = defaultdict(list)
     rows = []
@@ -141,6 +163,7 @@ def run_model(events: list[Event], model) -> dict:
         "n": len(rows),
         "brier": float(brier.mean()),
         "log_loss": float(np.mean([_log_loss(row["p"], row["truth"]) for row in rows])),
+        "ece": _ece(probability, truth),
         "accuracy": float(correct.mean()),
         "flip_n": int(flip.sum()),
         "flip_recall": float(predicted_change[flip].mean()) if flip.any() else None,
@@ -164,6 +187,7 @@ def _mean_metrics(rows: list[dict]) -> dict:
     for key in (
         "brier",
         "log_loss",
+        "ece",
         "accuracy",
         "flip_recall",
         "change_false_alarm",
@@ -194,18 +218,27 @@ def _paired_bootstrap_delta(
         aware[metric] is None or baseline[metric] is None
         for aware, baseline in zip(aware_rows, baseline_rows)
     ):
-        return {"aware_minus_fixed_share": None, "lo": None, "hi": None}
+        return {
+            "aware_minus_baseline": None,
+            "lo": None,
+            "hi": None,
+            "one_sided_97_5_upper": None,
+        }
     differences = np.asarray(
-        [aware[metric] - baseline[metric] for aware, baseline in zip(aware_rows, baseline_rows)],
+        [
+            aware[metric] - baseline[metric]
+            for aware, baseline in zip(aware_rows, baseline_rows)
+        ],
         dtype=float,
     )
     rng = np.random.default_rng(20260723)
     sample_indexes = rng.integers(0, len(differences), size=(draws, len(differences)))
     means = differences[sample_indexes].mean(axis=1)
     return {
-        "aware_minus_fixed_share": float(differences.mean()),
+        "aware_minus_baseline": float(differences.mean()),
         "lo": float(np.quantile(means, 0.025)),
         "hi": float(np.quantile(means, 0.975)),
+        "one_sided_97_5_upper": float(np.quantile(means, 0.975)),
     }
 
 
@@ -217,70 +250,100 @@ def evaluate_world(world: str, seeds: range, rounds: int) -> dict:
             per_method[name].append(run_model(events, factory()))
 
     summary = {name: _mean_metrics(rows) for name, rows in per_method.items()}
-    comparisons = {
-        "aware_vs_fixed_share_brier": _paired_bootstrap_delta(
-            per_method["aware_coalition"], per_method["fixed_share_hedge"], "brier"
-        ),
-        "aware_vs_fixed_share_post_shift_brier": _paired_bootstrap_delta(
-            per_method["aware_coalition"],
-            per_method["fixed_share_hedge"],
-            "post_shift_brier",
-        ),
-    }
+    brier_delta = _paired_bootstrap_delta(
+        per_method["aware_coalition"], per_method["fixed_share_hedge"], "brier"
+    )
+    recovery_delta = _paired_bootstrap_delta(
+        per_method["aware_coalition"],
+        per_method["fixed_share_hedge"],
+        "post_shift_brier",
+    )
     return {
         "world": world,
         "seeds": list(seeds),
         "rounds_per_seed": rounds,
         "summary": summary,
-        "comparisons": comparisons,
+        "comparisons": {
+            "aware_vs_fixed_share_brier": brier_delta,
+            "aware_vs_fixed_share_post_shift_brier": recovery_delta,
+            "brier_noninferior_delta": BRIER_NONINFERIORITY_DELTA,
+            "brier_noninferior": (
+                brier_delta["one_sided_97_5_upper"] is not None
+                and brier_delta["one_sided_97_5_upper"] <= BRIER_NONINFERIORITY_DELTA
+            ),
+        },
     }
 
 
 def pilot_gate(worlds: dict[str, dict]) -> dict:
-    brier_checks = {}
-    for name, payload in worlds.items():
-        aware = payload["summary"]["aware_coalition"]["brier"]
-        hedge = payload["summary"]["fixed_share_hedge"]["brier"]
-        brier_checks[name] = aware <= hedge + 0.002
-
-    recovery_worlds = ("abrupt_drift", "adversarial_switch")
-    recovery_checks = {
-        name: worlds[name]["summary"]["aware_coalition"]["post_shift_brier"]
-        < worlds[name]["summary"]["fixed_share_hedge"]["post_shift_brier"]
-        for name in recovery_worlds
-        if name in worlds
+    brier_checks = {
+        name: payload["comparisons"]["brier_noninferior"]
+        for name, payload in worlds.items()
     }
+    recovery_worlds = ("abrupt_drift", "adversarial_switch")
+    recovery_checks = {}
+    for name in recovery_worlds:
+        if name not in worlds:
+            continue
+        aware_shift = worlds[name]["summary"]["aware_coalition"]["post_shift_brier"]
+        hedge_shift = worlds[name]["summary"]["fixed_share_hedge"]["post_shift_brier"]
+        if aware_shift is None or hedge_shift is None:
+            recovery_checks[name] = False
+        else:
+            recovery_checks[name] = aware_shift < hedge_shift
     return {
-        "brier_noninferior_to_fixed_share_by_0.002": brier_checks,
+        "primary_metric": "prequential_brier",
+        "brier_noninferiority_delta": BRIER_NONINFERIORITY_DELTA,
+        "brier_noninferior_ci_rule": (
+            "one_sided_97_5_upper(AwareBrier-FixedShareBrier) <= delta"
+        ),
+        "brier_noninferior_to_fixed_share": brier_checks,
         "better_post_shift_brier_than_fixed_share": recovery_checks,
+        "resource_policy": "pareto_frontier_no_hard_activation_threshold",
+        "delay_policy": "expert_baselines_update_only_on_queue_release",
+        "simulator": "contract_simulator.py + contract/v1_worlds.json",
         "pilot_passes": all(brier_checks.values()) and all(recovery_checks.values()),
     }
 
 
 def _print_world(payload: dict) -> None:
-    print(f"\n{payload['world']} ({len(payload['seeds'])} seeds × {payload['rounds_per_seed']} events)")
-    print("  method                         brier   logloss  acc    flip-r  false-a  act   eps")
+    print(
+        f"\n{payload['world']} "
+        f"({len(payload['seeds'])} seeds × {payload['rounds_per_seed']} events)"
+    )
+    print(
+        "  method                         brier   logloss  ece    acc    "
+        "flip-r  false-a  act   eps"
+    )
     for name, values in payload["summary"].items():
-        flip_recall = values["flip_recall"]
-        false_alarm = values["change_false_alarm"]
         print(
             f"  {name:30} {values['brier']:.4f}  {values['log_loss']:.4f}  "
-            f"{values['accuracy']:.3f}  "
-            f"{flip_recall:.3f}  {false_alarm:.3f}  "
+            f"{values['ece']:.4f}  {values['accuracy']:.3f}  "
+            f"{values['flip_recall']:.3f}  {values['change_false_alarm']:.3f}  "
             f"{values['avg_downstream_activated']:.2f}  "
             f"{values['events_per_second']:.0f}"
         )
+    comparison = payload["comparisons"]["aware_vs_fixed_share_brier"]
+    print(
+        "  noninferiority vs Fixed-Share: "
+        f"Δ={comparison['aware_minus_baseline']} "
+        f"CI97.5≤{comparison['one_sided_97_5_upper']} "
+        f"δ={BRIER_NONINFERIORITY_DELTA} "
+        f"pass={payload['comparisons']['brier_noninferior']}"
+    )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--seeds", type=int, default=24)
     parser.add_argument("--rounds", type=int, default=800)
-    parser.add_argument("--worlds", nargs="+", choices=WORLD_NAMES, default=list(WORLD_NAMES))
+    parser.add_argument(
+        "--worlds", nargs="+", choices=WORLD_NAMES, default=list(WORLD_NAMES)
+    )
     parser.add_argument(
         "--out",
         type=Path,
-        default=ROOT / "results" / "dbsa_v1_pilot.json",
+        default=ROOT / "results" / "dbsa_v1_contract_screen.json",
     )
     args = parser.parse_args()
     if args.seeds < 2:
@@ -289,12 +352,18 @@ def main() -> None:
         parser.error("--rounds must exceed the fixed feedback delay (14)")
 
     worlds = {
-        world: evaluate_world(world, range(args.seeds), args.rounds) for world in args.worlds
+        world: evaluate_world(world, range(args.seeds), args.rounds)
+        for world in args.worlds
     }
     result = {
-        "protocol": "dbsa_v1",
+        "protocol": "dbsa_v1_contract",
         "task": "causal delayed-feedback source aggregation under drift and dependence",
-        "fixed_feedback_delay_events": 14,
+        "primary_metric": "prequential_brier",
+        "brier_noninferiority_delta": BRIER_NONINFERIORITY_DELTA,
+        "delay_policy": "expert_baselines_update_only_on_queue_release",
+        "simulator": "contract_simulator.py",
+        "contract": "contract/v1_worlds.json",
+        "exploratory_pilot_not_leadership": "results/dbsa_v1_pilot.json",
         "worlds": worlds,
         "pilot_gate": pilot_gate(worlds),
     }
@@ -302,7 +371,7 @@ def main() -> None:
     args.out.write_text(json.dumps(result, indent=2, default=float))
     for payload in worlds.values():
         _print_world(payload)
-    print("\nPILOT GATE", result["pilot_gate"]["pilot_passes"])
+    print("\nCONTRACT SCREEN GATE", result["pilot_gate"]["pilot_passes"])
     print("wrote", args.out)
 
 

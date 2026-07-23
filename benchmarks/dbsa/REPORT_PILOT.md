@@ -1,13 +1,16 @@
-# DBSA-v1 causal aggregation pilot — FAIL
+# Exploratory causal aggregation pilot — FAIL (not sealed DBSA-v1)
 
-Protocol: [`PROTOCOL.md`](PROTOCOL.md)  
-Run: 24 fixed seeds × 800 events × six preregistered worlds  
+**Status: exploratory diagnostic only.** This run used the legacy
+`simulator.py` before the declarative contract rebuild. It is **not** the
+DBSA-v1 sealed leadership / screening result. See rebuilt
+[`PROTOCOL.md`](PROTOCOL.md) and `contract_simulator.py`.
+
+Run: 24 fixed seeds × 800 events × six worlds  
 Feedback: label release exactly 14 events after prediction  
 Candidate: `AwareCoalitionCellular` (sealed ACI defaults + Mnemosheath)
 
-This is the first same-information causal comparison for the task Aware/ACI
-actually performs. Every method saw the same reports at decision time and only
-received source-outcome feedback when its label entered the shared queue.
+Every method saw the same reports at decision time and only received
+source-outcome feedback when its label entered the shared queue.
 
 ## Result
 
