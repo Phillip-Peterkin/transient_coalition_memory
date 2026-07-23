@@ -1,0 +1,99 @@
+{
+  "protocol": "transition_confirmation_v1",
+  "fixed_transition_params": {
+    "error_decay": 0.6,
+    "ignite_threshold": 0.75,
+    "confidence_floor": 0.2,
+    "investigate_decay": 0.88,
+    "anchor_floor": 0.2,
+    "counterevidence_floor": 0.75
+  },
+  "stream": {
+    "n_events": 1891,
+    "n_symbols": 33,
+    "n_sources": 10,
+    "n_days": 282,
+    "contact_events": 1211,
+    "holdout_events": 680,
+    "flip_events": 880,
+    "truth_up_rate": 0.48069804336329985,
+    "mean_reports": 1.3855103120042305,
+    "mean_sites": 1.197778952934955,
+    "multi_source_frac": 0.1565309360126917,
+    "mean_source_agreement": 0.8191884720882234,
+    "sources": {
+      "0": "benzinga",
+      "1": "feeds2",
+      "2": "finance",
+      "3": "fool",
+      "4": "globenewswire",
+      "5": "investing",
+      "6": "investorplace",
+      "7": "itbusiness",
+      "8": "marketbeat",
+      "9": "marketwatch"
+    }
+  },
+  "warmup": "first 70% of days; causal state only, not scored",
+  "confirmation": {
+    "calibrated_baseline": {
+      "n": 680,
+      "accuracy": 0.47058823529411764,
+      "flip_accuracy": 0.24,
+      "nonflip_accuracy": 0.6816901408450704,
+      "flip_n": 325,
+      "brier": 0.25660022351486256,
+      "ece": 0.07248653443153298,
+      "pred_up_rate": 0.5352941176470588,
+      "avg_activated": 1.1455882352941176
+    },
+    "transition_investigator": {
+      "n": 680,
+      "accuracy": 0.46911764705882353,
+      "flip_accuracy": 0.2553846153846154,
+      "nonflip_accuracy": 0.6647887323943662,
+      "flip_n": 325,
+      "brier": 0.25592067863738516,
+      "ece": 0.07465020474578661,
+      "pred_up_rate": 0.5602941176470588,
+      "avg_activated": 1.15
+    },
+    "paired_vs_calibrated_baseline": {
+      "accuracy": {
+        "delta": -0.0014705882352941176,
+        "lo": -0.014705882352941176,
+        "hi": 0.011764705882352941,
+        "p": 0.76
+      },
+      "flip_accuracy": {
+        "delta": 0.015384615384615385,
+        "lo": -0.003076923076923077,
+        "hi": 0.033846153846153845,
+        "p": 0.0536
+      }
+    },
+    "bootstrap_confidence_intervals": {
+      "baseline_accuracy": {
+        "mean": 0.47058823529411764,
+        "lo": 0.4338235294117647,
+        "hi": 0.5073529411764706
+      },
+      "candidate_accuracy": {
+        "mean": 0.46911764705882353,
+        "lo": 0.4308823529411765,
+        "hi": 0.5073529411764706
+      },
+      "baseline_flip": {
+        "mean": 0.24,
+        "lo": 0.19384615384615383,
+        "hi": 0.28923076923076924
+      },
+      "candidate_flip": {
+        "mean": 0.2553846153846154,
+        "lo": 0.20923076923076922,
+        "hi": 0.3046153846153846
+      }
+    },
+    "passes_predeclared_gate": false
+  }
+}

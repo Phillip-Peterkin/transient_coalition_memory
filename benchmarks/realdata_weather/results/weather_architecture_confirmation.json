@@ -1,0 +1,111 @@
+{
+  "protocol": "weather_architecture_confirmation_v1",
+  "architecture_under_test": "ActiveExperimentalCellular (ACI)",
+  "not_under_test": "BatchedReserveCellular (Wave XI synthetic reference)",
+  "candidate": "CleanWeatherStream + ActiveExperimentalCellular({'min_delta': 0.15, 'max_silence_hazard': 0.55, 'null_rho_gain': 0.3, 'null_pe_floor': 0.35, 'null_pe_span': 0.5, 'null_err_beta': 0.3, 'force_all_positive_null': True, 'fe_cert_slack': 0.0})",
+  "universe": "confirmation2",
+  "stream": {
+    "n_events": 6936,
+    "n_symbols": 12,
+    "n_sources": 6,
+    "n_days": 578,
+    "contact_events": 4848,
+    "holdout_events": 2088,
+    "flip_events": 3490,
+    "truth_up_rate": 0.5188869665513264,
+    "mean_reports": 6.0,
+    "majority_accuracy": 0.8318915801614764,
+    "sources": {
+      "0": "gfs_seamless",
+      "1": "ecmwf_ifs025",
+      "2": "icon_seamless",
+      "3": "gem_seamless",
+      "4": "meteofrance_seamless",
+      "5": "jma_seamless"
+    },
+    "label_rule": "tmax_obs[D+1] > tmax_obs[D]",
+    "report_lead": "previous_day1",
+    "no_weekly_median": true
+  },
+  "warmup": "first 70% of days; causal state only, not scored",
+  "feedback_delay": "first event on decision_day+2",
+  "holdout": {
+    "persistence": {
+      "n": 2088,
+      "accuracy": 0.4942528735632184,
+      "flip_accuracy": 0.0,
+      "nonflip_accuracy": 1.0,
+      "flip_n": 1056,
+      "brier": 0.5057471264367817,
+      "pred_up_rate": 0.5114942528735632,
+      "avg_activated": 0.0
+    },
+    "majority": {
+      "n": 2088,
+      "accuracy": 0.810823754789272,
+      "flip_accuracy": 0.8200757575757576,
+      "nonflip_accuracy": 0.8013565891472868,
+      "flip_n": 1056,
+      "brier": 0.13243667518092808,
+      "pred_up_rate": 0.5052681992337165,
+      "avg_activated": 6.0
+    },
+    "silence_escape": {
+      "n": 2088,
+      "accuracy": 0.6403256704980843,
+      "flip_accuracy": 0.6628787878787878,
+      "nonflip_accuracy": 0.6172480620155039,
+      "flip_n": 1056,
+      "brier": 0.23610464243716198,
+      "pred_up_rate": 0.3146551724137931,
+      "avg_activated": 2.6513409961685825
+    },
+    "active_experimental_aci": {
+      "n": 2088,
+      "accuracy": 0.7227011494252874,
+      "flip_accuracy": 0.7329545454545454,
+      "nonflip_accuracy": 0.7122093023255814,
+      "flip_n": 1056,
+      "brier": 0.19959873522309907,
+      "pred_up_rate": 0.3970306513409962,
+      "avg_activated": 3.1230842911877397
+    }
+  },
+  "paired": {
+    "vs_silence_accuracy": {
+      "delta": 0.08237547892720307,
+      "lo": 0.05986590038314176,
+      "hi": 0.10584291187739464,
+      "p": 0.0
+    },
+    "vs_silence_flip": {
+      "delta": 0.07007575757575757,
+      "lo": 0.038825757575757576,
+      "hi": 0.10132575757575757,
+      "p": 0.0
+    },
+    "vs_persistence_accuracy": {
+      "delta": 0.22844827586206898,
+      "lo": 0.19923371647509577,
+      "hi": 0.25766283524904215,
+      "p": 0.0
+    },
+    "vs_majority_accuracy": {
+      "delta": -0.08812260536398467,
+      "lo": -0.10201149425287356,
+      "hi": -0.07471264367816093,
+      "p": 0.0
+    }
+  },
+  "gate": {
+    "checks": {
+      "flip_ge_0.45": true,
+      "flip_ge_silence_lineage": true,
+      "acc_vs_persistence": true,
+      "pred_up_le_0.65": true,
+      "nonflip_ge_0.50": true
+    },
+    "passes": true
+  },
+  "passes_predeclared_gate": true
+}
