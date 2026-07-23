@@ -45,6 +45,10 @@ Raw TCM was initially underconfident relative to the provenance graph. A develop
   **PASS** — flip **0.868** vs sealed ACI **0.771** (no retune). See
   [`benchmarks/realdata_weather/REPORT_WEATHER_AWARE_CONFIRMATION.md`](benchmarks/realdata_weather/REPORT_WEATHER_AWARE_CONFIRMATION.md),
   [`docs/MNEMOSHEATH.md`](docs/MNEMOSHEATH.md).
+- Truth-discovery literature yardstick ([`benchmarks/truth_discovery/`](benchmarks/truth_discovery/)):
+  Luna Dong Stock + Weather with **TruthFinder / CRH / CATD / StreamingCRH**,
+  plus wall-clock efficiency vs Aware/ACI/Wave XI. See
+  [`benchmarks/truth_discovery/REPORT.md`](benchmarks/truth_discovery/REPORT.md).
 - Headline accuracy on persistence-heavy real data can look like a win while mostly reflecting a "same as yesterday" prior. Any claim must report persistence-oracle and flip-detection decompositions.
 
 **Formal title:** *Transient Coalition Memory: A Cellular Architecture for Sparse, Certified Belief Formation*

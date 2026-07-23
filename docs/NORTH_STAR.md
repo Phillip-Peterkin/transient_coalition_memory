@@ -278,6 +278,22 @@ Implementation: `tcm.ActiveCoalitionCellular` (alias
   New bed, not recovered sandbox Weather final. Wave XI remains synthetic
   reference only for real-data architecture claims.
 
+### 19. Truth-discovery literature yardstick (Stock + Weather)
+Reviewers from the truth-discovery field demand that field’s methods on the
+canonical multi-source Stock/Weather fusion beds:
+
+- **TruthFinder** (Yin et al. 2008), **CRH** (Li et al. 2014), **CATD**
+  (Li et al. 2015), plus a streaming TD variant
+- Efficiency (wall/CPU/activation), not accuracy alone
+
+Harness: [`benchmarks/truth_discovery/`](../benchmarks/truth_discovery/)
+(Luna Dong public dumps; slim scored tables committed). First look:
+majority/TruthFinder are extremely strong where sources already agree with
+gold; Aware is **not** ahead on Stock binary `last>prev` (acc 0.872 vs TD
+majority 0.999 / Wave XI 0.990) and is slower wall-clock than ACI/Wave XI
+while remaining activation-sparser. See
+[`REPORT.md`](../benchmarks/truth_discovery/REPORT.md).
+
 ### One-paragraph summary
 TCM is a strong architecture for adversarial, noisy-source regimes — where
 it is genuinely state of the art on accuracy, cost, and calibration — but it
