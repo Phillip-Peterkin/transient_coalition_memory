@@ -18,12 +18,12 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[1]
 FINANCE = REPO / "benchmarks" / "realdata_finance"
 sys.path.insert(0, str(REPO / "src"))
-sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(FINANCE))
+sys.path.insert(0, str(ROOT))  # weather stream must win over finance stream.py
 
 from ablation import paired_delta  # noqa: E402
 from evaluate import CELL_PARAMS  # noqa: E402
-from stream import CleanWeatherStream  # noqa: E402
+from weather_stream import CleanWeatherStream  # noqa: E402
 from tcm import (  # noqa: E402
     ActiveCoalitionCellular,
     BatchedReserveCellular,

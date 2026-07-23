@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 from cities import CITIES, END_DATE, MODELS, START_DATE  # noqa: E402
-from stream import CleanWeatherStream  # noqa: E402
+from weather_stream import CleanWeatherStream  # noqa: E402
 
 
 def main() -> None:
