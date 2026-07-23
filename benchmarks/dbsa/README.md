@@ -24,8 +24,8 @@ Resources are a **Pareto frontier** (no hard activation threshold).
 
 - Contract screen (24-seed, sealed post-rebuild): **FAIL** —
   [`REPORT_CONTRACT_SCREEN.md`](REPORT_CONTRACT_SCREEN.md)
-- Leadership contract (200-seed): see
-  [`REPORT_CONTRACT_200.md`](REPORT_CONTRACT_200.md) when present
+- Leadership synthetic contract (200-seed): **FAIL** —
+  [`REPORT_CONTRACT_200.md`](REPORT_CONTRACT_200.md)
 - Exploratory pre-contract pilot: diagnostic only —
   [`REPORT_PILOT.md`](REPORT_PILOT.md)
 
