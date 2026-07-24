@@ -1,0 +1,214 @@
+{
+  "protocol": "dbsa_ropl_first_look_v1",
+  "baked_at_utc": "2026-07-24T04:48:55.979837+00:00",
+  "ropl_params_locked": {
+    "ropl_enabled": true,
+    "ropl_g_mode": "covvar",
+    "rebate_window": 120,
+    "rebate_min_updates": 40,
+    "pool_restore_enabled": false
+  },
+  "essc_params": {
+    "essc_enabled": true,
+    "essc_disable_christmas_bow": true,
+    "essc_credit_init": 0.2,
+    "essc_max_credit": 0.5,
+    "essc_lo_cap": 1.25,
+    "essc_credit_lr": 0.08,
+    "essc_disagree_emphasis": 2.5
+  },
+  "ledger_status": {
+    "n_forecast_days": 60,
+    "n_observation_days": 60,
+    "n_events": 708,
+    "n_labeled_decision_days": 59,
+    "forecast_span": [
+      "2026-05-25",
+      "2026-07-23"
+    ],
+    "open_forecast_days_met": true,
+    "open_label_days_met": true
+  },
+  "weather_methods": {
+    "persistence": {
+      "brier": 0.5268361571468926,
+      "accuracy": 0.4759887005649718,
+      "used": 5.946327683615819,
+      "n": 708
+    },
+    "majority": {
+      "brier": 0.16241211544883868,
+      "accuracy": 0.7556497175141242,
+      "used": 5.946327683615819,
+      "n": 708
+    },
+    "fixed_share_hedge": {
+      "brier": 0.17810975948151528,
+      "accuracy": 0.7443502824858758,
+      "used": 5.946327683615819,
+      "n": 708
+    },
+    "ada_hedge": {
+      "brier": 0.2316423340697073,
+      "accuracy": 0.7471751412429378,
+      "used": 5.946327683615819,
+      "n": 708
+    },
+    "fading_source_bayes": {
+      "brier": 0.19129459123023757,
+      "accuracy": 0.7655367231638418,
+      "used": 5.946327683615819,
+      "n": 708
+    },
+    "agreement_discounted_bayes": {
+      "brier": 0.18334203619945125,
+      "accuracy": 0.7655367231638418,
+      "used": 5.946327683615819,
+      "n": 708
+    },
+    "pwdr": {
+      "brier": 0.2149391526694357,
+      "accuracy": 0.6977401129943502,
+      "used": 5.946327683615819,
+      "n": 708
+    },
+    "active_experimental_aci": {
+      "brier": 0.21465746531804242,
+      "accuracy": 0.6751412429378532,
+      "used": 2.9901129943502824,
+      "n": 708
+    },
+    "aware_coalition": {
+      "brier": 0.1728489315147031,
+      "accuracy": 0.7612994350282486,
+      "used": 3.538135593220339,
+      "n": 708,
+      "rebate_est": 0.0,
+      "rebate_updates": 0,
+      "essc_applications": 632,
+      "essc_oppose_majority": 104,
+      "pool_restore_emit_maj": 0,
+      "pool_restore_emit_leave": 0,
+      "ropl_mean_g": 0.0,
+      "ropl_emit_count": 0,
+      "ropl_pool_count": 0,
+      "ropl_full_leave_count": 0,
+      "ropl_g": 0.0
+    },
+    "aware_pool_restore": {
+      "brier": 0.16269738251829155,
+      "accuracy": 0.7669491525423728,
+      "used": 5.396892655367232,
+      "n": 708,
+      "rebate_est": 0.3916332857585831,
+      "rebate_updates": 707,
+      "essc_applications": 630,
+      "essc_oppose_majority": 104,
+      "pool_restore_emit_maj": 540,
+      "pool_restore_emit_leave": 168,
+      "ropl_mean_g": 0.0,
+      "ropl_emit_count": 0,
+      "ropl_pool_count": 0,
+      "ropl_full_leave_count": 0,
+      "ropl_g": 0.0
+    },
+    "aware_ropl": {
+      "brier": 0.15912190134420345,
+      "accuracy": 0.7612994350282486,
+      "used": 5.946327683615819,
+      "n": 708,
+      "rebate_est": 0.36674823265905093,
+      "rebate_updates": 707,
+      "essc_applications": 630,
+      "essc_oppose_majority": 105,
+      "pool_restore_emit_maj": 0,
+      "pool_restore_emit_leave": 0,
+      "ropl_mean_g": 0.32905068226892,
+      "ropl_emit_count": 708,
+      "ropl_pool_count": 84,
+      "ropl_full_leave_count": 0,
+      "ropl_g": 0.36674823265905093
+    }
+  },
+  "weather_ropl_detail": {
+    "n": 708,
+    "brier_ropl": 0.15912190134420345,
+    "brier_majority": 0.16241211544883868,
+    "brier_internal_counterfactual": 0.1713287311071622,
+    "delta_vs_majority": -0.0032902141046352307,
+    "mean_used": 5.946327683615819,
+    "mean_g": 0.3290506822689197,
+    "median_g": 0.3537094286872781,
+    "final_rebate_est": 0.36674823265905093,
+    "rebate_updates": 707,
+    "g_zero_frac": 0.11864406779661017,
+    "g_full_frac": 0.0,
+    "g_partial_frac": 0.8813559322033898,
+    "day_blocks": {
+      "n_days": 59,
+      "mean_delta": -0.0032902141046352454,
+      "frac_days_worse": 0.3728813559322034,
+      "frac_days_better": 0.5084745762711864,
+      "frac_days_tie": 0.11864406779661017
+    }
+  },
+  "synthetic_24seed_400rounds_mean_brier": {
+    "independent_stable": {
+      "majority": 0.07556423611111111,
+      "aware_essc": 0.07595768963664973,
+      "aware_pool_restore": 0.07157246850069031,
+      "aware_ropl": 0.06863052297186038,
+      "delta_ropl_minus_maj": -0.00693371313925073
+    },
+    "correlated_stable": {
+      "majority": 0.09984953703412038,
+      "aware_essc": 0.11995519542445526,
+      "aware_pool_restore": 0.10084490671564494,
+      "aware_ropl": 0.09948363138538159,
+      "delta_ropl_minus_maj": -0.0003659056487387846
+    },
+    "abrupt_drift": {
+      "majority": 0.08818793402777779,
+      "aware_essc": 0.0362842179543672,
+      "aware_pool_restore": 0.038402404637457165,
+      "aware_ropl": 0.03743248659725529,
+      "delta_ropl_minus_maj": -0.0507554474305225
+    },
+    "recurring_crossover": {
+      "majority": 0.0956322337962963,
+      "aware_essc": 0.052379574695233445,
+      "aware_pool_restore": 0.05485728568245213,
+      "aware_ropl": 0.05559021075650217,
+      "delta_ropl_minus_maj": -0.040042023039794136
+    },
+    "adversarial_switch": {
+      "majority": 0.06138599537037037,
+      "aware_essc": 0.048865799073225726,
+      "aware_pool_restore": 0.047405076974088044,
+      "aware_ropl": 0.04596408856248781,
+      "delta_ropl_minus_maj": -0.015421906807882559
+    },
+    "bursty_missing": {
+      "majority": 0.08012915775539942,
+      "aware_essc": 0.07706401095574188,
+      "aware_pool_restore": 0.07442929521574872,
+      "aware_ropl": 0.0723870496985243,
+      "delta_ropl_minus_maj": -0.007742108056875113
+    }
+  },
+  "verdict": {
+    "crushes_majority": true,
+    "weather_brier": 0.15912190134420345,
+    "majority_brier": 0.16241211544883868,
+    "delta": -0.0032902141046352307,
+    "headline": "CRUSH majority"
+  },
+  "honesty": {
+    "knobs_locked_before_scoring": true,
+    "no_hindsight_fixed_g": true,
+    "honest_used_full_roster_when_g_lt_1": true,
+    "incredible_used_3_5_not_claimed": true,
+    "crush_bar_unchanged": true,
+    "majority_target": 0.16241211544883868
+  }
+}

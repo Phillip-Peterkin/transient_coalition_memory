@@ -1,0 +1,8 @@
+# Raw Luna Dong dumps (large; re-fetch via download_data.py)
+data/*.zip
+data/clean_stock/
+data/nasdaq_truth/
+data/pop_truth/
+data/*.txt
+__pycache__/
+*.pyc

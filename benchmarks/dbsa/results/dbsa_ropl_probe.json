@@ -1,0 +1,21 @@
+{
+  "protocol": "diagnostic_probe_not_sealed",
+  "note": "Room probe for CONSENSUS_COMBINED_LEAVE.md — not a leaderboard claim.",
+  "bed": "prospective_weather/708",
+  "majority_brier": 0.162412,
+  "majority_used": 5.946,
+  "aware_essc_brier": 0.172849,
+  "aware_essc_used": 3.538,
+  "baked_cov_over_var": 0.315343,
+  "probes": {
+    "shrink_fixed_g_0.315": {"brier": 0.159579, "used_honest": 5.946, "note": "hindsight g* illustrative"},
+    "ropl_online_covvar_w120_min40": {"brier": 0.160413, "used_honest": 5.946, "mean_g": 0.287},
+    "online_hard_gate_rho_gt_0.5": {"brier": 0.163124, "used_honest": 5.562},
+    "pool_restore_reference": {"brier": 0.162697, "used": 5.397},
+    "subset_pool_k3_g0.315": {"brier": 0.166362, "used_approx": 3.648, "note": "incredible path fails"},
+    "oracle_pick_aware_vs_maj": {"brier": 0.128655, "used_honest_approx": 5.342}
+  },
+  "named_next_object": "ROPL",
+  "pass_criterion": "sealed Brier < 0.162412 with locked online g_t; honest Used",
+  "incredible_used_3.5": "not claimed by ROPL"
+}
