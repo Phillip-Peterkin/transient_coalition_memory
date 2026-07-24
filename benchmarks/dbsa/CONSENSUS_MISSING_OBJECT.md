@@ -76,6 +76,7 @@ Pre-register before any PWDR look:
 4. No metric softening while the idea matures.
 
 **Status:** consensus locked; **PWDR implemented** as `baselines.PrecisionWhitenedDelayedResidual`
-(`name="pwdr"`) with knobs in `baselines.py` (`PWDR_*`). First scored looks
-recorded in `REPORT_PWDR.md`. Year-stress collection continues under a closed
-score. Metrics held — crush majority remains the bar.
+(`name="pwdr"`) with knobs in `baselines.py` (`PWDR_*`). First scored look:
+**does not crush majority** — see `REPORT_PWDR.md`. Whitened base ≈ majority
+on weather; residual head hurts under locked knobs. Slice prediction FAIL.
+No silent retune. Metrics held.

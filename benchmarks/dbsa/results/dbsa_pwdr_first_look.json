@@ -1,0 +1,179 @@
+{
+  "protocol": "dbsa_pwdr_first_look_v2_identity_fix",
+  "synthetic_24seed_400rounds": {
+    "independent_stable": {
+      "majority": {
+        "mean_brier": 0.07556423611111111,
+        "std_brier": 0.0031547659668641295
+      },
+      "pwdr": {
+        "mean_brier": 0.10139337956928107,
+        "std_brier": 0.007852412283850604
+      },
+      "fading_source_bayes": {
+        "mean_brier": 0.04063083228215824,
+        "std_brier": 0.004068505385055339
+      },
+      "fixed_share_hedge": {
+        "mean_brier": 0.09835839223740091,
+        "std_brier": 0.006074197757126324
+      }
+    },
+    "correlated_stable": {
+      "majority": {
+        "mean_brier": 0.09984953703412038,
+        "std_brier": 0.007593699635974547
+      },
+      "pwdr": {
+        "mean_brier": 0.13567673873618338,
+        "std_brier": 0.010623243721578864
+      },
+      "fading_source_bayes": {
+        "mean_brier": 0.10793199273089223,
+        "std_brier": 0.012738939155498
+      },
+      "fixed_share_hedge": {
+        "mean_brier": 0.12310035374268119,
+        "std_brier": 0.010481452658651219
+      }
+    },
+    "abrupt_drift": {
+      "majority": {
+        "mean_brier": 0.08818793402777779,
+        "std_brier": 0.0037564105379665523
+      },
+      "pwdr": {
+        "mean_brier": 0.17927314537567182,
+        "std_brier": 0.01634105179989718
+      },
+      "fading_source_bayes": {
+        "mean_brier": 0.019557060680791088,
+        "std_brier": 0.00384027081586633
+      },
+      "fixed_share_hedge": {
+        "mean_brier": 0.0433556351882235,
+        "std_brier": 0.005063916774450477
+      }
+    },
+    "recurring_crossover": {
+      "majority": {
+        "mean_brier": 0.0956322337962963,
+        "std_brier": 0.0042798247009655874
+      },
+      "pwdr": {
+        "mean_brier": 0.16000047204655898,
+        "std_brier": 0.01114961848006083
+      },
+      "fading_source_bayes": {
+        "mean_brier": 0.04796012885923603,
+        "std_brier": 0.006322979415523504
+      },
+      "fixed_share_hedge": {
+        "mean_brier": 0.05902431404621589,
+        "std_brier": 0.006460504110679274
+      }
+    },
+    "adversarial_switch": {
+      "majority": {
+        "mean_brier": 0.06138599537037037,
+        "std_brier": 0.003009673782881436
+      },
+      "pwdr": {
+        "mean_brier": 0.10596472012933165,
+        "std_brier": 0.006657993217924206
+      },
+      "fading_source_bayes": {
+        "mean_brier": 0.025465124753209768,
+        "std_brier": 0.006983723144134499
+      },
+      "fixed_share_hedge": {
+        "mean_brier": 0.06548045401243076,
+        "std_brier": 0.005545584103386804
+      }
+    },
+    "bursty_missing": {
+      "majority": {
+        "mean_brier": 0.08012915775539942,
+        "std_brier": 0.005046927555568692
+      },
+      "pwdr": {
+        "mean_brier": 0.11909178768471405,
+        "std_brier": 0.011814490182271849
+      },
+      "fading_source_bayes": {
+        "mean_brier": 0.054912197610468144,
+        "std_brier": 0.008259436047775825
+      },
+      "fixed_share_hedge": {
+        "mean_brier": 0.10725242011711573,
+        "std_brier": 0.008902939929743616
+      }
+    }
+  },
+  "weather": {
+    "persistence": {
+      "brier": 0.5268361571468926,
+      "accuracy": 0.4759887005649718,
+      "used": 5.946327683615819
+    },
+    "majority": {
+      "brier": 0.16241211544883868,
+      "accuracy": 0.7556497175141242,
+      "used": 5.946327683615819
+    },
+    "fixed_share_hedge": {
+      "brier": 0.17810975948151528,
+      "accuracy": 0.7443502824858758,
+      "used": 5.946327683615819
+    },
+    "ada_hedge": {
+      "brier": 0.2316423340697073,
+      "accuracy": 0.7471751412429378,
+      "used": 5.946327683615819
+    },
+    "fading_source_bayes": {
+      "brier": 0.19129459123023757,
+      "accuracy": 0.7655367231638418,
+      "used": 5.946327683615819
+    },
+    "agreement_discounted_bayes": {
+      "brier": 0.18334203619945125,
+      "accuracy": 0.7655367231638418,
+      "used": 5.946327683615819
+    },
+    "pwdr": {
+      "brier": 0.2149391526694357,
+      "accuracy": 0.6977401129943502,
+      "used": 5.946327683615819
+    },
+    "active_experimental_aci": {
+      "brier": 0.21465746531804242,
+      "accuracy": 0.6751412429378532,
+      "used": 2.9901129943502824
+    },
+    "aware_coalition": {
+      "brier": 0.17239544307081267,
+      "accuracy": 0.7584745762711864,
+      "used": 3.555084745762712
+    }
+  },
+  "weather_slices": {
+    "hi_n": 180,
+    "lo_n": 180,
+    "hi_pwdr": 0.20302862966303215,
+    "hi_maj": 0.1750864196530864,
+    "lo_pwdr": 0.23433718243784807,
+    "lo_maj": 0.15493827159382717,
+    "m_only_brier": 0.0
+  },
+  "weather_m_only_brier": 0.16609578392291213,
+  "weather_full_brier": 0.2149391526694357,
+  "honesty": {
+    "fixed_gross_bugs": [
+      "signed_correctness_kernel",
+      "identity_Lambda_equals_majority"
+    ],
+    "crush_majority_is_the_bar": true,
+    "result_summary": "PWDR does not crush majority on first look"
+  }
+}

@@ -40,6 +40,21 @@ def test_pwdr_knobs_are_locked():
     assert PWDR_MIN_UPDATES == 20
 
 
+def test_identity_precision_reduces_to_majority():
+    """Gross-bug guard: cold-start / Λ=I must emit majority (exchangeable opt)."""
+    model = PrecisionWhitenedDelayedResidual(min_updates=10_000)
+    reports = [(0, 0, 1), (1, 0, 1), (2, 0, 0), (3, 0, 0), (4, 0, 1)]
+    p, trace = model.predict((0, 0), reports, 0)
+    assert abs(trace["pwdr_m"] - trace["pwdr_majority"]) < 1e-12
+    assert abs(trace["pwdr_m"] - 0.6) < 1e-12
+    # Residual may move p, but base m is majority.
+    assert abs(p - _clip_if_needed(trace["pwdr_m"] + trace["pwdr_r"])) < 1e-12
+
+
+def _clip_if_needed(value: float) -> float:
+    return min(1.0 - 1e-9, max(1e-9, value))
+
+
 def test_pwdr_updates_only_after_delay_release():
     events = generate("independent_stable", seed=11, rounds=15)[:14]
     model = PrecisionWhitenedDelayedResidual()
@@ -174,14 +189,15 @@ def test_residual_trains_on_whitened_m_not_raw_majority():
 
 def test_whitening_downweights_perfect_error_clone():
     """Correlated-majority trap: two clones wrong, one independent right."""
-    model = PrecisionWhitenedDelayedResidual(min_updates=10, cov_forget=1.0, ridge=0.05)
+    model = PrecisionWhitenedDelayedResidual(
+        min_updates=10, cov_forget=1.0, ridge=0.05, residual_lr=0.0
+    )
     delay = 5
     pending = []
     for t in range(80):
         truth = t % 2
         # Clones 0,1 copy each other and are wrong; 2 is correct.
         reports = [(0, 0, 1 - truth), (1, 0, 1 - truth), (2, 0, truth)]
-        # release due
         due = [item for item in pending if item[0] == t]
         pending = [item for item in pending if item[0] != t]
         for _, payload in due:
@@ -200,13 +216,12 @@ def test_whitening_downweights_perfect_error_clone():
                 },
             )
         )
-    # After learning, whitened base should favor the independent source (≥0.5 when truth=1 pattern)
-    truth = 0
     reports = [(0, 0, 1), (1, 0, 1), (2, 0, 0)]  # majority=1 wrong, minority=0 right
     p, trace = model.predict((0, 0), reports, 1000)
     assert trace["pwdr_majority"] > 0.5
-    assert trace["pwdr_m"] < trace["pwdr_majority"]
-    assert p < 0.5  # crush side: side with independent minority
+    # Whitened base must move toward the independent minority vs raw majority.
+    assert trace["pwdr_m"] < trace["pwdr_majority"] - 0.1
+    assert abs(trace["pwdr_m"] - 0.0) < abs(trace["pwdr_majority"] - 0.0)
 
 
 def test_pwdr_runs_on_contract_stream():

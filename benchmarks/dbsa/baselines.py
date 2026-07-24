@@ -391,11 +391,15 @@ class PrecisionWhitenedDelayedResidual(_Baseline):
         ell = 2.0 * votes - 1.0
         ones = np.ones(len(votes), dtype=float)
         neff = float(ones @ lam @ ones)
-        # Whitened pool: precision-weighted logit mass.
-        logit_mass = float(ones @ (lam @ ell))
-        # Scale so identity-Λ cold start stays O(1) in logit space.
-        scale = 1.0 / max(1.0, math.sqrt(max(neff, 1.0)))
-        m = _sigmoid(scale * logit_mass)
+        # Precision-weighted vote. When Λ∝I this equals majority exactly —
+        # required so exchangeable regimes do not invent a worse aggregator.
+        weights = lam @ ones
+        weight_sum = float(np.sum(weights))
+        if weight_sum <= EPS:
+            m = float(votes.mean()) if len(votes) else 0.5
+        else:
+            m = float(np.dot(weights, votes) / weight_sum)
+        m = _clip_probability(m)
         majority = float(votes.mean()) if len(votes) else 0.5
         if self._cov_updates >= self.min_updates and len(idxs) >= 2:
             cov = self._S[np.ix_(idxs, idxs)] / max(1, self._cov_updates)
