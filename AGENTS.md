@@ -7,16 +7,18 @@ scripts. No services/servers — everything runs as one-shot CLI scripts.
 
 | Doc | Why |
 |---|---|
-| [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) | Long-term vision (General Dynamic Memory Architecture / living populations), canonical vision PDF pointer, **complete real-data weakness ledger**, anti-scope-creep rules. **Mandatory before proposing cures.** |
+| [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) | Long-term vision (**ACS** / micro-agent ecosystem), **complete real-data weakness ledger**, anti-scope-creep rules. **Mandatory before proposing cures.** |
+| [`docs/ACS.md`](docs/ACS.md) | Adaptive Cognitive Substrate dream: disturb → recruit → certify; topology rewires; TCM≠ACS-complete. |
 | [`docs/TCM_Vision_and_Technical_Report.pdf`](docs/TCM_Vision_and_Technical_Report.pdf) | What the research program currently is (Waves IV–XVI). |
 | [`README.md`](README.md) | Public summary: synthetic results + scientific-status honesty. |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Frozen mechanisms + known architectural failure modes. |
 | [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) | Exact run commands and `main`-branch `/mnt/data` gotchas. |
 
-Do not start mechanism work from chat alone without checking `docs/NORTH_STAR.md`.
-Prefer curing ledger items 2–5 (self-sealing attractor, confirmation-biased
-recruitment, static exchange rate, regime specialization) over new surface
-features. Do not rewrite archival `benchmarks/wave*/REPORT.md` files.
+Do not start mechanism work from chat alone without checking `docs/NORTH_STAR.md`
+and `docs/ACS.md`. Prefer curing ledger items 2–5 (self-sealing attractor,
+confirmation-biased recruitment, static exchange rate, regime specialization)
+over new surface features or premature TCM→ACS rebrands. Do not rewrite
+archival `benchmarks/wave*/REPORT.md` files.
 
 Active real-data entrypoint: `benchmarks/realdata_finance/` (download + evaluate).
 Treat its chronological `holdout` split as confirmatory for locked weights only.

@@ -4,9 +4,11 @@ Keep these documents aligned when the research narrative changes.
 
 | File | Audience | Contents |
 |---|---|---|
+| [`ACS.md`](ACS.md) | Anyone steering product vision | Adaptive Cognitive Substrate dream (micro-agents, topology) |
 | [`NORTH_STAR.md`](NORTH_STAR.md) | Anyone proposing cures or claims | Dream, current state, real-data weakness ledger, anti-scope-creep rules |
-| [`TCM_Vision_and_Technical_Report.pdf`](TCM_Vision_and_Technical_Report.pdf) | External / review | Canonical Vision & Technical Report (Waves IV–XVI) |
+| [`TCM_Vision_and_Technical_Report.pdf`](TCM_Vision_and_Technical_Report.pdf) | External / review | Canonical TCM Vision & Technical Report (Waves IV–XVI) |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Implementers | Frozen mechanisms + known architectural failure modes |
+| [`MNEMOSHEATH.md`](MNEMOSHEATH.md) | Experimental lineage | Context-awareness organ on ACI |
 | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) | Anyone running code | Environment, commands, `main` `/mnt/data` gotchas |
 | [`../README.md`](../README.md) | First landing | Synthetic results + scientific-status honesty + doc map |
 | [`../AGENTS.md`](../AGENTS.md) | Cursor / agents | Operating notes + mandatory north-star pointer |

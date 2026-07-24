@@ -8,9 +8,9 @@ Instead of retrieving a permanent record, TCM recruits a temporary coalition of 
 
 | | |
 |---|---|
-| **Dream** | A **General Dynamic Memory Architecture** — information treated like living populations, not fixed database entries. |
-| **This repo today** | Frozen Wave XI synthetic reference + active experimental real-data cell (`ActiveCoalitionCellular`) + historical waves / calibration / wall-clock tooling. A research prototype, not the finished general architecture. |
-| **Full vision writeup** | [`docs/TCM_Vision_and_Technical_Report.pdf`](docs/TCM_Vision_and_Technical_Report.pdf) |
+| **Dream** | **Adaptive Cognitive Substrate (ACS)** — a living knowledge ecosystem of micro-agents; decisions emerge from activation → recruitment → competition → certification. Memory is the pattern of relationships; topology rewires. See [`docs/ACS.md`](docs/ACS.md). |
+| **This repo today** | **TCM** research program: frozen Wave XI synthetic reference + active experimental real-data cell (`ActiveCoalitionCellular`) + Mnemosheath awareness organ + historical waves / calibration / wall-clock tooling. Pieces of ACS, not ACS-complete. |
+| **TCM technical report** | [`docs/TCM_Vision_and_Technical_Report.pdf`](docs/TCM_Vision_and_Technical_Report.pdf) |
 | **North star + real-data honesty ledger** | [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) — read before proposing cures; anti-scope-creep rules live there. |
 
 ## Synthetic result (what this repo currently ships)
@@ -52,8 +52,9 @@ Author: Phillip Peterkin
 
 | Doc | Purpose |
 |---|---|
+| [`docs/ACS.md`](docs/ACS.md) | Adaptive Cognitive Substrate long-term dream (micro-agents, topology) |
 | [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) | Vision, current state, real-data weakness ledger, anti-scope-creep rules |
-| [`docs/TCM_Vision_and_Technical_Report.pdf`](docs/TCM_Vision_and_Technical_Report.pdf) | Canonical Vision & Technical Report (Waves IV–XVI) |
+| [`docs/TCM_Vision_and_Technical_Report.pdf`](docs/TCM_Vision_and_Technical_Report.pdf) | Canonical TCM Vision & Technical Report (Waves IV–XVI) |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Mechanisms in the frozen reference + known architectural failure modes |
 | [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) | Exact run instructions, including `main`-branch path gotchas |
 | [`AGENTS.md`](AGENTS.md) | Cursor Cloud / agent operating notes |

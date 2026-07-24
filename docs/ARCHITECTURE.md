@@ -1,8 +1,8 @@
 # Architecture
 
-TCM treats memory as a persistent adaptive substrate rather than a collection of retrieved records.
+TCM treats memory as a persistent adaptive substrate rather than a collection of retrieved records. Long-term product framing: Adaptive Cognitive Substrate ([`ACS.md`](ACS.md)) — TCM is the research lineage building toward it, not ACS-complete.
 
-For the long-term vision, real-data honesty ledger, and anti-scope-creep rules, see [`NORTH_STAR.md`](NORTH_STAR.md). Canonical program writeup: [`TCM_Vision_and_Technical_Report.pdf`](TCM_Vision_and_Technical_Report.pdf).
+For the long-term vision, real-data honesty ledger, and anti-scope-creep rules, see [`NORTH_STAR.md`](NORTH_STAR.md). Canonical TCM program writeup: [`TCM_Vision_and_Technical_Report.pdf`](TCM_Vision_and_Technical_Report.pdf).
 
 ## Inference
 

@@ -12,15 +12,30 @@ started from this document alone.
 
 ## 1. Long-term vision (the dream)
 
-A **General Dynamic Memory Architecture** — information treated like
-**living populations**, not fixed database entries.
+**Product name for the dream:** Adaptive Cognitive Substrate (**ACS**), also
+speakable as Living Knowledge Substrate (**LKS**). Full writeup:
+[`ACS.md`](ACS.md).
 
-Beliefs and evidence should recruit, compete, go dormant, return from reserve,
-and revise under delayed outcomes — temporary coalitions of useful evidence,
-not exhaustive retrieval or permanent records.
+**Research program that is building toward it:** Transient Coalition Memory
+(**TCM**) — sparse certified coalitions, dormant reserve, delayed learning.
 
-This is the north star. Mechanisms, datasets, and wave numbers are means;
-they are not the product.
+The older shorthand "General Dynamic Memory Architecture / living populations"
+still applies, but the sharper framing is:
+
+> Not a memory database. An ecosystem. Every piece of information is a
+> **micro-agent** (not a record, JSON object, or vector). Micro-agents recruit,
+> decay, strengthen, certify, contradict, merge, split, and die. None knows
+> the answer. The answer is a coalition. You do not query a master store —
+> you disturb the substrate; local activation, recruitment, competition, and
+> certification produce an emergent decision. Memory lives in the **pattern of
+> relationships**, not in the nodes. Beliefs adapt; the **topology** must
+> adapt too (successful pathways become easier to recruit; unused ones fade).
+
+That is why "better truth-discovery algorithm" undersells the work. Truth
+discovery can be an evaluation surface. The product is a digital ecosystem
+where knowledge lives, competes, cooperates, and reorganizes over time.
+
+Mechanisms, datasets, and wave numbers are means; they are not the product.
 
 ---
 
@@ -28,6 +43,8 @@ they are not the product.
 
 Canonical written statement of the present research program:
 
+- [`docs/ACS.md`](ACS.md) — Adaptive Cognitive Substrate dream (micro-agents,
+  disturbance pipeline, topology adaptation).
 - [`docs/TCM_Vision_and_Technical_Report.pdf`](TCM_Vision_and_Technical_Report.pdf)
   — Vision & Technical Report (v1.0 research program, Waves IV–XVI).
 
@@ -38,9 +55,18 @@ outcomes. Strongest demonstrated claim is architectural (favorable
 accuracy–compute tradeoff under matched benchmarks); central open challenge
 is change response on correlated, imperfect real-world data.
 
+What TCM already approximates of ACS: budgeted recruitment, competition under
+contradiction, certification against dormant reserve, delayed learning, and
+(in experimental lineage) prior-free evidence and maturing context awareness
+(Mnemosheath). What is **not** yet ACS-complete: first-class micro-agent
+lifecycle (merge/split/die as operators), rich co-activation energy state,
+inspectable "why this coalition believes," and **graph topology plasticity**
+as a first-class learner.
+
 Repo code on `main` is the frozen Wave XI reference + historical waves /
-calibration / wall-clock tooling. It is a research prototype, not the finished
-general architecture.
+calibration / wall-clock tooling. Experimental real-data lineage (ACI,
+Mnemosheath, finance/weather harnesses) lives on working branches. It is a
+research prototype, not the finished substrate.
 
 ---
 
@@ -289,9 +315,10 @@ regime generality).
 Before any substantive change is proposed or merged, it must answer yes to
 these — or be explicitly marked as out-of-vision exploratory work:
 
-1. **Living populations, not a better database.** Does the change reinforce
-   recruit / certify / reserve / delayed-learn dynamics, or does it drift
-   toward denser retrieval, permanent records, or black-box fine-tuning that
+1. **Living micro-agents / ecosystem, not a better database.** Does the
+   change reinforce activate → recruit → compete → certify → emerge (plus
+   reserve / delayed-learn), or does it drift toward denser retrieval,
+   permanent records, master-memory stores, or black-box fine-tuning that
    erases the architecture story?
 2. **Regime honesty.** Does the evaluation report adversarial *and*
    trustworthy-source regimes (at least synthetic + stock + weather class),
@@ -306,14 +333,18 @@ these — or be explicitly marked as out-of-vision exploratory work:
 5. **Independence honesty.** If evidence is block-correlated, do not treat
    report count as independent sample size in claims, certificates, or ops.
 6. **Vision over wave numbers.** Prefer fewer mechanism changes that serve
-   the General Dynamic Memory Architecture over a pile of regime-shaped
-   patches (C7/C8-class) that win one dataset and fade the dream.
-7. **Cure before feature.** When returning to "the beginning of where the
-   repo is," prioritize curing ledger items 2–5 (self-sealing attractor,
-   confirmation-biased recruitment, static exchange rate, regime
-   specialization) over new surface features.
+   ACS (Adaptive Cognitive Substrate) over a pile of regime-shaped patches
+   (C7/C8-class) that win one dataset and fade the dream.
+7. **Cure before feature / rebrand.** Prioritize curing ledger items 2–5
+   (self-sealing attractor, confirmation-biased recruitment, static exchange
+   rate, regime specialization) over new surface features or renaming TCM→ACS
+   before mechanism fidelity matches.
+8. **Topology adaptation.** If the change only updates beliefs on a forever-
+   fixed interaction graph, name that limit. ACS-complete work must allow
+   successful coalitions to become easier to recruit and unused pathways to
+   fade (see [`ACS.md`](ACS.md) §5).
 
-When in doubt: **preserve the dream, name the tradeoff, do not paper over
+When in doubt: **preserve the ecosystem, name the tradeoff, do not paper over
 persistence as intelligence.**
 
 ---
@@ -323,7 +354,8 @@ persistence as intelligence.**
 | Doc | Role |
 |---|---|
 | [`README.md`](README.md) | Index of all docs in this folder |
-| [`TCM_Vision_and_Technical_Report.pdf`](TCM_Vision_and_Technical_Report.pdf) | Canonical Vision & Technical Report |
+| [`ACS.md`](ACS.md) | Adaptive Cognitive Substrate long-term dream |
+| [`TCM_Vision_and_Technical_Report.pdf`](TCM_Vision_and_Technical_Report.pdf) | Canonical TCM Vision & Technical Report |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Frozen mechanisms + known failure modes |
 | [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) | How to run / reproduce on `main` |
 | [`../README.md`](../README.md) | Public entry point: vision vs shipped results |
