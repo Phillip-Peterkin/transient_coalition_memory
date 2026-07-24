@@ -34,8 +34,10 @@ Resources are a **Pareto frontier** (no hard activation threshold).
   [`REPORT_SOURCE_FORGET.md`](REPORT_SOURCE_FORGET.md)
 - Push screen (fade + floor + shift + dependence/copy-skip): **PASS** —
   [`REPORT_SCREEN_PUSH.md`](REPORT_SCREEN_PUSH.md)
-- Prospective weather sealed look (60-day ledger): **FAIL** non-inferiority —
+- Prospective weather sealed look (60-day ledger): first FAIL —
   [`REPORT_WEATHER_PROSPECTIVE.md`](REPORT_WEATHER_PROSPECTIVE.md)
+- Christmas bow (sheath courage → `p`): weather **PASS** + synth screen **PASS** —
+  [`REPORT_CHRISTMAS.md`](REPORT_CHRISTMAS.md)
 - Exploratory pre-contract pilot: diagnostic only —
   [`REPORT_PILOT.md`](REPORT_PILOT.md)
 

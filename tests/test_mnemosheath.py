@@ -100,3 +100,29 @@ def test_prior_never_enters_report_delta():
     cell.cf[(key, 1)] = 9.0
     cell.cf[(key, 0)] = -9.0
     assert abs(cell._report_delta("s", 1) - d0) < 1e-9
+
+
+def test_agreement_evidence_sharpens_probability_toward_vote():
+    """Christmas bow: sheath courage must enter p, not only the trace."""
+    cell = AwareCoalitionCellular(**{**CELL, "min_delta": 0.01})
+    key = ("wx", 0)
+    reports = [("gfs", 0, 1), ("ecmwf", 0, 1), ("icon", 0, 1), ("gem", 0, 1)]
+    for _ in range(30):
+        _, tr = cell.predict(key, reports, t=0)
+        cell.feedback(
+            {
+                "key": key,
+                "truth": 1,
+                "reports": reports,
+                "trace": tr,
+                "time": 1,
+            }
+        )
+    assert cell.sheath.agreement_is_evidence({"unanimous": True, "unanimous_pos": True})
+    p, tr = cell.predict(key, reports, t=100)
+    assert tr["stop_reason"] != "null_diagnostic"
+    assert tr["awareness"]["awareness_sharpness_applied"] is True
+    assert tr["awareness"]["agreement_blend_weight"] > 0.0
+    # Must be braver than the timid pre-awareness probability on clear yes-votes.
+    assert p > tr["awareness"]["p_before_awareness"]
+    assert p >= 0.70

@@ -1760,6 +1760,69 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         base = super()._null_hazard(key)
         return self.sheath.mix_null_hazard(base, self.max_silence_hazard)
 
+    def _apply_awareness_sharpness(
+        self, probability: float, reports, cues: dict, stop_reason: str
+    ) -> tuple[float, dict]:
+        """Put Mnemosheath's learned courage into the emitted probability.
+
+        Bug/gap: ``vote_context`` was computed and traced but never entered
+        ``p``. On clear diagnostic agreement that made Aware timid versus a
+        simple vote — the weather near-miss. Null/silence paths stay untouched.
+        """
+        meta = {
+            "awareness_sharpness_applied": False,
+            "p_before_awareness": float(probability),
+            "agreement_blend_weight": 0.0,
+            "signed_context_lo": 0.0,
+        }
+        if (
+            not reports
+            or stop_reason in {"silence_channel", "null_diagnostic"}
+            or cues is None
+        ):
+            return float(probability), meta
+
+        votes = [int(vote) for _, _, vote in reports]
+        if not votes or not self.sheath.agreement_is_evidence(cues):
+            return float(probability), meta
+        majority = 1 if sum(votes) >= (len(votes) / 2) else 0
+        vote_mean = sum(votes) / len(votes)
+        aci_side = 1 if float(probability) >= 0.5 else 0
+        diagnosticity = float(self.sheath.diagnosticity(cues))
+        # Only sharpen when the sheath trusts agreement AND ACI already
+        # picked the crowd's side — bravery without flip-chasing.
+        if aci_side != majority:
+            meta.update(
+                {
+                    "awareness_sharpness_applied": False,
+                    "diagnosticity": diagnosticity,
+                    "sharpen_aligned_with_majority": False,
+                }
+            )
+            return float(probability), meta
+        # Mild courage: move partway toward the vote rate. Keep the step
+        # bounded so regime flips (where agreement can be briefly wrong)
+        # are not over-chased.
+        blend = min(0.40, max(0.0, diagnosticity - 0.5))
+        signed_context = float(self.sheath.context_log_odds) * (
+            1.0 if majority == 1 else -1.0
+        )
+        # Cap context add so sheath confidence cannot dominate evidence.
+        signed_context = max(-0.75, min(0.75, signed_context))
+        base_lo = _logit(float(probability))
+        sharpened = _sigmoid(base_lo + signed_context)
+        sharpened = (1.0 - blend) * sharpened + blend * vote_mean
+        meta.update(
+            {
+                "awareness_sharpness_applied": True,
+                "agreement_blend_weight": blend,
+                "signed_context_lo": signed_context,
+                "diagnosticity": diagnosticity,
+                "sharpen_aligned_with_majority": True,
+            }
+        )
+        return float(min(1.0 - EPS, max(EPS, sharpened))), meta
+
     def predict(self, key, reports, t):
         prior_lo = self._prior_log_odds(key)
         prior_p = _sigmoid(prior_lo)
@@ -1781,7 +1844,11 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         else:
             self.time_since_evidence[key] = int(self.time_since_evidence[key]) + 1
         probability, trace = super().predict(key, reports, t)
+        probability, sharp_meta = self._apply_awareness_sharpness(
+            probability, reports, cues, trace.get("stop_reason", "")
+        )
         trace = dict(trace)
+        trace["p"] = probability
         trace["awareness"] = {
             "cues": {name: bool(flag) for name, flag in cues.items() if flag},
             "diagnosticity": self.sheath.diagnosticity(cues),
@@ -1790,6 +1857,7 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             "bits": self.sheath.bit_count,
             "stage_cap": self.sheath.stage_cap,
             "empty_lessons": self.sheath.empty_lessons,
+            **sharp_meta,
         }
         trace["awareness_cues"] = cues
         if reports:
