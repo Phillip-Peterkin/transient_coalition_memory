@@ -130,3 +130,7 @@ Whatever is missing is upstream of that ribbon — structure majority flattens
 scalar trust). No knob hunt, no metric softening, no inventing a public
 physics costume for a gap we have not named yet. Hold the board until the
 idea is real enough to crush.
+
+**Room consensus (bio / neuro / physics / AI eng):** see
+[`CONSENSUS_MISSING_OBJECT.md`](CONSENSUS_MISSING_OBJECT.md) —
+**PWDR** (Precision-Whitened Delayed Residual). Named. Not implemented. Not scored.
