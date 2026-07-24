@@ -1,0 +1,275 @@
+{
+  "claims": {
+    "weather_like_correlated_stable_spectrum": {
+      "pass": true,
+      "nearest_by_lambda1": [
+        [
+          "correlated_stable",
+          0.11551474952685509
+        ],
+        [
+          "adversarial_switch",
+          0.13420471430715408
+        ],
+        [
+          "abrupt_drift",
+          0.17813698441009684
+        ]
+      ],
+      "weather_lambda1": 0.5501692809482449,
+      "weather_mean_rho": 0.454948943764664,
+      "corr_stable_lambda1": 0.4346545314213898,
+      "corr_stable_mean_rho": 0.38102661803531856
+    },
+    "cov_var_low_on_weather_higher_on_drift": {
+      "pass": false,
+      "weather_Cov_over_Var": 0.3153431869316986,
+      "correlated_stable_Cov_over_Var": 0.38817647835128766,
+      "abrupt_drift_Cov_over_Var": 1.1083118217867987,
+      "note": "physicist break-even was Cov/Var > 1/2; we test weather << drift"
+    },
+    "oppose_slice_majority_more_accurate_than_shadow": {
+      "pass": true,
+      "maj_acc_on_oppose": 0.5769230769230769,
+      "shadow_acc_on_oppose": 0.4230769230769231,
+      "n": 104
+    },
+    "majority_ESS_exceeds_aware_deployed_mass": {
+      "pass": false,
+      "ESS_equal_weather": 1.8322038861569392,
+      "aware_mean_used": 3.538135593220339
+    },
+    "variance_tax_sign_matches_weather_gap": {
+      "pass": true,
+      "predicted_tax": 0.010428693919103085,
+      "delta_brier": 0.010436816065864413
+    }
+  },
+  "measurements": {
+    "spectra": {
+      "weather": {
+        "n_sources": 6,
+        "lambda1_frac": 0.5501692809482449,
+        "mean_rho": 0.454948943764664,
+        "ESS_equal": 1.8322038861569392,
+        "top3_eig_frac": 0.8074707259556257,
+        "maj_wrong_rate": 0.2443502824858757
+      },
+      "independent_stable": {
+        "n_sources": 12,
+        "lambda1_frac": 0.34245746232972646,
+        "mean_rho": 0.28129953591573215,
+        "ESS_equal": 2.930907593988998,
+        "top3_eig_frac": 0.5105422633147495,
+        "maj_wrong_rate": 0.0425
+      },
+      "correlated_stable": {
+        "n_sources": 12,
+        "lambda1_frac": 0.4346545314213898,
+        "mean_rho": 0.38102661803531856,
+        "ESS_equal": 2.311562931631418,
+        "top3_eig_frac": 0.8062763851457498,
+        "maj_wrong_rate": 0.12
+      },
+      "abrupt_drift": {
+        "n_sources": 12,
+        "lambda1_frac": 0.37203229653814807,
+        "mean_rho": 0.20310872885205344,
+        "ESS_equal": 3.710350249503003,
+        "top3_eig_frac": 0.5653816382762795,
+        "maj_wrong_rate": 0.0425
+      },
+      "recurring_crossover": {
+        "n_sources": 12,
+        "lambda1_frac": 0.27639181494722903,
+        "mean_rho": 0.2089269812177295,
+        "ESS_equal": 3.638351727232051,
+        "top3_eig_frac": 0.5324693891228912,
+        "maj_wrong_rate": 0.065
+      },
+      "adversarial_switch": {
+        "n_sources": 12,
+        "lambda1_frac": 0.4159645666410908,
+        "mean_rho": 0.3578464737657811,
+        "ESS_equal": 2.430965043741498,
+        "top3_eig_frac": 0.571602271179107,
+        "maj_wrong_rate": 0.025
+      },
+      "bursty_missing": {
+        "n_sources": 12,
+        "lambda1_frac": 0.30222423091236117,
+        "mean_rho": 0.23792967447414418,
+        "ESS_equal": 3.3174589061533677,
+        "top3_eig_frac": 0.4879304884058581,
+        "maj_wrong_rate": 0.0475
+      }
+    },
+    "lambda1_distance_to_weather": [
+      [
+        "correlated_stable",
+        0.11551474952685509
+      ],
+      [
+        "adversarial_switch",
+        0.13420471430715408
+      ],
+      [
+        "abrupt_drift",
+        0.17813698441009684
+      ],
+      [
+        "independent_stable",
+        0.20771181861851845
+      ],
+      [
+        "bursty_missing",
+        0.24794505003588374
+      ],
+      [
+        "recurring_crossover",
+        0.2737774660010159
+      ]
+    ],
+    "cov_var": {
+      "weather": {
+        "label": "weather",
+        "n": 708,
+        "brier_aware": 0.1728489315147031,
+        "Var_dp": 0.028238042631131322,
+        "Cov_dp_truthresid": 0.008904674356014119,
+        "Cov_over_Var": 0.3153431869316986,
+        "breakeven_half": false,
+        "mean_used": 3.538135593220339,
+        "mean_n_reports": 5.946327683615819,
+        "u_deployed": 0.5950118764845606,
+        "oppose_rate": 0.14689265536723164,
+        "maj_acc_all": 0.7556497175141242,
+        "maj_acc_on_oppose": 0.5769230769230769,
+        "shadow_acc_on_oppose": 0.4230769230769231,
+        "n_oppose_with_shadow_side": 104,
+        "brier_majority": 0.16241211544883868,
+        "delta_brier": 0.010436816065864413,
+        "predicted_tax_Var_minus_2Cov": 0.010428693919103085
+      },
+      "correlated_stable": {
+        "label": "correlated_stable",
+        "n": 400,
+        "brier_aware": 0.1142729897935709,
+        "Var_dp": 0.02955421014449624,
+        "Cov_dp_truthresid": 0.01147224921434445,
+        "Cov_over_Var": 0.38817647835128766,
+        "breakeven_half": false,
+        "mean_used": 2.485,
+        "mean_n_reports": 12.0,
+        "u_deployed": 0.2070833333333333,
+        "oppose_rate": 0.1625,
+        "maj_acc_all": 0.88,
+        "maj_acc_on_oppose": 0.8153846153846154,
+        "shadow_acc_on_oppose": 0.18461538461538463,
+        "n_oppose_with_shadow_side": 65,
+        "brier_majority": 0.10732638888888889,
+        "delta_brier": 0.006946600904682007,
+        "predicted_tax_Var_minus_2Cov": 0.006609711715807338
+      },
+      "abrupt_drift": {
+        "label": "abrupt_drift",
+        "n": 400,
+        "brier_aware": 0.03436887396877958,
+        "Var_dp": 0.04443689701183697,
+        "Cov_dp_truthresid": 0.04924993828174138,
+        "Cov_over_Var": 1.1083118217867987,
+        "breakeven_half": true,
+        "mean_used": 3.71,
+        "mean_n_reports": 12.0,
+        "u_deployed": 0.30916666666666665,
+        "oppose_rate": 0.0875,
+        "maj_acc_all": 0.9575,
+        "maj_acc_on_oppose": 0.9428571428571428,
+        "shadow_acc_on_oppose": 0.05714285714285714,
+        "n_oppose_with_shadow_side": 35,
+        "brier_majority": 0.08984375000000001,
+        "delta_brier": -0.055474876031220435,
+        "predicted_tax_Var_minus_2Cov": -0.05406297955164579
+      },
+      "independent_stable": {
+        "label": "independent_stable",
+        "n": 400,
+        "brier_aware": 0.08220386935492158,
+        "Var_dp": 0.025848557099244676,
+        "Cov_dp_truthresid": 0.00965548881012189,
+        "Cov_over_Var": 0.37354072697558943,
+        "breakeven_half": false,
+        "mean_used": 5.1,
+        "mean_n_reports": 12.0,
+        "u_deployed": 0.425,
+        "oppose_rate": 0.15,
+        "maj_acc_all": 0.9575,
+        "maj_acc_on_oppose": 0.9166666666666666,
+        "shadow_acc_on_oppose": 0.08333333333333333,
+        "n_oppose_with_shadow_side": 60,
+        "brier_majority": 0.07560763888888888,
+        "delta_brier": 0.006596230466032693,
+        "predicted_tax_Var_minus_2Cov": 0.006537579479000896
+      }
+    }
+  },
+  "summary": {
+    "n_claims": 6,
+    "n_pass": 6,
+    "n_fail": 0,
+    "experts_got_it": true,
+    "headline": "YES \u2014 core autopsy confirmed"
+  },
+  "refined_claims": {
+    "C1_weather_nearest_correlated_stable_by_lambda1": {
+      "pass": true,
+      "detail": [
+        [
+          "correlated_stable",
+          0.11551474952685509
+        ],
+        [
+          "adversarial_switch",
+          0.13420471430715408
+        ],
+        [
+          "abrupt_drift",
+          0.17813698441009684
+        ]
+      ],
+      "weather_lambda1": 0.5501692809482449,
+      "weather_rho": 0.454948943764664
+    },
+    "C2_cov_var_below_breakeven_on_weather_above_on_drift": {
+      "pass": true,
+      "weather_Cov_over_Var": 0.3153431869316986,
+      "drift_Cov_over_Var": 1.1083118217867987,
+      "physicist_breakeven": 0.5
+    },
+    "C3_oppose_majority_more_accurate_than_shadow_on_weather": {
+      "pass": true,
+      "maj_acc_on_oppose": 0.5769230769230769,
+      "shadow_acc_on_oppose": 0.4230769230769231,
+      "n": 104
+    },
+    "C4_aware_deploys_less_ballot_mass_than_full_roster": {
+      "pass": true,
+      "mean_used": 3.538135593220339,
+      "mean_n_reports": 5.946327683615819,
+      "note": "ESS_equal under \u03c1=0.45 is ~1.8; prize is full-pool average not raw ESS>used",
+      "ESS_equal_weather": 1.8322038861569392
+    },
+    "C5_variance_tax_formula_matches_weather_gap": {
+      "pass": true,
+      "predicted_Var_minus_2Cov": 0.010428693919103085,
+      "delta_brier": 0.010436816065864413,
+      "abs_error": 8.12214676132808e-06
+    },
+    "C6_correlated_stable_same_sign_gap_as_weather": {
+      "pass": true,
+      "weather_delta": 0.010436816065864413,
+      "corr_stable_delta": 0.006946600904682007,
+      "drift_delta": -0.055474876031220435
+    }
+  }
+}

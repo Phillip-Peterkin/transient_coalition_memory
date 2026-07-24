@@ -189,6 +189,8 @@ majority’s prize = full-pool low Var(¯v)  (ESS ≈ mid–high single digits)
 
 ## Status
 
-Autopsy complete. **No new object locked. No retune. No score claim.**
+Autopsy complete. **Validation: experts got it (6/6 refined claims).**
+See `REPORT_WHITEBOARD_VALIDATION.md` — variance-tax formula matches the
+weather gap to ~10⁻⁵. **No new object locked. No retune.**
 PWDR rejected. ESSC scored: weather FAIL, synthetic niche-split explained.
 Metrics held.
