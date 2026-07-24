@@ -44,7 +44,7 @@ at year scale:
 - Reports: locked FluSight models’ point/median forecasts → vote
   `1{ forecast_{w+1} > adm_w }` (or hub rate-change side when present)
 - Locations: US national + locked state subset (see `medical/locations.py`)
-- Span: FluSight 2023–24 and 2024–25 seasons as available (≥40 labeled weeks)
+- Span: reference dates **2023-10-14 → 2024-10-12** (≥40 labeled location-weeks)
 - Delay: 1 week (label after next week’s target seal)
 - Primary: prequential Brier vs Majority of models; Fixed-Share diagnostic
 
