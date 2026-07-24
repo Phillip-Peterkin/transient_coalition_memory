@@ -133,4 +133,10 @@ idea is real enough to crush.
 
 **Room consensus (bio / neuro / physics / AI eng):** see
 [`CONSENSUS_MISSING_OBJECT.md`](CONSENSUS_MISSING_OBJECT.md) —
-**PWDR** (Precision-Whitened Delayed Residual). Named. Not implemented. Not scored.
+**PWDR** rejected on weather (0.215). Later Aware-next object: ESSC
+([`CONSENSUS_AWARE_NEXT.md`](CONSENSUS_AWARE_NEXT.md)) — weather still
+0.1728 vs majority 0.1624.
+
+**Baked real-data diagnosis:** [`BAKED_DIAGNOSIS.md`](BAKED_DIAGNOSIS.md) /
+[`REPORT_WHITEBOARD_VALIDATION.md`](REPORT_WHITEBOARD_VALIDATION.md) —
+variance tax matches the +0.0104 gap to ~10⁻⁵. Crush bar unchanged.

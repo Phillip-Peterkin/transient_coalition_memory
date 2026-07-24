@@ -190,7 +190,12 @@ majority’s prize = full-pool low Var(¯v)  (ESS ≈ mid–high single digits)
 ## Status
 
 Autopsy complete. **Validation: experts got it (6/6 refined claims).**
-See `REPORT_WHITEBOARD_VALIDATION.md` — variance-tax formula matches the
-weather gap to ~10⁻⁵. **No new object locked. No retune.**
-PWDR rejected. ESSC scored: weather FAIL, synthetic niche-split explained.
+**Baked into** [`BAKED_DIAGNOSIS.md`](BAKED_DIAGNOSIS.md) with canonical
+real-weather numbers (`results/dbsa_weather_baked_diagnosis.json`).
+
+Headline real numbers: Majority **0.162412**, Aware+ESSC **0.172849**,
+gap **+0.010437**, tax prediction **0.010429** (err ~10⁻⁵), λ₁ **0.550**,
+Cov/Var **0.315**, used **3.538/5.946**, oppose 104 (maj 0.577 > shadow 0.423).
+
+**No new crush object locked. No retune.** PWDR rejected. ESSC weather FAIL.
 Metrics held.

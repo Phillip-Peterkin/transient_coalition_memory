@@ -65,8 +65,24 @@ Weather still does not. Bar unmet on the held real lane.
 
 `results/dbsa_essc_first_look.json`
 
+## Baked real-data numbers (canonical)
+
+See [`BAKED_DIAGNOSIS.md`](BAKED_DIAGNOSIS.md) — re-measured on the same
+708-event prospective ledger:
+
+| Quantity | Value |
+|---|---:|
+| Majority Brier | **0.162412** |
+| Aware+ESSC Brier | **0.172849** |
+| Gap | **+0.010437** |
+| Predicted tax Var−2Cov | **0.010429** |
+| Cov/Var | **0.315** (< ½) |
+| Used | **3.538** / 5.946 |
+| Oppose n | 104 (maj acc 0.577 > shadow 0.423) |
+
 ## Honesty
 
 - Crush majority remains the destination; weather FAIL stands.
 - Selective activation retained; no Christmas blend; no PWDR residual.
 - Synthetic wins are not a weather substitute.
+- Diagnosis baked; no silent retune.

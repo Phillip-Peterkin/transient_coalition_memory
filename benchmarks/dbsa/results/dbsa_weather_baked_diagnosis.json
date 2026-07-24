@@ -1,0 +1,180 @@
+{
+  "protocol": "dbsa_weather_baked_diagnosis_v1",
+  "baked_at_utc": "2026-07-24T04:09:44.373193+00:00",
+  "ledger_status": {
+    "n_forecast_days": 60,
+    "n_observation_days": 60,
+    "n_events": 708,
+    "n_labeled_decision_days": 59,
+    "forecast_span": [
+      "2026-05-25",
+      "2026-07-23"
+    ],
+    "open_forecast_days_met": true,
+    "open_label_days_met": true
+  },
+  "essc_params_locked": {
+    "essc_enabled": true,
+    "essc_disable_christmas_bow": true,
+    "essc_credit_init": 0.2,
+    "essc_max_credit": 0.5,
+    "essc_lo_cap": 1.25,
+    "essc_credit_lr": 0.08,
+    "essc_disagree_emphasis": 2.5
+  },
+  "brier_noninferiority_delta_unchanged": 0.005,
+  "methods": {
+    "persistence": {
+      "brier": 0.5268361571468926,
+      "accuracy": 0.4759887005649718,
+      "log_loss": 10.841703575536572,
+      "used": 5.946327683615819,
+      "inspected": 5.946327683615819,
+      "n": 708
+    },
+    "majority": {
+      "brier": 0.16241211544883868,
+      "accuracy": 0.7556497175141242,
+      "log_loss": 0.9695869289492989,
+      "used": 5.946327683615819,
+      "inspected": 5.946327683615819,
+      "n": 708
+    },
+    "fixed_share_hedge": {
+      "brier": 0.17810975948151528,
+      "accuracy": 0.7443502824858758,
+      "log_loss": 1.024822737557005,
+      "used": 5.946327683615819,
+      "inspected": 5.946327683615819,
+      "n": 708
+    },
+    "ada_hedge": {
+      "brier": 0.2316423340697073,
+      "accuracy": 0.7471751412429378,
+      "log_loss": 1.8078731953870935,
+      "used": 5.946327683615819,
+      "inspected": 5.946327683615819,
+      "n": 708
+    },
+    "fading_source_bayes": {
+      "brier": 0.19129459123023757,
+      "accuracy": 0.7655367231638418,
+      "log_loss": 0.7172572893292434,
+      "used": 5.946327683615819,
+      "inspected": 5.946327683615819,
+      "n": 708
+    },
+    "agreement_discounted_bayes": {
+      "brier": 0.18334203619945125,
+      "accuracy": 0.7655367231638418,
+      "log_loss": 0.5578102833132078,
+      "used": 5.946327683615819,
+      "inspected": 5.946327683615819,
+      "n": 708
+    },
+    "pwdr": {
+      "brier": 0.2149391526694357,
+      "accuracy": 0.6977401129943502,
+      "log_loss": 1.5726580356951465,
+      "used": 5.946327683615819,
+      "inspected": 5.946327683615819,
+      "n": 708
+    },
+    "active_experimental_aci": {
+      "brier": 0.21465746531804242,
+      "accuracy": 0.6751412429378532,
+      "log_loss": 0.6220868531428532,
+      "used": 2.9901129943502824,
+      "inspected": 5.946327683615819,
+      "n": 708
+    },
+    "aware_coalition": {
+      "brier": 0.1728489315147031,
+      "accuracy": 0.7612994350282486,
+      "log_loss": 0.5239850823243016,
+      "used": 3.538135593220339,
+      "inspected": 5.946327683615819,
+      "n": 708
+    },
+    "aware_christmas_bow": {
+      "brier": 0.17239544307081267,
+      "accuracy": 0.7584745762711864,
+      "used": 3.555084745762712,
+      "n": 708
+    },
+    "pwdr_m_only_diagnostic": {
+      "brier": 0.16609578392291213,
+      "n": 708,
+      "note": "diagnostic residual_lr=0; not a scored gate row"
+    }
+  },
+  "spectrum": {
+    "n_events": 708,
+    "n_sources": 6,
+    "source_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "lambda1_frac": 0.5501692809482449,
+    "mean_pairwise_rho": 0.454948943764664,
+    "ESS_equal_weight": 1.8322038861569392,
+    "majority_wrong_rate": 0.2443502824858757,
+    "eigenvalues": [
+      0.31924981728587154,
+      0.3677778790252732,
+      0.46814794795510073,
+      0.6424803346692162,
+      0.9013283353750691,
+      3.3010156856894692
+    ]
+  },
+  "variance_tax": {
+    "brier_aware_essc": 0.1728489315147031,
+    "brier_majority": 0.16241211544883868,
+    "delta_brier_aware_minus_majority": 0.010436816065864413,
+    "Var_delta_p": 0.028238042631131322,
+    "Cov_delta_p_truth_resid": 0.008904674356014119,
+    "Cov_over_Var": 0.3153431869316986,
+    "predicted_tax_Var_minus_2Cov": 0.010428693919103085,
+    "tax_minus_observed_gap": -8.12214676132808e-06,
+    "physicist_breakeven": 0.5,
+    "below_breakeven": true,
+    "mean_used": 3.538135593220339,
+    "mean_n_reports": 5.946327683615819,
+    "u_deployed": 0.5950118764845606,
+    "n_essc_applied": 632,
+    "n_oppose_majority": 104,
+    "oppose_aware_brier": 0.26118568143998894,
+    "oppose_majority_brier": 0.24377136752136758,
+    "oppose_maj_accuracy": 0.5769230769230769,
+    "oppose_shadow_accuracy": 0.4230769230769231,
+    "agree_shadow_aware_brier": 0.14438870097703807,
+    "agree_shadow_majority_brier": 0.13399621204545453,
+    "final_essc_credit": 0.2893310777383812
+  },
+  "day_block_delta_summary": {
+    "n_days": 59,
+    "mean_delta": 0.010436816065864416,
+    "median_delta": 0.012231289946649654,
+    "frac_days_aware_worse": 0.5932203389830508,
+    "frac_days_aware_better": 0.4067796610169492
+  },
+  "claims_baked": {
+    "weather_spike_dominated": true,
+    "cov_var_below_breakeven": true,
+    "tax_matches_gap": true,
+    "oppose_maj_beats_shadow": true,
+    "majority_leads_raw_brier": true
+  },
+  "honesty": {
+    "bed": "prospective_weather",
+    "not_confirmation3": true,
+    "archive_backfill_disclosed": true,
+    "no_retune": true,
+    "crush_majority_is_the_bar": true
+  }
+}
