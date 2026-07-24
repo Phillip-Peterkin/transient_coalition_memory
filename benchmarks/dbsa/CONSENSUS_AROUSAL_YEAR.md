@@ -31,6 +31,6 @@ when thrift is safe.
 ## Status
 
 - Organ implemented + unit tests
-- Protocols sealed
-- Collection started / in progress
-- No year-multi scores yet (honest)
+- Protocols sealed; collection complete
+- **First look scored once** — see [`REPORT_YEAR_MULTI_DOMAIN.md`](REPORT_YEAR_MULTI_DOMAIN.md)
+- Arousal crushes majority on weather / finance / medical (3/3)
