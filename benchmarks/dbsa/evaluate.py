@@ -71,9 +71,20 @@ ACI_PARAMS = {
     "source_redundant_agree": 0.90,
     "source_redundant_min_pairs": 8,
 }
+# Locked ESSC knobs (CONSENSUS_AWARE_NEXT.md) — declared before scoring.
+ESSC_PARAMS = {
+    "essc_enabled": True,
+    "essc_disable_christmas_bow": True,
+    "essc_credit_init": 0.20,
+    "essc_max_credit": 0.50,
+    "essc_lo_cap": 1.25,
+    "essc_credit_lr": 0.08,
+    "essc_disagree_emphasis": 2.5,
+}
 AWARE_PARAMS = {
     key: value for key, value in ACI_PARAMS.items() if key != "force_all_positive_null"
 }
+AWARE_PARAMS.update(ESSC_PARAMS)
 
 
 def _method_factories():

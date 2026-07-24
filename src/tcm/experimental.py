@@ -1526,6 +1526,8 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
         contradiction = min(pos, neg) / (max(pos, neg) + EPS)
         self.infer_reads += self.header_cost * len(reports) + len(active)
         self._track_belief(key)
+        # Leftover diversified rows after early-stop (ESSC shadow input).
+        unread_rows = rows[len(active) :]
 
         return probability, {
             "key": key,
@@ -1549,6 +1551,10 @@ class ActiveCoalitionCellular(BatchedReserveCellular):
             "max_delta_scaled": max_delta * active_scale,
             "correlation_scale": active_scale,
             "unread_mass": suffix_abs[len(active)] if active else 0.0,
+            "unread_rows": [
+                (abs_delta, delta, source, context, vote)
+                for abs_delta, delta, source, context, vote in unread_rows
+            ],
         }
 
     def feedback(self, event):
@@ -1703,6 +1709,11 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
     Keeps every ACI law. Agreement bits learn cheerleader vs consensus.
     Silence bits use a two-phase curriculum: prime on empty predict, complete
     when truth arrives (change vs stay). No separate tutor stack.
+
+    Optional ESSC (ESS-Shadow Sheath Completion): after ACI early-stop, unread
+    diversified mass re-enters ``p`` as an ESS-weighted shadow under a sheath
+    credit gate — including against majority. Default **off** (sealed cells).
+    Christmas-bow majority blend is disabled when ESSC is on (crush path).
     """
 
     name = "aware_coalition_cellular"
@@ -1710,6 +1721,22 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
     def __init__(self, **params):
         params = dict(params)
         params["force_all_positive_null"] = False
+        # ESSC knobs — opt-in; defaults preserve sealed Aware behavior.
+        self.essc_enabled = bool(params.pop("essc_enabled", False))
+        self.essc_disable_christmas_bow = bool(
+            params.pop("essc_disable_christmas_bow", True)
+        )
+        self.essc_credit_init = float(params.pop("essc_credit_init", 0.20))
+        self.essc_max_credit = float(params.pop("essc_max_credit", 0.50))
+        self.essc_lo_cap = float(params.pop("essc_lo_cap", 1.25))
+        self.essc_credit_lr = float(params.pop("essc_credit_lr", 0.08))
+        self.essc_disagree_emphasis = float(
+            params.pop("essc_disagree_emphasis", 2.5)
+        )
+        if not (0.0 <= self.essc_credit_init <= self.essc_max_credit):
+            raise ValueError("essc_credit_init must be in [0, essc_max_credit]")
+        if self.essc_max_credit <= 0.0:
+            raise ValueError("essc_max_credit must be > 0")
         super().__init__(**params)
         from .awareness import Mnemosheath
 
@@ -1719,6 +1746,10 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         self.time_since_evidence = defaultdict(int)
         self.last_truth = {}
         self.last_was_flip = defaultdict(bool)
+        self.essc_credit = float(self.essc_credit_init)
+        self.essc_applications = 0
+        self.essc_oppose_majority = 0
+        self.essc_gate_updates = 0
 
     def _batch_cues(self, key, reports, max_delta: float, prior_p: float):
         return self.sheath.sense_cues(
@@ -1823,6 +1854,137 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         )
         return float(min(1.0 - EPS, max(EPS, sharpened))), meta
 
+    def _essc_block_collapse(self, unread_rows: list) -> list[list]:
+        """Soft-collapse historical near-copies; independent unread stay separate."""
+        blocks: list[list] = []
+        for row in unread_rows:
+            placed = False
+            source = row[2]
+            for block in blocks:
+                members = [member[2] for member in block]
+                if self._is_redundant_source(source, members):
+                    block.append(row)
+                    placed = True
+                    break
+            if not placed:
+                blocks.append([row])
+        return blocks
+
+    def _essc_shadow_log_odds(self, unread_rows: list) -> tuple[float, float, int]:
+        """ESS-weighted shadow log-odds from unread blocks (one ESS unit each)."""
+        if not unread_rows:
+            return 0.0, 0.0, 0
+        blocks = self._essc_block_collapse(unread_rows)
+        shadow_lo = 0.0
+        total_ess = 0.0
+        for block in blocks:
+            # Collapsed block = one effective ballot (mean Δ, ESS = 1).
+            mean_delta = sum(float(row[1]) for row in block) / len(block)
+            ess = 1.0
+            shadow_lo += mean_delta * ess
+            total_ess += ess
+        return float(shadow_lo), float(total_ess), len(blocks)
+
+    def _apply_essc_shadow(
+        self, probability: float, reports, cues: dict, trace: dict
+    ) -> tuple[float, dict]:
+        """Sheath-gated shadow completion into ``p`` (may oppose majority)."""
+        meta = {
+            "essc_applied": False,
+            "p_before_essc": float(probability),
+            "essc_shadow_lo": 0.0,
+            "essc_ess": 0.0,
+            "essc_unread_n": 0,
+            "essc_blocks": 0,
+            "essc_credit": float(self.essc_credit),
+            "essc_gate": 0.0,
+            "essc_opposes_majority": False,
+            "essc_opposes_active": False,
+            "christmas_bow_off": True,
+        }
+        stop_reason = trace.get("stop_reason", "")
+        if (
+            not self.essc_enabled
+            or not reports
+            or stop_reason in {"silence_channel", "null_diagnostic"}
+        ):
+            meta["christmas_bow_off"] = bool(
+                self.essc_enabled and self.essc_disable_christmas_bow
+            )
+            return float(probability), meta
+
+        # Use ACI leftover rows only — never re-diversify (would double-count
+        # skips / preview ops) and never densify the active set.
+        unread = list(trace.get("unread_rows") or [])
+        shadow_lo, total_ess, n_blocks = self._essc_shadow_log_odds(unread)
+        meta.update(
+            {
+                "essc_shadow_lo": float(shadow_lo),
+                "essc_ess": float(total_ess),
+                "essc_unread_n": len(unread),
+                "essc_blocks": int(n_blocks),
+            }
+        )
+        if abs(shadow_lo) <= EPS or total_ess <= EPS:
+            return float(probability), meta
+
+        diagnosticity = (
+            float(self.sheath.diagnosticity(cues)) if cues is not None else 0.5
+        )
+        # Sheath scales the learned credit; never blends toward majority vote.
+        gate = float(self.essc_credit) * (0.5 + 0.5 * diagnosticity)
+        gate = max(0.0, min(self.essc_max_credit, gate))
+        signed = max(-self.essc_lo_cap, min(self.essc_lo_cap, gate * shadow_lo))
+        completed = _sigmoid(_logit(float(probability)) + signed)
+
+        active_side = 1 if float(probability) >= 0.5 else 0
+        shadow_side = 1 if shadow_lo > 0.0 else 0
+        votes = [int(vote) for _, _, vote in reports]
+        majority = 1 if sum(votes) >= (len(votes) / 2) else 0
+        opposes_majority = shadow_side != majority
+        opposes_active = shadow_side != active_side
+        if opposes_majority:
+            self.essc_oppose_majority += 1
+        self.essc_applications += 1
+        meta.update(
+            {
+                "essc_applied": True,
+                "essc_gate": float(gate),
+                "essc_signed_lo": float(signed),
+                "essc_opposes_majority": bool(opposes_majority),
+                "essc_opposes_active": bool(opposes_active),
+                "essc_shadow_side": int(shadow_side),
+                "essc_active_side": int(active_side),
+                "diagnosticity": diagnosticity,
+            }
+        )
+        # Selective stop held: do not inflate ``used`` — unread is shadow only.
+        return float(min(1.0 - EPS, max(EPS, completed))), meta
+
+    def _essc_update_credit(self, trace: dict, truth: int) -> None:
+        """Delay-corrected merit on the credit gate; emphasize disagreement."""
+        essc = (trace.get("awareness") or {}).get("essc") or {}
+        if not essc.get("essc_applied"):
+            return
+        p_before = float(essc.get("p_before_essc", trace.get("p", 0.5)))
+        p_after = float(trace.get("p", p_before))
+        err_before = (p_before - truth) ** 2
+        err_after = (p_after - truth) ** 2
+        disagree = bool(
+            essc.get("essc_opposes_majority") or essc.get("essc_opposes_active")
+        )
+        lr = self.essc_credit_lr * (
+            self.essc_disagree_emphasis if disagree else 0.25
+        )
+        if err_after + 1e-12 < err_before:
+            self.essc_credit += lr * (self.essc_max_credit - self.essc_credit)
+        else:
+            self.essc_credit -= lr * self.essc_credit
+        self.essc_credit = float(
+            max(0.0, min(self.essc_max_credit, self.essc_credit))
+        )
+        self.essc_gate_updates += 1
+
     def predict(self, key, reports, t):
         prior_lo = self._prior_log_odds(key)
         prior_p = _sigmoid(prior_lo)
@@ -1844,10 +2006,35 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         else:
             self.time_since_evidence[key] = int(self.time_since_evidence[key]) + 1
         probability, trace = super().predict(key, reports, t)
-        probability, sharp_meta = self._apply_awareness_sharpness(
-            probability, reports, cues, trace.get("stop_reason", "")
-        )
+        bow_blocked = self.essc_enabled and self.essc_disable_christmas_bow
+        if bow_blocked:
+            sharp_meta = {
+                "awareness_sharpness_applied": False,
+                "p_before_awareness": float(probability),
+                "agreement_blend_weight": 0.0,
+                "signed_context_lo": 0.0,
+                "christmas_bow_off": True,
+            }
+        else:
+            probability, sharp_meta = self._apply_awareness_sharpness(
+                probability, reports, cues, trace.get("stop_reason", "")
+            )
+        essc_meta = {
+            "essc_applied": False,
+            "essc_enabled": bool(self.essc_enabled),
+            "christmas_bow_off": bool(bow_blocked),
+        }
+        if self.essc_enabled:
+            probability, essc_meta = self._apply_essc_shadow(
+                probability, reports, cues, trace
+            )
         trace = dict(trace)
+        # Real shadow mass for traces (was a (0,0) stub on the crush path).
+        shadow_lo = float(essc_meta.get("essc_shadow_lo", 0.0))
+        if shadow_lo > 0.0:
+            trace["shadow_mass"] = (0.0, abs(shadow_lo))
+        elif shadow_lo < 0.0:
+            trace["shadow_mass"] = (abs(shadow_lo), 0.0)
         trace["p"] = probability
         trace["awareness"] = {
             "cues": {name: bool(flag) for name, flag in cues.items() if flag},
@@ -1858,6 +2045,7 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             "stage_cap": self.sheath.stage_cap,
             "empty_lessons": self.sheath.empty_lessons,
             **sharp_meta,
+            "essc": essc_meta,
         }
         trace["awareness_cues"] = cues
         if reports:
@@ -1881,6 +2069,8 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
                 truth=truth,
                 key=key,
             )
+        if self.essc_enabled:
+            self._essc_update_credit(trace, truth)
         prev = self.last_truth.get(key)
         self.last_was_flip[key] = prev is not None and int(prev) != truth
         self.last_truth[key] = truth
@@ -1893,6 +2083,11 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
                 "awareness": self.sheath.stats(),
                 "awareness_evidence_routes": self.awareness_evidence_routes,
                 "awareness_null_routes": self.awareness_null_routes,
+                "essc_enabled": self.essc_enabled,
+                "essc_credit": self.essc_credit,
+                "essc_applications": self.essc_applications,
+                "essc_oppose_majority": self.essc_oppose_majority,
+                "essc_gate_updates": self.essc_gate_updates,
             }
         )
         return stats
