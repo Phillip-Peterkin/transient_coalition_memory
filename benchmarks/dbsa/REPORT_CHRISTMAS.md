@@ -40,6 +40,29 @@ Say it before a reviewer does:
 
 Frontier framing absorbs this only because the majority gap is stated **first**.
 
+### 3. What this number does **not** claim
+
+The Christmas PASS is a **60-day** finding on **2026-05-25 → 2026-07-23**
+(NH late spring / early summer; SH late autumn / early winter). It does **not**
+answer:
+
+| Axis | On this bed? | Notes |
+|---|---|---|
+| Full year | **No** | 60 days only; months present: May–Jul 2026 |
+| Different climates | **Partial roster, not a climate test** | 12 cities span bands, but one short season — no per-band gate |
+| Different weather providers | **No** | Six NWP models, all delivered by **Open-Meteo** `previous_day1` / archive — model diversity ≠ provider diversity |
+| Missing reports | **Barely present** | ~0.88% forecast slots missing (GEM only, 4 days); not a stress test |
+| Sensor outages | **No** | 0/720 observation slots missing on this window |
+| Severe weather | **No** | Median \|ΔTmax\| ≈ 1.2°C; p99 ≈ 7.6°C — not a severe-event slice |
+| Seasonal transitions | **No** | No equinox / solstice / monsoon-shift windows; `post_shift_brier` not opened |
+
+Synthetic DBSA already has a **bursty_missing** world; that is not a substitute
+for real provider outages or year-scale weather.
+
+Next sealed look that *can* answer these axes:
+[`weather_year_stress/SCORING_PROTOCOL.md`](weather_year_stress/SCORING_PROTOCOL.md)
+— protocol locked **before** scoring; Christmas knobs stay frozen; no retune.
+
 ---
 
 ## The missing ribbon

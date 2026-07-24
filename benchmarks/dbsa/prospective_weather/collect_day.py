@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import time
 import urllib.parse
 import urllib.request
@@ -19,7 +20,7 @@ from pathlib import Path
 from stations import MODELS, STATIONS, assert_disjoint
 
 ROOT = Path(__file__).resolve().parent
-LEDGER = ROOT / "ledger"
+LEDGER = Path(os.environ.get("DBSA_WEATHER_LEDGER", str(ROOT / "ledger"))).resolve()
 INDEX = LEDGER / "INDEX.jsonl"
 USER_AGENT = "transient-coalition-memory-dbsa-prospective/0.1"
 
@@ -132,7 +133,11 @@ def collect(
         "day_utc": day.isoformat(),
         "collected_at_utc": collected_at,
         "sha256": digest,
-        "path": str(artifact_path.relative_to(ROOT)),
+        "path": str(
+            artifact_path.relative_to(LEDGER.parent)
+            if LEDGER.parent in artifact_path.parents
+            else artifact_path
+        ),
         "n_stations": len(stations),
         "n_models": len(MODELS),
         "collection_mode": collection_mode,

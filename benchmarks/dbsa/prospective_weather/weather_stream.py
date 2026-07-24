@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
@@ -10,7 +11,7 @@ from pathlib import Path
 from stations import MODELS, STATIONS
 
 ROOT = Path(__file__).resolve().parent
-LEDGER = ROOT / "ledger"
+LEDGER = Path(os.environ.get("DBSA_WEATHER_LEDGER", str(ROOT / "ledger"))).resolve()
 
 
 @dataclass(frozen=True)
