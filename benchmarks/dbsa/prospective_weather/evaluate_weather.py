@@ -33,6 +33,7 @@ from evaluate import (  # noqa: E402
     AWARE_PARAMS,
     AWARE_POOL_RESTORE_PARAMS,
     AWARE_ROPL_PARAMS,
+    AWARE_AROUSAL_PARAMS,
     BRIER_NONINFERIORITY_DELTA,
     CELL_PARAMS,
     _ece,
@@ -77,6 +78,9 @@ def _method_factories():
         ),
         "aware_ropl": lambda: AwareCoalitionCellular(
             **AWARE_ROPL_PARAMS, **CELL_PARAMS
+        ),
+        "aware_arousal": lambda: AwareCoalitionCellular(
+            **AWARE_AROUSAL_PARAMS, **CELL_PARAMS
         ),
     }
 

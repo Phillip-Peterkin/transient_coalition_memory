@@ -1726,6 +1726,13 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
     ``g = clip(delayed Cov/Var, 0, 1)``. Continuous shrink — not binary
     leave. Default **off**. Mutually exclusive with Pool-Restore in DBSA
     locked params (do not enable both).
+
+    Optional Arousal Dual-Mode (ADM / biology switch):
+    - **Thrift (dormant roster):** when delayed ρ̂ ≥ ``thrift_rho_enter``,
+      emit coalition ``p_internal`` (Aware+ESSC) with Used = active size.
+    - **Truth (aroused pool):** otherwise emit ROPL shrink with honest
+      full-roster Used whenever g < 1.
+    Default **off**. Mutually exclusive with Pool-Restore and standalone ROPL.
     """
 
     name = "aware_coalition_cellular"
@@ -1753,6 +1760,9 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         # ROPL — continuous g*=rho shrink (CONSENSUS_COMBINED_LEAVE).
         self.ropl_enabled = bool(params.pop("ropl_enabled", False))
         self.ropl_g_mode = str(params.pop("ropl_g_mode", "covvar"))
+        # Arousal dual-mode — thrift ESSC vs truth ROPL (biology switch).
+        self.arousal_enabled = bool(params.pop("arousal_enabled", False))
+        self.thrift_rho_enter = float(params.pop("thrift_rho_enter", 0.5))
         if not (0.0 <= self.essc_credit_init <= self.essc_max_credit):
             raise ValueError("essc_credit_init must be in [0, essc_max_credit]")
         if self.essc_max_credit <= 0.0:
@@ -1763,8 +1773,16 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             raise ValueError("rebate_min_updates must be >= 2")
         if self.ropl_g_mode not in {"covvar"}:
             raise ValueError("ropl_g_mode must be 'covvar'")
+        if not (0.0 < self.thrift_rho_enter <= 1.0):
+            raise ValueError("thrift_rho_enter must be in (0, 1]")
         if self.ropl_enabled and self.pool_restore_enabled:
             raise ValueError("ropl_enabled and pool_restore_enabled are mutually exclusive")
+        if self.arousal_enabled and self.pool_restore_enabled:
+            raise ValueError("arousal_enabled and pool_restore_enabled are mutually exclusive")
+        if self.arousal_enabled and self.ropl_enabled:
+            raise ValueError(
+                "arousal_enabled embeds ROPL truth mode; do not also set ropl_enabled"
+            )
         super().__init__(**params)
         from .awareness import Mnemosheath
 
@@ -1791,6 +1809,9 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         self.ropl_g_sum = 0.0
         self.ropl_full_leave_count = 0
         self.ropl_pool_count = 0
+        self.arousal_thrift_count = 0
+        self.arousal_truth_count = 0
+        self._last_arousal_mode = "off"
 
     def _batch_cues(self, key, reports, max_delta: float, prior_p: float):
         return self.sheath.sense_cues(
@@ -2131,16 +2152,77 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
 
     def _ropl_feedback(self, trace: dict, truth: int) -> None:
         """Update delayed Cov/Var from coalition leave attempt vs majority."""
-        ro = (trace.get("awareness") or {}).get("ropl") or {}
-        if not ro.get("ropl_enabled"):
+        aw = trace.get("awareness") or {}
+        ro = aw.get("ropl") or {}
+        ar = aw.get("arousal") or {}
+        meta = ro if ro.get("ropl_enabled") else ar if ar.get("arousal_enabled") else {}
+        if not (ro.get("ropl_enabled") or ar.get("arousal_enabled")):
             return
-        p_internal = ro.get("p_internal")
-        p_maj = ro.get("p_maj")
+        p_internal = meta.get("p_internal")
+        p_maj = meta.get("p_maj")
         if p_internal is None or p_maj is None:
             return
         self._rebate_dp.append(float(p_internal) - float(p_maj))
         self._rebate_rt.append(float(truth) - float(p_maj))
         self.rebate_updates += 1
+
+    def _apply_arousal(
+        self, p_internal: float, reports, stop_reason: str, active_used: int
+    ) -> tuple[float, dict]:
+        """Biology switch: thrift ESSC when ρ̂ clears enter; else truth ROPL."""
+        votes = [int(vote) for _, _, vote in reports] if reports else []
+        p_maj = sum(votes) / len(votes) if votes else 0.5
+        p_maj = float(min(1.0 - EPS, max(EPS, p_maj)))
+        rebate = self._rebate_estimate()
+        self._last_rebate_est = rebate
+        cold = len(self._rebate_dp) < self.rebate_min_updates
+        meta = {
+            "arousal_enabled": True,
+            "p_maj": p_maj,
+            "p_internal": float(p_internal),
+            "rebate_est": float(rebate),
+            "thrift_rho_enter": float(self.thrift_rho_enter),
+            "rebate_updates": int(self.rebate_updates),
+            "cold_start": bool(cold),
+            "mode": "truth",
+            "ropl_g": 0.0,
+            "used_policy": "full_roster",
+        }
+        if not votes or stop_reason == "silence_channel":
+            self._last_arousal_mode = "silence"
+            meta["mode"] = "silence"
+            return float(p_internal), meta
+        # Cold start → truth/pool (safe equal-gain), g=0.
+        if cold:
+            self.arousal_truth_count += 1
+            self._last_arousal_mode = "truth"
+            self._last_ropl_g = 0.0
+            meta["mode"] = "truth"
+            meta["ropl_g"] = 0.0
+            meta["p_emit"] = p_maj
+            return p_maj, meta
+        # Thrift / dormant roster: full-leave rebate clears → trust coalition.
+        if rebate >= self.thrift_rho_enter:
+            self.arousal_thrift_count += 1
+            self._last_arousal_mode = "thrift"
+            self._last_ropl_g = 1.0
+            meta["mode"] = "thrift"
+            meta["ropl_g"] = 1.0
+            meta["used_policy"] = "active"
+            meta["p_emit"] = float(p_internal)
+            return float(p_internal), meta
+        # Truth / aroused pool: ROPL shrink with honest full-roster Used.
+        g = float(max(0.0, min(1.0, rebate)))
+        p_emit = p_maj + g * (float(p_internal) - p_maj)
+        p_emit = float(min(1.0 - EPS, max(EPS, p_emit)))
+        self.arousal_truth_count += 1
+        self._last_arousal_mode = "truth"
+        self._last_ropl_g = g
+        meta["mode"] = "truth"
+        meta["ropl_g"] = g
+        meta["used_policy"] = "full_roster" if g < 1.0 - EPS else "active"
+        meta["p_emit"] = p_emit
+        return p_emit, meta
 
     def predict(self, key, reports, t):
         prior_lo = self._prior_log_odds(key)
@@ -2163,9 +2245,9 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         else:
             self.time_since_evidence[key] = int(self.time_since_evidence[key]) + 1
         probability, trace = super().predict(key, reports, t)
-        # Pool-restore / ROPL also forbid Christmas maj-blend (that caps crush).
+        # Pool-restore / ROPL / arousal also forbid Christmas maj-blend.
         bow_blocked = (self.essc_enabled and self.essc_disable_christmas_bow) or (
-            self.pool_restore_enabled or self.ropl_enabled
+            self.pool_restore_enabled or self.ropl_enabled or self.arousal_enabled
         )
         if bow_blocked:
             sharp_meta = {
@@ -2192,7 +2274,18 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         p_internal = float(probability)
         pool_meta = {"pool_restore_enabled": False}
         ropl_meta = {"ropl_enabled": False}
-        if self.ropl_enabled:
+        arousal_meta = {"arousal_enabled": False}
+        active_used = int(trace.get("used", len(reports) if reports else 0))
+        if self.arousal_enabled:
+            probability, arousal_meta = self._apply_arousal(
+                p_internal, reports, trace.get("stop_reason", ""), active_used
+            )
+            trace = dict(trace)
+            if arousal_meta.get("mode") == "thrift":
+                trace["used"] = active_used
+            elif reports and arousal_meta.get("used_policy") == "full_roster":
+                trace["used"] = len(reports)
+        elif self.ropl_enabled:
             probability, ropl_meta = self._apply_ropl(
                 p_internal, reports, trace.get("stop_reason", "")
             )
@@ -2230,6 +2323,7 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             "essc": essc_meta,
             "pool_restore": pool_meta,
             "ropl": ropl_meta,
+            "arousal": arousal_meta,
         }
         trace["awareness_cues"] = cues
         if reports:
@@ -2257,7 +2351,7 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             self._essc_update_credit(trace, truth)
         if self.pool_restore_enabled:
             self._pool_restore_feedback(trace, truth)
-        if self.ropl_enabled:
+        if self.ropl_enabled or self.arousal_enabled:
             self._ropl_feedback(trace, truth)
         prev = self.last_truth.get(key)
         self.last_was_flip[key] = prev is not None and int(prev) != truth
@@ -2290,6 +2384,11 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
                 "ropl_emit_count": self.ropl_emit_count,
                 "ropl_pool_count": self.ropl_pool_count,
                 "ropl_full_leave_count": self.ropl_full_leave_count,
+                "arousal_enabled": self.arousal_enabled,
+                "arousal_mode": self._last_arousal_mode,
+                "arousal_thrift_count": self.arousal_thrift_count,
+                "arousal_truth_count": self.arousal_truth_count,
+                "thrift_rho_enter": self.thrift_rho_enter,
             }
         )
         return stats

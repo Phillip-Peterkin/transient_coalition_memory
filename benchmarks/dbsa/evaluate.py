@@ -107,6 +107,18 @@ ROPL_PARAMS = {
 }
 AWARE_ROPL_PARAMS = {**AWARE_PARAMS, **ROPL_PARAMS}
 
+# Locked Arousal Dual-Mode (biology switch) — declared before scoring.
+# Thrift (ESSC, Used=active) when delayed ρ̂ ≥ thrift_rho_enter; else truth ROPL.
+AROUSAL_PARAMS = {
+    "arousal_enabled": True,
+    "thrift_rho_enter": 0.5,
+    "rebate_window": 120,
+    "rebate_min_updates": 40,
+    "ropl_enabled": False,
+    "pool_restore_enabled": False,
+}
+AWARE_AROUSAL_PARAMS = {**AWARE_PARAMS, **AROUSAL_PARAMS}
+
 
 def _method_factories():
     return {
@@ -126,6 +138,9 @@ def _method_factories():
         ),
         "aware_ropl": lambda: AwareCoalitionCellular(
             **AWARE_ROPL_PARAMS, **CELL_PARAMS
+        ),
+        "aware_arousal": lambda: AwareCoalitionCellular(
+            **AWARE_AROUSAL_PARAMS, **CELL_PARAMS
         ),
     }
 
