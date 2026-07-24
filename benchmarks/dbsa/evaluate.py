@@ -26,6 +26,7 @@ from baselines import (  # noqa: E402
     FixedShareHedge,
     Majority,
     Persistence,
+    PrecisionWhitenedDelayedResidual,
 )
 from contract_simulator import WORLD_NAMES, Event, generate  # noqa: E402
 from tcm import ActiveExperimentalCellular, AwareCoalitionCellular  # noqa: E402
@@ -83,6 +84,7 @@ def _method_factories():
         "ada_hedge": AdaHedge,
         "fading_source_bayes": FadingSourceBayes,
         "agreement_discounted_bayes": AgreementDiscountedBayes,
+        "pwdr": PrecisionWhitenedDelayedResidual,
         "active_experimental_aci": lambda: ActiveExperimentalCellular(
             **ACI_PARAMS, **CELL_PARAMS
         ),

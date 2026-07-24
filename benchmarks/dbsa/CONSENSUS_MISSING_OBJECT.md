@@ -31,8 +31,9 @@ should never have entered the pool.
 *(also floated as WDCQ / DWPS / WPRF — same mechanism)*
 
 1. **Error kernel, not opinion kernel.**  
-   Estimate source covariance \(C_t\) from **delayed error** co-occurrence
-   (residuals vs revealed labels), not from forecast agreement.
+   Estimate source covariance \(C_t\) from **delayed signed-correctness**
+   residuals \(s_i\in\{+1,-1\}\) (label vs vote), not from forecast agreement.
+   (Binary `vote−truth` cannot express negative cross-terms — rejected.)
 
 2. **Whiten before pooling.**  
    \(\Lambda_t \approx C_t^{-1}\) (regularized / low-rank+diagonal OK).  
@@ -74,5 +75,7 @@ Pre-register before any PWDR look:
 3. Residual stacks on whitened \(m\), not on raw majority.
 4. No metric softening while the idea matures.
 
-**Status:** consensus on the missing object. Not yet implemented. Not yet scored.
-Year-stress collection continues under a closed score. Metrics held.
+**Status:** consensus locked; **PWDR implemented** as `baselines.PrecisionWhitenedDelayedResidual`
+(`name="pwdr"`) with knobs in `baselines.py` (`PWDR_*`). First scored looks
+recorded in `REPORT_PWDR.md`. Year-stress collection continues under a closed
+score. Metrics held — crush majority remains the bar.
