@@ -96,6 +96,17 @@ POOL_RESTORE_PARAMS = {
 }
 AWARE_POOL_RESTORE_PARAMS = {**AWARE_PARAMS, **POOL_RESTORE_PARAMS}
 
+# Locked ROPL (CONSENSUS_COMBINED_LEAVE) — declared before scoring.
+# p = p_maj + g*(p_coalition - p_maj), g = clip(delayed Cov/Var, 0, 1).
+ROPL_PARAMS = {
+    "ropl_enabled": True,
+    "ropl_g_mode": "covvar",
+    "rebate_window": 120,
+    "rebate_min_updates": 40,
+    "pool_restore_enabled": False,
+}
+AWARE_ROPL_PARAMS = {**AWARE_PARAMS, **ROPL_PARAMS}
+
 
 def _method_factories():
     return {
@@ -112,6 +123,9 @@ def _method_factories():
         "aware_coalition": lambda: AwareCoalitionCellular(**AWARE_PARAMS, **CELL_PARAMS),
         "aware_pool_restore": lambda: AwareCoalitionCellular(
             **AWARE_POOL_RESTORE_PARAMS, **CELL_PARAMS
+        ),
+        "aware_ropl": lambda: AwareCoalitionCellular(
+            **AWARE_ROPL_PARAMS, **CELL_PARAMS
         ),
     }
 

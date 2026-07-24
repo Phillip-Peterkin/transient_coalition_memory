@@ -1720,6 +1720,12 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
     (p_internal − p_maj, y − p_maj) clears ``rebate_threshold`` (default ½).
     Default **off**. Implements the baked diagnosis: restore maj pooling
     geometry when leave-maj has no live rebate.
+
+    Optional Rebate-Optimal Partial Leave (ROPL / CONSENSUS_COMBINED_LEAVE):
+    emit ``p_maj + g * (p_internal − p_maj)`` with
+    ``g = clip(delayed Cov/Var, 0, 1)``. Continuous shrink — not binary
+    leave. Default **off**. Mutually exclusive with Pool-Restore in DBSA
+    locked params (do not enable both).
     """
 
     name = "aware_coalition_cellular"
@@ -1744,6 +1750,9 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         self.rebate_threshold = float(params.pop("rebate_threshold", 0.5))
         self.rebate_window = int(params.pop("rebate_window", 120))
         self.rebate_min_updates = int(params.pop("rebate_min_updates", 40))
+        # ROPL — continuous g*=rho shrink (CONSENSUS_COMBINED_LEAVE).
+        self.ropl_enabled = bool(params.pop("ropl_enabled", False))
+        self.ropl_g_mode = str(params.pop("ropl_g_mode", "covvar"))
         if not (0.0 <= self.essc_credit_init <= self.essc_max_credit):
             raise ValueError("essc_credit_init must be in [0, essc_max_credit]")
         if self.essc_max_credit <= 0.0:
@@ -1752,6 +1761,10 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             raise ValueError("rebate_window must be >= 2")
         if self.rebate_min_updates < 2:
             raise ValueError("rebate_min_updates must be >= 2")
+        if self.ropl_g_mode not in {"covvar"}:
+            raise ValueError("ropl_g_mode must be 'covvar'")
+        if self.ropl_enabled and self.pool_restore_enabled:
+            raise ValueError("ropl_enabled and pool_restore_enabled are mutually exclusive")
         super().__init__(**params)
         from .awareness import Mnemosheath
 
@@ -1773,6 +1786,11 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         self.pool_restore_emit_maj = 0
         self.pool_restore_emit_leave = 0
         self._last_rebate_est = 0.0
+        self._last_ropl_g = 0.0
+        self.ropl_emit_count = 0
+        self.ropl_g_sum = 0.0
+        self.ropl_full_leave_count = 0
+        self.ropl_pool_count = 0
 
     def _batch_cues(self, key, reports, max_delta: float, prior_p: float):
         return self.sheath.sense_cues(
@@ -2073,6 +2091,57 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         self._rebate_rt.append(float(truth) - float(p_maj))
         self.rebate_updates += 1
 
+    def _apply_ropl(
+        self, p_internal: float, reports, stop_reason: str
+    ) -> tuple[float, dict]:
+        """Emit p_maj + g*(p_internal − p_maj) with g=clip(delayed ρ̂, 0, 1)."""
+        votes = [int(vote) for _, _, vote in reports] if reports else []
+        p_maj = sum(votes) / len(votes) if votes else 0.5
+        p_maj = float(min(1.0 - EPS, max(EPS, p_maj)))
+        rebate = self._rebate_estimate()
+        self._last_rebate_est = rebate
+        # Cold start / underpowered → g=0 (pure pool). Online covvar otherwise.
+        if len(self._rebate_dp) < self.rebate_min_updates:
+            g = 0.0
+        else:
+            g = float(max(0.0, min(1.0, rebate)))
+        self._last_ropl_g = g
+        meta = {
+            "ropl_enabled": True,
+            "p_maj": p_maj,
+            "p_internal": float(p_internal),
+            "rebate_est": float(rebate),
+            "ropl_g": float(g),
+            "ropl_g_mode": self.ropl_g_mode,
+            "rebate_updates": int(self.rebate_updates),
+            "cold_start": bool(len(self._rebate_dp) < self.rebate_min_updates),
+        }
+        if not votes or stop_reason == "silence_channel":
+            return float(p_internal), meta
+        p_emit = p_maj + g * (float(p_internal) - p_maj)
+        p_emit = float(min(1.0 - EPS, max(EPS, p_emit)))
+        self.ropl_emit_count += 1
+        self.ropl_g_sum += g
+        if g <= EPS:
+            self.ropl_pool_count += 1
+        elif g >= 1.0 - EPS:
+            self.ropl_full_leave_count += 1
+        meta["p_emit"] = p_emit
+        return p_emit, meta
+
+    def _ropl_feedback(self, trace: dict, truth: int) -> None:
+        """Update delayed Cov/Var from coalition leave attempt vs majority."""
+        ro = (trace.get("awareness") or {}).get("ropl") or {}
+        if not ro.get("ropl_enabled"):
+            return
+        p_internal = ro.get("p_internal")
+        p_maj = ro.get("p_maj")
+        if p_internal is None or p_maj is None:
+            return
+        self._rebate_dp.append(float(p_internal) - float(p_maj))
+        self._rebate_rt.append(float(truth) - float(p_maj))
+        self.rebate_updates += 1
+
     def predict(self, key, reports, t):
         prior_lo = self._prior_log_odds(key)
         prior_p = _sigmoid(prior_lo)
@@ -2094,9 +2163,9 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         else:
             self.time_since_evidence[key] = int(self.time_since_evidence[key]) + 1
         probability, trace = super().predict(key, reports, t)
-        # Pool-restore also forbids Christmas maj-blend (that caps crush).
+        # Pool-restore / ROPL also forbid Christmas maj-blend (that caps crush).
         bow_blocked = (self.essc_enabled and self.essc_disable_christmas_bow) or (
-            self.pool_restore_enabled
+            self.pool_restore_enabled or self.ropl_enabled
         )
         if bow_blocked:
             sharp_meta = {
@@ -2122,7 +2191,17 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         essc_meta["p_after_essc"] = float(probability)
         p_internal = float(probability)
         pool_meta = {"pool_restore_enabled": False}
-        if self.pool_restore_enabled:
+        ropl_meta = {"ropl_enabled": False}
+        if self.ropl_enabled:
+            probability, ropl_meta = self._apply_ropl(
+                p_internal, reports, trace.get("stop_reason", "")
+            )
+            # Honest Used: full roster whenever g < 1 (pool mass in the emit).
+            g = float(ropl_meta.get("ropl_g", 0.0))
+            if reports and g < 1.0 - EPS:
+                trace = dict(trace)
+                trace["used"] = len(reports)
+        elif self.pool_restore_enabled:
             probability, pool_meta = self._apply_pool_restore(
                 p_internal, reports, trace.get("stop_reason", "")
             )
@@ -2150,6 +2229,7 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             **sharp_meta,
             "essc": essc_meta,
             "pool_restore": pool_meta,
+            "ropl": ropl_meta,
         }
         trace["awareness_cues"] = cues
         if reports:
@@ -2177,6 +2257,8 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             self._essc_update_credit(trace, truth)
         if self.pool_restore_enabled:
             self._pool_restore_feedback(trace, truth)
+        if self.ropl_enabled:
+            self._ropl_feedback(trace, truth)
         prev = self.last_truth.get(key)
         self.last_was_flip[key] = prev is not None and int(prev) != truth
         self.last_truth[key] = truth
@@ -2184,6 +2266,9 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
 
     def stats(self):
         stats = super().stats()
+        mean_g = (
+            self.ropl_g_sum / self.ropl_emit_count if self.ropl_emit_count else 0.0
+        )
         stats.update(
             {
                 "awareness": self.sheath.stats(),
@@ -2199,6 +2284,12 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
                 "rebate_updates": self.rebate_updates,
                 "pool_restore_emit_maj": self.pool_restore_emit_maj,
                 "pool_restore_emit_leave": self.pool_restore_emit_leave,
+                "ropl_enabled": self.ropl_enabled,
+                "ropl_g": self._last_ropl_g,
+                "ropl_mean_g": mean_g,
+                "ropl_emit_count": self.ropl_emit_count,
+                "ropl_pool_count": self.ropl_pool_count,
+                "ropl_full_leave_count": self.ropl_full_leave_count,
             }
         )
         return stats
