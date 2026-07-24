@@ -1,0 +1,114 @@
+{
+  "protocol": "finance_silence_escape_development_v1",
+  "mechanism": "Null sensation (empty or all-Positive) + PE/rho escape hazard mixes memory toward anti-memory. Mixed/negative reports keep clean evidence.",
+  "grid": [
+    {
+      "pe_floor": 0.35,
+      "pe_span": 0.35,
+      "rho_gain": 0.3,
+      "max_hazard": 0.7
+    },
+    {
+      "pe_floor": 0.35,
+      "pe_span": 0.5,
+      "rho_gain": 0.3,
+      "max_hazard": 0.7
+    },
+    {
+      "pe_floor": 0.4,
+      "pe_span": 0.35,
+      "rho_gain": 0.3,
+      "max_hazard": 0.7
+    }
+  ],
+  "selection": "apply_to_all_positive=True fixed; among gate passers (flip>=0.45, acc drop<0.01, up<=0.65, nonflip>=0.50) pick max flip then nonflip.",
+  "cells": {
+    "clean_baseline": {
+      "accuracy": 0.503584229390681,
+      "flip_accuracy": 0.40823970037453183,
+      "nonflip_accuracy": 0.5910652920962199,
+      "avg_activated": 0.7974910394265233,
+      "pred_up_rate": 0.696236559139785,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "escape_floor0.35_span0.35_rho0.3_maxh0.7": {
+      "accuracy": 0.503584229390681,
+      "flip_accuracy": 0.550561797752809,
+      "nonflip_accuracy": 0.46048109965635736,
+      "avg_activated": 0.1774193548387097,
+      "pred_up_rate": 0.4507168458781362,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "escape_floor0.35_span0.5_rho0.3_maxh0.7": {
+      "accuracy": 0.5062724014336918,
+      "flip_accuracy": 0.49063670411985016,
+      "nonflip_accuracy": 0.520618556701031,
+      "avg_activated": 0.18100358422939067,
+      "pred_up_rate": 0.48566308243727596,
+      "n": 1116,
+      "flip_n": 534
+    },
+    "escape_floor0.4_span0.35_rho0.3_maxh0.7": {
+      "accuracy": 0.510752688172043,
+      "flip_accuracy": 0.48314606741573035,
+      "nonflip_accuracy": 0.5360824742268041,
+      "avg_activated": 0.18010752688172044,
+      "pred_up_rate": 0.48655913978494625,
+      "n": 1116,
+      "flip_n": 534
+    }
+  },
+  "paired_vs_clean": {
+    "escape_floor0.35_span0.35_rho0.3_maxh0.7": {
+      "accuracy": {
+        "delta": 0.0,
+        "lo": -0.04390681003584229,
+        "hi": 0.044802867383512544,
+        "p": 0.984
+      },
+      "flip_accuracy": {
+        "delta": 0.14232209737827714,
+        "lo": 0.0823501872659176,
+        "hi": 0.20603932584269638,
+        "p": 0.0
+      }
+    },
+    "escape_floor0.35_span0.5_rho0.3_maxh0.7": {
+      "accuracy": {
+        "delta": 0.002688172043010753,
+        "lo": -0.035842293906810034,
+        "hi": 0.042114695340501794,
+        "p": 0.874
+      },
+      "flip_accuracy": {
+        "delta": 0.08239700374531835,
+        "lo": 0.024344569288389514,
+        "hi": 0.13670411985018727,
+        "p": 0.003
+      }
+    },
+    "escape_floor0.4_span0.35_rho0.3_maxh0.7": {
+      "accuracy": {
+        "delta": 0.007168458781362007,
+        "lo": -0.03136200716845878,
+        "hi": 0.04390681003584229,
+        "p": 0.72
+      },
+      "flip_accuracy": {
+        "delta": 0.0749063670411985,
+        "lo": 0.018726591760299626,
+        "hi": 0.13108614232209737,
+        "p": 0.008
+      }
+    }
+  },
+  "winners": [
+    "escape_floor0.35_span0.5_rho0.3_maxh0.7",
+    "escape_floor0.4_span0.35_rho0.3_maxh0.7"
+  ],
+  "selected_winner": "escape_floor0.35_span0.5_rho0.3_maxh0.7",
+  "passes_development_gate": true,
+  "note": "Contact-tail only. Fresh confirmation requires a new virgin universe and a frozen one-shot protocol \u2014 not this script."
+}
