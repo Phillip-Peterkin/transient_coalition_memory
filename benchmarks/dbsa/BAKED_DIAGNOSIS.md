@@ -95,3 +95,8 @@ Spike-dominated. Weather is λ₁-heavy.
 5. Majority leads raw Brier
 
 **Bar unchanged:** crush Majority **0.162412** on this bed. Not done.
+
+**Why majority wins (deeper):** see [`WHY_MAJORITY_WINS.md`](WHY_MAJORITY_WINS.md) —
+majority is near-optimal on this λ₁ bed; even full-mass learners lose; the
+missing organ is an emit-time Cov/Var>½ leave-maj rebate (or restoring
+equal-weight full pooling).
