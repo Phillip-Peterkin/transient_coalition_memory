@@ -111,3 +111,22 @@ Artifact: `results/dbsa_v1_contract_screen_christmas.json`
 - Look #1 FAIL kept; look #2 is post-bow
 - **Majority remains ahead on raw Brier at full evidence cost**
 - Aware’s claim on this lane is Fixed-Share quality at ~60% sources, not raw leadership over majority
+
+## Held bar (do not lower)
+
+Metrics stay. Fixed-Share non-inferiority at ~60% sources is a **frontier
+checkpoint**, not the destination.
+
+**Destination:** crush majority on raw prequential Brier — not tie, not
+“within δ,” not “sparser so close enough.” Majority 0.1624 is the number to
+beat on weather; anything short of a clear win is still missing.
+
+The Christmas bow cannot get there by construction: it only sharpens when
+already on the majority’s side, and blends **toward** the vote mean. That
+closes an underconfidence gap; it does not transcend equal-weight voting.
+
+Whatever is missing is upstream of that ribbon — structure majority flattens
+(dependence geometry / delayed reliability manifold / something sharper than
+scalar trust). No knob hunt, no metric softening, no inventing a public
+physics costume for a gap we have not named yet. Hold the board until the
+idea is real enough to crush.
