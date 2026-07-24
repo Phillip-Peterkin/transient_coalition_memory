@@ -146,7 +146,12 @@ majority is fine; every “clever” add-on is where the blood is.
 
 ## Status
 
-Evidence clear. Diagnosis deepened. **No new object locked. No retune.**
-Crush bar unchanged: beat **0.162412** on this bed — which means either
-(a) restore majority’s pooling geometry, or (b) find a real emit-time rebate
-with Cov/Var > ½. Everything else has been a costume.
+Evidence clear. Diagnosis deepened.
+
+**Tried (a)+(b) as Pool-Restore Gate** — see [`REPORT_POOL_RESTORE.md`](REPORT_POOL_RESTORE.md):
+weather Brier **0.162697** vs Majority **0.162412** (Δ **+0.000285**).
+Gap closed. **Still no crush.** Delayed Cov/Var rebate stays ~0.39 < ½ on
+weather, so the gate mostly restores majority (76% of events).
+
+Crush bar unchanged: beat **0.162412**. Next leave cue must be better than
+delayed rolling Cov/Var — or admit match is the honest ceiling on this bed.
