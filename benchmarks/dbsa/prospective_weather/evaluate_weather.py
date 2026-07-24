@@ -26,6 +26,7 @@ from baselines import (  # noqa: E402
     FixedShareHedge,
     Majority,
     Persistence,
+    PrecisionWhitenedDelayedResidual,
 )
 from evaluate import (  # noqa: E402
     ACI_PARAMS,
@@ -64,6 +65,7 @@ def _method_factories():
         "ada_hedge": AdaHedge,
         "fading_source_bayes": FadingSourceBayes,
         "agreement_discounted_bayes": AgreementDiscountedBayes,
+        "pwdr": PrecisionWhitenedDelayedResidual,
         "active_experimental_aci": lambda: ActiveExperimentalCellular(
             **ACI_PARAMS, **CELL_PARAMS
         ),
