@@ -82,6 +82,8 @@ Pre-register before any ESSC look:
 
 ## Status
 
-Consensus locked. **Not implemented. Not scored.**
-Start from Aware. PWDR remains a documented reject.
-Metrics held — crush majority, not tie.
+Consensus locked. **Implemented** on `AwareCoalitionCellular` (opt-in;
+DBSA `AWARE_PARAMS` enables it). **First look scored:** weather does **not**
+crush majority (0.1728 vs 0.1624); selective stop held (~3.54 sources).
+Synthetic drift/crossover worlds beat majority — not a weather substitute.
+See `REPORT_ESSC.md`. PWDR remains rejected. Metrics held.
