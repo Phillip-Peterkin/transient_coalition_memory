@@ -1714,6 +1714,12 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
     diversified mass re-enters ``p`` as an ESS-weighted shadow under a sheath
     credit gate — including against majority. Default **off** (sealed cells).
     Christmas-bow majority blend is disabled when ESSC is on (crush path).
+
+    Optional Pool-Restore Gate (PRG / WHY_MAJORITY_WINS): emit equal-weight
+    full-roster majority unless a *delayed* rolling Cov/Var rebate on
+    (p_internal − p_maj, y − p_maj) clears ``rebate_threshold`` (default ½).
+    Default **off**. Implements the baked diagnosis: restore maj pooling
+    geometry when leave-maj has no live rebate.
     """
 
     name = "aware_coalition_cellular"
@@ -1733,10 +1739,19 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         self.essc_disagree_emphasis = float(
             params.pop("essc_disagree_emphasis", 2.5)
         )
+        # Pool-restore / rebate gate — opt-in (WHY_MAJORITY_WINS).
+        self.pool_restore_enabled = bool(params.pop("pool_restore_enabled", False))
+        self.rebate_threshold = float(params.pop("rebate_threshold", 0.5))
+        self.rebate_window = int(params.pop("rebate_window", 120))
+        self.rebate_min_updates = int(params.pop("rebate_min_updates", 40))
         if not (0.0 <= self.essc_credit_init <= self.essc_max_credit):
             raise ValueError("essc_credit_init must be in [0, essc_max_credit]")
         if self.essc_max_credit <= 0.0:
             raise ValueError("essc_max_credit must be > 0")
+        if self.rebate_window < 2:
+            raise ValueError("rebate_window must be >= 2")
+        if self.rebate_min_updates < 2:
+            raise ValueError("rebate_min_updates must be >= 2")
         super().__init__(**params)
         from .awareness import Mnemosheath
 
@@ -1750,6 +1765,14 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         self.essc_applications = 0
         self.essc_oppose_majority = 0
         self.essc_gate_updates = 0
+        from collections import deque
+
+        self._rebate_dp = deque(maxlen=self.rebate_window)
+        self._rebate_rt = deque(maxlen=self.rebate_window)
+        self.rebate_updates = 0
+        self.pool_restore_emit_maj = 0
+        self.pool_restore_emit_leave = 0
+        self._last_rebate_est = 0.0
 
     def _batch_cues(self, key, reports, max_delta: float, prior_p: float):
         return self.sheath.sense_cues(
@@ -1967,7 +1990,8 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         if not essc.get("essc_applied"):
             return
         p_before = float(essc.get("p_before_essc", trace.get("p", 0.5)))
-        p_after = float(trace.get("p", p_before))
+        # Use pre-pool-restore ESSC emission — not gated majority overwrite.
+        p_after = float(essc.get("p_after_essc", trace.get("p_internal", p_before)))
         err_before = (p_before - truth) ** 2
         err_after = (p_after - truth) ** 2
         disagree = bool(
@@ -1984,6 +2008,70 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             max(0.0, min(self.essc_max_credit, self.essc_credit))
         )
         self.essc_gate_updates += 1
+
+    def _rebate_estimate(self) -> float:
+        """Delayed rolling Cov(δp, y−p_maj) / Var(δp). 0 if underpowered."""
+        n = len(self._rebate_dp)
+        if n < self.rebate_min_updates:
+            return 0.0
+        dp = list(self._rebate_dp)
+        rt = list(self._rebate_rt)
+        mean_dp = sum(dp) / n
+        mean_rt = sum(rt) / n
+        var = sum((x - mean_dp) ** 2 for x in dp) / n
+        if var <= EPS:
+            return 0.0
+        cov = sum((x - mean_dp) * (y - mean_rt) for x, y in zip(dp, rt)) / n
+        return float(cov / var)
+
+    def _apply_pool_restore(
+        self, p_internal: float, reports, stop_reason: str
+    ) -> tuple[float, dict]:
+        """Emit equal-weight majority unless delayed Cov/Var clears threshold."""
+        votes = [int(vote) for _, _, vote in reports] if reports else []
+        p_maj = (
+            sum(votes) / len(votes)
+            if votes
+            else 0.5
+        )
+        p_maj = float(min(1.0 - EPS, max(EPS, p_maj)))
+        rebate = self._rebate_estimate()
+        self._last_rebate_est = rebate
+        meta = {
+            "pool_restore_enabled": True,
+            "p_maj": p_maj,
+            "p_internal": float(p_internal),
+            "rebate_est": float(rebate),
+            "rebate_threshold": float(self.rebate_threshold),
+            "rebate_updates": int(self.rebate_updates),
+            "emitted_majority": False,
+            "leave_allowed": False,
+        }
+        # Empty silence: nothing to pool.
+        if not votes or stop_reason == "silence_channel":
+            return float(p_internal), meta
+        # Cold start / rebate closed → restore full-pool majority (the organ),
+        # including ACI null_diagnostic batches that still have reports.
+        if rebate <= self.rebate_threshold:
+            self.pool_restore_emit_maj += 1
+            meta["emitted_majority"] = True
+            return p_maj, meta
+        self.pool_restore_emit_leave += 1
+        meta["leave_allowed"] = True
+        return float(p_internal), meta
+
+    def _pool_restore_feedback(self, trace: dict, truth: int) -> None:
+        """Update delayed Cov/Var from pre-gate leave attempt vs majority."""
+        pr = (trace.get("awareness") or {}).get("pool_restore") or {}
+        if not pr.get("pool_restore_enabled"):
+            return
+        p_internal = pr.get("p_internal")
+        p_maj = pr.get("p_maj")
+        if p_internal is None or p_maj is None:
+            return
+        self._rebate_dp.append(float(p_internal) - float(p_maj))
+        self._rebate_rt.append(float(truth) - float(p_maj))
+        self.rebate_updates += 1
 
     def predict(self, key, reports, t):
         prior_lo = self._prior_log_odds(key)
@@ -2006,7 +2094,10 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         else:
             self.time_since_evidence[key] = int(self.time_since_evidence[key]) + 1
         probability, trace = super().predict(key, reports, t)
-        bow_blocked = self.essc_enabled and self.essc_disable_christmas_bow
+        # Pool-restore also forbids Christmas maj-blend (that caps crush).
+        bow_blocked = (self.essc_enabled and self.essc_disable_christmas_bow) or (
+            self.pool_restore_enabled
+        )
         if bow_blocked:
             sharp_meta = {
                 "awareness_sharpness_applied": False,
@@ -2028,6 +2119,17 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             probability, essc_meta = self._apply_essc_shadow(
                 probability, reports, cues, trace
             )
+        essc_meta["p_after_essc"] = float(probability)
+        p_internal = float(probability)
+        pool_meta = {"pool_restore_enabled": False}
+        if self.pool_restore_enabled:
+            probability, pool_meta = self._apply_pool_restore(
+                p_internal, reports, trace.get("stop_reason", "")
+            )
+            # When emitting majority, used = full roster (honest accounting).
+            if pool_meta.get("emitted_majority") and reports:
+                trace = dict(trace)
+                trace["used"] = len(reports)
         trace = dict(trace)
         # Real shadow mass for traces (was a (0,0) stub on the crush path).
         shadow_lo = float(essc_meta.get("essc_shadow_lo", 0.0))
@@ -2036,6 +2138,7 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
         elif shadow_lo < 0.0:
             trace["shadow_mass"] = (abs(shadow_lo), 0.0)
         trace["p"] = probability
+        trace["p_internal"] = p_internal
         trace["awareness"] = {
             "cues": {name: bool(flag) for name, flag in cues.items() if flag},
             "diagnosticity": self.sheath.diagnosticity(cues),
@@ -2046,6 +2149,7 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             "empty_lessons": self.sheath.empty_lessons,
             **sharp_meta,
             "essc": essc_meta,
+            "pool_restore": pool_meta,
         }
         trace["awareness_cues"] = cues
         if reports:
@@ -2071,6 +2175,8 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
             )
         if self.essc_enabled:
             self._essc_update_credit(trace, truth)
+        if self.pool_restore_enabled:
+            self._pool_restore_feedback(trace, truth)
         prev = self.last_truth.get(key)
         self.last_was_flip[key] = prev is not None and int(prev) != truth
         self.last_truth[key] = truth
@@ -2088,6 +2194,11 @@ class AwareCoalitionCellular(ActiveCoalitionCellular):
                 "essc_applications": self.essc_applications,
                 "essc_oppose_majority": self.essc_oppose_majority,
                 "essc_gate_updates": self.essc_gate_updates,
+                "pool_restore_enabled": self.pool_restore_enabled,
+                "rebate_est": self._last_rebate_est,
+                "rebate_updates": self.rebate_updates,
+                "pool_restore_emit_maj": self.pool_restore_emit_maj,
+                "pool_restore_emit_leave": self.pool_restore_emit_leave,
             }
         )
         return stats

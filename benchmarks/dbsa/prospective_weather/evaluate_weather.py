@@ -31,6 +31,7 @@ from baselines import (  # noqa: E402
 from evaluate import (  # noqa: E402
     ACI_PARAMS,
     AWARE_PARAMS,
+    AWARE_POOL_RESTORE_PARAMS,
     BRIER_NONINFERIORITY_DELTA,
     CELL_PARAMS,
     _ece,
@@ -70,6 +71,9 @@ def _method_factories():
             **ACI_PARAMS, **CELL_PARAMS
         ),
         "aware_coalition": lambda: AwareCoalitionCellular(**AWARE_PARAMS, **CELL_PARAMS),
+        "aware_pool_restore": lambda: AwareCoalitionCellular(
+            **AWARE_POOL_RESTORE_PARAMS, **CELL_PARAMS
+        ),
     }
 
 

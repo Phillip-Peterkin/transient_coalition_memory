@@ -86,6 +86,16 @@ AWARE_PARAMS = {
 }
 AWARE_PARAMS.update(ESSC_PARAMS)
 
+# Locked Pool-Restore Gate (WHY_MAJORITY_WINS) — declared before scoring.
+# Emit equal-weight majority unless delayed Cov/Var rebate > threshold.
+POOL_RESTORE_PARAMS = {
+    "pool_restore_enabled": True,
+    "rebate_threshold": 0.5,
+    "rebate_window": 120,
+    "rebate_min_updates": 40,
+}
+AWARE_POOL_RESTORE_PARAMS = {**AWARE_PARAMS, **POOL_RESTORE_PARAMS}
+
 
 def _method_factories():
     return {
@@ -100,6 +110,9 @@ def _method_factories():
             **ACI_PARAMS, **CELL_PARAMS
         ),
         "aware_coalition": lambda: AwareCoalitionCellular(**AWARE_PARAMS, **CELL_PARAMS),
+        "aware_pool_restore": lambda: AwareCoalitionCellular(
+            **AWARE_POOL_RESTORE_PARAMS, **CELL_PARAMS
+        ),
     }
 
 
